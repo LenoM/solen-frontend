@@ -9,7 +9,6 @@ const RequireAuth = () => {
   const location = useLocation();
 
   if (!isLoggedIn() || isExpired()) {
-    console.log("entrei", isLoggedIn(), isExpired());
     return <Navigate to="/login" state={{ from: location }} />;
   }
 
