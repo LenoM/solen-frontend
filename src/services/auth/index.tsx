@@ -31,14 +31,10 @@ const doLogIn = async (email: string, password: string) => {
 
   const authToken = await fetch(url, params).then((resp) => resp.json());
 
-  setData(authToken);
-};
-
-const setData = (data: any) => {
-  if (data.access_token && data.email) {
+  if (authToken.access_token && authToken.email) {
     localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("username", data.email);
-    localStorage.setItem("accessToken", data.access_token);
+    localStorage.setItem("username", authToken.email);
+    localStorage.setItem("accessToken", authToken.access_token);
   }
 };
 
@@ -56,7 +52,8 @@ const isExpired = (): boolean => {
     }
   }
 
-  logOut();
+  localStorage.clear();
+
   return true;
 };
 
@@ -64,10 +61,6 @@ const isLoggedIn = (): boolean => {
   return Boolean(localStorage.getItem("isLoggedIn")) === true;
 };
 
-const logOut = () => {
-  localStorage.clear();
-};
-
 export default RequireAuth;
 
-export { isExpired, doLogIn, isLoggedIn, logOut };
+export { isExpired, doLogIn, isLoggedIn };
