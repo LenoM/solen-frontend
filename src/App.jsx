@@ -6,7 +6,6 @@ import { features } from "./features/index";
 
 function App() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between">
       <BrowserRouter>
         <Routes>
           <Route element={<RequireAuth />}>
@@ -20,7 +19,6 @@ function App() {
           <Route path="*" element={<Login />} />
         </Routes>
       </BrowserRouter>
-    </main>
   );
 }
 
