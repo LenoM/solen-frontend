@@ -4,10 +4,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import * as authService from "../../services/auth";
 
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 import {
   Form,
