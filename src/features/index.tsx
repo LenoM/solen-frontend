@@ -4,11 +4,12 @@ import { Receipt } from "lucide-react";
 import { BarChartBig } from "lucide-react";
 import { ShoppingBasket } from "lucide-react";
 
-import Dashboard from "./dashboard";
-import Invoice from "./invoice";
-import Product from "./product";
-import Logoff from "./logoff";
-import Client from "./client";
+import Dashboard from "@/features/dashboard";
+import Invoice from "@/features/invoice";
+import Product from "@/features/product";
+import Logoff from "@/features/logoff";
+import Client from "@/features/client";
+import Details from "@/features/client/details";
 
 export const features = [
   {
@@ -24,6 +25,12 @@ export const features = [
     isMenuItem: true,
     element: <Client />,
     icon: <Users />,
+  },
+  {
+    label: "Associados",
+    path: "/client/:id",
+    isMenuItem: false,
+    element: <Details />,
   },
   {
     label: "Boletos",
