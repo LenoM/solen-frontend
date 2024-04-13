@@ -23,9 +23,9 @@ export default function Sidebar() {
             <Menu />
           </Button>
         </SheetTrigger>
-        <SheetContent className={"md:w-1/4 xl:w-auto"} side={"left"}>
+        <SheetContent className={"md:w-1/4 xl:w-1/6"} side={"left"}>
           <SheetHeader>
-            <SheetTitle className="mb-4 mt-4 font-bold text-2xl">Solen</SheetTitle>
+            <SheetTitle className="mb-8 mt-4 font-bold text-2xl">Solen</SheetTitle>
           </SheetHeader>
 
           <SheetClose asChild>
