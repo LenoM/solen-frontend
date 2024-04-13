@@ -15,7 +15,7 @@ import SidebarItem from "./sidebar-item";
 
 export default function Sidebar() {
   return (
-    <div className="fixed">
+    <div className="relative">
       <Sheet key="left">
         <SheetTrigger asChild>
           <Button variant="outline" className="w-14 m-2">
