@@ -2,9 +2,9 @@ import { useState } from "react";
 import { PlusCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { FindClient } from "./forms/find";
-import { DataTable } from "./dataTable";
-import { columns } from "./table";
+import { FindClient } from "@/features/client/forms/find";
+import { DataTable } from "@/components/dataTable";
+import { columns } from "@/features/client/table/list-clients";
 
 export default function Client() {
   const [data, setData] = useState([]);
