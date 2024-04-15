@@ -5,10 +5,9 @@ import Layout from "../../components/default-page";
 
 const url = import.meta.env.VITE_API_URL + "/auth/login";
 
-const RequireAuth = () => {
-  const location = useLocation();
-
+const RequireAuth = () => {  
   if (!isLoggedIn() || isExpired()) {
+    const location = useLocation();
     return <Navigate to="/login" state={{ from: location }} />;
   }
 
@@ -16,7 +15,7 @@ const RequireAuth = () => {
 };
 
 const doLogIn = async (email: string, password: string) => {
-  const body = JSON.stringify({
+  const body: BodyInit = JSON.stringify({
     password,
     email,
   });

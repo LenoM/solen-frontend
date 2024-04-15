@@ -55,7 +55,8 @@ export const columns: ColumnDef<Address>[] = [
   {
     accessorKey: "city",
     header: "Cidade",
-    accessorFn: (data: Address) => data.district.city.abbreviation.toUpperCase(),
+    accessorFn: (data: Address) =>
+      data.district.city.abbreviation.toUpperCase(),
   },
   {
     accessorKey: "state",
@@ -69,6 +70,8 @@ export const columns: ColumnDef<Address>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
+      const { id } = useParams();
+
       return (
         <>
           <Link to={`${row.original.id}`}>
@@ -76,14 +79,38 @@ export const columns: ColumnDef<Address>[] = [
               <span className="sr-only">Open menu</span>
               <Pencil className="h-4 w-4" />
             </Button>
-          </Link>
 
-          <Link to={`${row.original.id}`}>
+          <Dialog>
+            <DialogTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
               <Trash className="h-4 w-4" />
             </Button>
-          </Link>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Remover endereço</DialogTitle>
+                <DialogDescription>
+                  Tem certeza que deseja remover o endereço?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary" className="mb-2">
+                    Cancelar
+                  </Button>
+                </DialogClose>
+                <Button
+                  onClick={() => handlerDelete(Number(id), row.original.id)}
+                  type="submit"
+                  variant="destructive"
+                  className="mb-2"
+                >
+                  Remover
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       );
     },
