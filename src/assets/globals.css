@@ -12,6 +12,11 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.solen-popover-content {
+  width: var(--radix-popover-trigger-width);
+  max-height: var(--radix-popover-content-available-height);
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

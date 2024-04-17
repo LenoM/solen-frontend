@@ -1,23 +1,108 @@
+import { AddressType } from "@/features/client/forms/address";
 import { getHeader } from "@/utils/headers-utils";
 
-const BASE_URL = import.meta.env.VITE_API_URL + "/client";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
-export type AddressInputType = {
-  cep: number;
-  address: string;
-  number?: number | null;
-  complement?: string | null;
-  addressCategory: "Residencial" | "Comercial" | "Cobranca";
-  addressTypeId: number;
-  districtId: number;
+const getAddressByCEP = async (input: string) => {
+  const headers = getHeader();
+
+  input = input.replace(".", "").replace("-", "");
+
+  const url = `${BASE_URL}/address/${input}`;
+
+  const params: RequestInit = {
+    method: "GET",
+    headers,
+  };
+
+  const address = await fetch(url, params).then((resp) => resp.json());
+
+  return address;
 };
 
-const createAddress = async (id: number, data: AddressInputType) => {
+const getAddressType = async () => {
   const headers = getHeader();
-  const url = `${BASE_URL}/${id}/address`;
+
+  const url = `${BASE_URL}/address-type`;
+
+  const params: RequestInit = {
+    method: "GET",
+    headers,
+  };
+
+  const addressType = await fetch(url, params).then((resp) => resp.json());
+
+  return addressType;
+};
+
+const getStates = async () => {
+  const headers = getHeader();
+
+  const url = `${BASE_URL}/states`;
+
+  const params: RequestInit = {
+    method: "GET",
+    headers,
+  };
+
+  const states = await fetch(url, params).then((resp) => resp.json());
+
+  return states;
+};
+
+const getCity = async (stateId: number) => {
+  const headers = getHeader();
+
+  const url = `${BASE_URL}/state/${stateId}/city`;
+
+  const params: RequestInit = {
+    method: "GET",
+    headers,
+  };
+
+  const states = await fetch(url, params).then((resp) => resp.json());
+
+  return states;
+};
+
+const getDistrict = async (cityId: number) => {
+  const headers = getHeader();
+
+  const url = `${BASE_URL}/city/${cityId}/district`;
+
+  const params: RequestInit = {
+    method: "GET",
+    headers,
+  };
+
+  const states = await fetch(url, params).then((resp) => resp.json());
+
+  return states;
+};
+
+const createAddress = async (
+  id: number,
+  {
+    cep,
+    address,
+    addressNumber,
+    complement,
+    addressCategory,
+    addressTypeId,
+    districtId,
+  }: AddressType
+) => {
+  const headers = getHeader();
+  const url = `${BASE_URL}/client/${id}/address`;
 
   const body: BodyInit = JSON.stringify({
-    ...data,
+    cep,
+    address,
+    number: Number(addressNumber),
+    complement,
+    addressCategory,
+    addressTypeId: Number(addressTypeId),
+    districtId: Number(districtId),
   });
 
   const params: RequestInit = {
@@ -26,14 +111,14 @@ const createAddress = async (id: number, data: AddressInputType) => {
     body,
   };
 
-  const address = await fetch(url, params).then((resp) => resp.json());
+  const newAddress = await fetch(url, params).then((resp) => resp.json());
 
-  return address;
+  return newAddress;
 };
 
 const deleteAddress = async (clientId: number, addressId: number) => {
   const headers = getHeader();
-  const url = `${BASE_URL}/${clientId}/address/${addressId}`;
+  const url = `${BASE_URL}/client/${clientId}/address/${addressId}`;
 
   const params: RequestInit = {
     method: "DELETE",
@@ -45,4 +130,12 @@ const deleteAddress = async (clientId: number, addressId: number) => {
   return address;
 };
 
-export { createAddress, deleteAddress };
+export {
+  createAddress,
+  deleteAddress,
+  getAddressByCEP,
+  getAddressType,
+  getStates,
+  getCity,
+  getDistrict,
+};
