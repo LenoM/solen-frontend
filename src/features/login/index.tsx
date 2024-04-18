@@ -1,12 +1,13 @@
 import * as yup from "yup";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as authService from "../../services/auth";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import * as authService from "@/services/auth";
 
 import {
   Form,
@@ -40,14 +41,17 @@ export default function Login() {
       await authService.doLogIn(email, password);
 
       if (authService.isLoggedIn() !== true) {
-        form.setError("root", { message: "E-mail ou senha incorretos." });
+        toast.error("Erro no login", {
+          description: "Verifique o e-mail e a senha",
+        });
+
         return;
       }
 
       navigate("/");
     } catch (error: any) {
-      form.setError("root", {
-        message: "Ocorreu um erro na tentativa de login.",
+      toast.error("Falha no login", {
+        description: "Ocorreu uma falha no serviço de login.",
       });
     }
   };
@@ -103,12 +107,6 @@ export default function Login() {
                   </div>
                   <div className="flex flex-col space-y-1.5">
                     <Button type="submit">Entrar</Button>
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <FormMessage>
-                      {form?.formState?.errors?.root?.message}
-                    </FormMessage>
                   </div>
                 </div>
               </form>
