@@ -3,12 +3,12 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { normalizeCepNumber } from "@/utils/document-utils";
+import { toast } from "sonner";
 
+import { normalizeCepNumber } from "@/utils/document-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import {
@@ -172,12 +172,23 @@ export default function AddressForm() {
   const onSubmit = async () => {
     try {
       const data: AddressType = form.getValues();
-      data.cep = data.cep.replace('-', '').replace('.', '')
 
-      await createAddress(Number(id), data);
+      const newAddress = await createAddress(Number(id), data);
+
+      if (!newAddress.id) {
+        toast.error("Erro no cadastro", {
+          description: "Ocorreu um erro ao tentar cadastrar o endereço",
+        });
+
+        return;
+      }
+
+      toast.info("Endereço cadastrado", {
+        description: `O endereço ${newAddress.id} foi cadastrado`,
+      });
     } catch (error) {
-      form.setError("root", {
-        message: "Ocorreu um erro na tentativa de login.",
+      toast.error("Falha no cadastro", {
+        description: "Ocorreu uma falha ao tentar cadastrar o endereço",
       });
     }
   };
@@ -522,9 +533,6 @@ export default function AddressForm() {
             <Button type="submit">Salvar</Button>
           </div>
 
-          <div className="flex flex-col">
-            <FormMessage>{form?.formState?.errors?.root?.message}</FormMessage>
-          </div>
         </div>
       </form>
     </Form>

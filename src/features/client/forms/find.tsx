@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { toast } from "sonner";
 import { Search } from "lucide-react";
 import { SetStateAction } from "react";
 import { useForm } from "react-hook-form";
@@ -42,12 +43,12 @@ export function FindClient({ setData }: FindClientProps) {
         setData(restult);
       }
     } catch (error: any) {
-      form.setError("root", {
-        message: "Ocorreu um erro na tentativa de busca.",
+      toast.error("Falha na busca", {
+        description: `Ocorreu uma falha ao procurar os clientes.`,
       });
     }
   };
-  const { filter, root } = form?.formState?.errors;
+  const { filter } = form?.formState?.errors;
 
   return (
     <Form {...form}>
@@ -63,7 +64,7 @@ export function FindClient({ setData }: FindClientProps) {
               <FormControl>
                 <Input placeholder="Nome" {...field} />
               </FormControl>
-              <FormMessage>{filter?.message ?? root?.message}</FormMessage>
+              <FormMessage>{filter?.message}</FormMessage>
             </FormItem>
           )}
         />
