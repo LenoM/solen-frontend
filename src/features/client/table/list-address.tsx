@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { deleteAddress } from "@/services/address";
-import AddressForm, { AddressDataProps } from "@/features/client/forms/address";
+import AddressForm, { AddressDataType } from "@/features/client/forms/address";
 
 type AddressType = {
   id: string;
@@ -47,7 +47,7 @@ export type Address = {
   city: City;
   state: State;
   cep: string;
-  number: number | null;
+  number: number;
   complement: string;
 };
 
@@ -60,7 +60,7 @@ const formatAddress = (data: Address) => {
   );
 };
 
-const editAddress = (data: Address): AddressDataProps => {
+const editAddress = (data: Address): AddressDataType => {
   return {
     cep: data.cep,
     city: data.district.city.id,

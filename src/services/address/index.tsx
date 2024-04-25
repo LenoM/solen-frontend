@@ -1,4 +1,4 @@
-import { AddressDataProps } from "@/features/client/forms/address";
+import { AddressDataType } from "@/features/client/forms/address";
 import { getHeader } from "@/utils/headers-utils";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -90,7 +90,7 @@ const createAddress = async (
     addressCategory,
     addressType,
     district,
-  }: AddressDataProps
+  }: AddressDataType
 ) => {
   const headers = getHeader();
   const url = `${BASE_URL}/client/${id}/address`;

@@ -35,29 +35,18 @@ import {
   getCity,
 } from "@/services/address";
 
-export type AddressDataProps = {
-  id?: number;
-  address: string;
-  addressType: string | null;
-  addressCategory: string;
-  district: string;
-  city: string;
-  state: string;
-  cep: string;
-  number: number | null;
-  complement?: string;
-};
-
-export const AddressEmptyData = {
-  address: "",
-  addressType: 0,
-  addressCategory: "",
-  district: "",
-  city: "",
-  state: "",
-  cep: "",
-  number: 0,
-  complement: "",
+export const loadAddressData = (data?: AddressDataType) => {
+  return {
+    cep: data?.cep || "",
+    state: data?.state || "",
+    city: data?.city || "",
+    district: data?.district || "",
+    address: data?.address || "",
+    number: data?.number || 0,
+    complement: data?.complement,
+    addressType: data?.addressType || "",
+    addressCategory: data?.addressCategory || "",
+  };
 };
 
 type AddressAttr = {
@@ -86,9 +75,9 @@ const addressSchema = yup.object({
   addressCategory: yup.string().required(customError.required),
 });
 
-type AddressDataType = yup.InferType<typeof addressSchema>;
+export type AddressDataType = yup.InferType<typeof addressSchema>;
 
-export default function AddressForm(data: AddressDataProps) {
+export default function AddressForm(data: AddressDataType) {
   const { id } = useParams();
 
   const [cityList, setCityList] = useState<AddressAttr[]>([]);
@@ -102,17 +91,7 @@ export default function AddressForm(data: AddressDataProps) {
 
   const form = useForm({
     resolver: yupResolver(addressSchema),
-    defaultValues: {
-      cep: data.cep || "",
-      state: data.state || "",
-      city: data.city || "",
-      district: data.district || "",
-      address: data.address || "",
-      number: data.number || 0,
-      complement: data.complement,
-      addressType: data.addressType || "",
-      addressCategory: data.addressCategory || "",
-    },
+    values: loadAddressData(data),
   });
 
   useEffect(() => {
@@ -131,7 +110,7 @@ export default function AddressForm(data: AddressDataProps) {
     setAddressTypeList(allAddressTypes);
   };
 
-  const loadInitialData = (data: AddressDataProps) => {
+  const loadInitialData = (data: AddressDataType) => {
     if (data.state) {
       setCurrentState(data.state);
       onChangeState(data.state);
@@ -195,11 +174,6 @@ export default function AddressForm(data: AddressDataProps) {
         return;
       }
     }
-
-    form.setValue("state", "");
-    form.setValue("city", "");
-    form.setValue("district", "");
-    form.setValue("address", "");
   };
 
   const onChangeState = async (addressStateId: string) => {
