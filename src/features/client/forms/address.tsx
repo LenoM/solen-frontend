@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
@@ -8,16 +8,6 @@ import { toast } from "sonner";
 import { normalizeCepNumber } from "@/utils/document-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
-
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
 
 import {
   Form,
@@ -27,12 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 import {
   Select,
@@ -51,12 +35,37 @@ import {
   getCity,
 } from "@/services/address";
 
+export type AddressDataProps = {
+  id?: number;
+  address: string;
+  addressType: string | null;
+  addressCategory: string;
+  district: string;
+  city: string;
+  state: string;
+  cep: string;
+  number: number | null;
+  complement?: string;
+};
+
+export const AddressEmptyData = {
+  address: "",
+  addressType: 0,
+  addressCategory: "",
+  district: "",
+  city: "",
+  state: "",
+  cep: "",
+  number: 0,
+  complement: "",
+};
+
 type AddressAttr = {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  cityId: number;
-  stateId: number;
+  cityId: string;
+  stateId: string;
 };
 
 const customError = {
@@ -69,20 +78,17 @@ const addressSchema = yup.object({
   cep: yup.string().required(customError.required),
   city: yup.string().required(customError.required),
   state: yup.string().required(customError.required),
-  districtId: yup.string().required(customError.required),
+  district: yup.string().required(customError.required),
   address: yup.string().required(customError.required),
-  addressNumber: yup
-    .number()
-    .min(0, customError.min)
-    .required(customError.required),
-  complement: yup.string().required(customError.required),
-  addressTypeId: yup.string().required(customError.required),
+  number: yup.number().min(0, customError.min).required(customError.required),
+  complement: yup.string(),
+  addressType: yup.string().required(customError.required),
   addressCategory: yup.string().required(customError.required),
 });
 
-export type AddressType = yup.InferType<typeof addressSchema>;
+type AddressDataType = yup.InferType<typeof addressSchema>;
 
-export default function AddressForm() {
+export default function AddressForm(data: AddressDataProps) {
   const { id } = useParams();
 
   const [cityList, setCityList] = useState<AddressAttr[]>([]);
@@ -90,42 +96,30 @@ export default function AddressForm() {
   const [districtList, setDistrictList] = useState<AddressAttr[]>([]);
   const [addressTypeList, setAddressTypeList] = useState<AddressAttr[]>([]);
 
+  const [currentCity, setCurrentCity] = useState("");
+  const [currentState, setCurrentState] = useState("");
+  const [currentDistrict, setCurrentDistrict] = useState("");
+
   const form = useForm({
     resolver: yupResolver(addressSchema),
     defaultValues: {
-      cep: "",
-      city: "",
-      state: "",
-      districtId: "",
-      address: "",
-      addressNumber: undefined,
-      complement: "",
-      addressTypeId: "",
-      addressCategory: "",
+      cep: data.cep || "",
+      state: data.state || "",
+      city: data.city || "",
+      district: data.district || "",
+      address: data.address || "",
+      number: data.number || 0,
+      complement: data.complement,
+      addressType: data.addressType || "",
+      addressCategory: data.addressCategory || "",
     },
   });
-
-  const cepValue = form.watch("cep");
-  const stateValue = form.watch("state");
-  const cityValue = form.watch("city");
 
   useEffect(() => {
     getAllStates();
     getAllAddressType();
-  }, []);
-
-  useEffect(() => {
-    form.setValue("cep", normalizeCepNumber(cepValue));
-    onChangeCEP();
-  }, [cepValue]);
-
-  useEffect(() => {
-    onChangeCity(Number(cityValue));
-  }, [cityValue]);
-
-  useEffect(() => {
-    onChangeState(Number(stateValue));
-  }, [stateValue]);
+    loadInitialData(data);
+  }, [data]);
 
   const getAllStates = async () => {
     const allStates = await getStates();
@@ -137,43 +131,111 @@ export default function AddressForm() {
     setAddressTypeList(allAddressTypes);
   };
 
-  const onChangeState = async (addressStateId: number) => {
-    const allCities = await getCity(addressStateId);
-    setCityList(allCities);
+  const loadInitialData = (data: AddressDataProps) => {
+    if (data.state) {
+      setCurrentState(data.state);
+      onChangeState(data.state);
+    }
+
+    if (data.city) {
+      onChangeCity(data.city);
+    }
+
+    if (data.district) {
+      onChangeDistrict(data.district);
+    }
   };
 
-  const onChangeCity = async (addressCityId: number) => {
-    const allDistricts = await getDistrict(addressCityId);
-    setDistrictList(allDistricts);
+  const onChangeCEP = async (e: React.FormEvent<HTMLInputElement>) => {
+    let input = e.currentTarget.value;
+    const cep = normalizeCepNumber(input);
+    form.setValue("cep", cep);
   };
 
-  const onChangeCEP = async () => {
-    if (cepValue.length > 8) {
-      form.setValue("state", "");
-      form.setValue("city", "");
-      form.setValue("districtId", "");
-      form.setValue("address", "");
+  const onBlurCEP = async (e: React.FormEvent<HTMLInputElement>) => {
+    const cep = e.currentTarget.value;
 
-      const result = await getAddressByCEP(cepValue);
+    if (cep.length === 10) {
+      const result = await getAddressByCEP(cep);
 
       if (result.length > 0) {
         const { district, address } = result[0];
         const { city } = district;
         const { state } = city;
 
-        form.setValue("state", state.id.toString());
-        form.setValue("city", city.id.toString());
-        form.setValue("districtId", district.id.toString());
+        /*** Set State */
+        setCurrentState(state.id);
+        form.setValue("state", state.id);
+
+        /*** Set City */
+        const hasCity = cityList.filter((el) => el.cityId === city.id).length;
+
+        if (cityList.length === 0 || !hasCity) {
+          onChangeState(state.id);
+        }
+
+        setCurrentCity(city.id);
+        form.setValue("city", city.id);
+
+        /*** Set District */
+        const hasDistrict = districtList.filter(
+          (el) => el.id === district.id
+        ).length;
+
+        if (districtList.length === 0 || !hasDistrict) {
+          onChangeCity(city.id);
+        }
+
+        setCurrentDistrict(district.id);
+        form.setValue("district", district.id);
+
+        /*** Set Address */
         form.setValue("address", address);
+
+        return;
       }
+    }
+
+    form.setValue("state", "");
+    form.setValue("city", "");
+    form.setValue("district", "");
+    form.setValue("address", "");
+  };
+
+  const onChangeState = async (addressStateId: string) => {
+    if (addressStateId) {
+      setDistrictList([]);
+
+      const allCities = await getCity(addressStateId);
+      setCityList(allCities);
+      setCurrentState(addressStateId);
+      form.setValue("state", addressStateId.toString());
+    }
+  };
+
+  const onChangeCity = async (addressCityId: string) => {
+    if (addressCityId) {
+      const allDistricts = await getDistrict(addressCityId);
+      setDistrictList(allDistricts);
+      setCurrentCity(addressCityId);
+      form.setValue("city", addressCityId.toString());
+    } else {
+      setDistrictList([]);
+    }
+  };
+
+  const onChangeDistrict = async (districtId: string) => {
+    if (districtId) {
+      setCurrentDistrict(districtId);
+      form.setValue("district", districtId.toString());
     }
   };
 
   const onSubmit = async () => {
     try {
-      const data: AddressType = form.getValues();
+      const newData: AddressDataType = form.getValues();
 
-      const newAddress = await createAddress(Number(id), data);
+      const newAddress = await createAddress(Number(id), newData);
 
       if (!newAddress.id) {
         toast.error("Erro no cadastro", {
@@ -183,8 +245,8 @@ export default function AddressForm() {
         return;
       }
 
-      toast.info("Endereço cadastrado", {
-        description: `O endereço ${newAddress.id} foi cadastrado`,
+      toast.info("Endereço salvo", {
+        description: `O endereço #${newAddress.id} foi salvo`,
       });
     } catch (error) {
       toast.error("Falha no cadastro", {
@@ -207,7 +269,12 @@ export default function AddressForm() {
                     <FormItem>
                       <FormLabel>CEP</FormLabel>
                       <FormControl>
-                        <Input {...field} maxLength={8} />
+                        <Input
+                          {...field}
+                          maxLength={8}
+                          onBlur={onBlurCEP}
+                          onChange={onChangeCEP}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -217,60 +284,33 @@ export default function AddressForm() {
 
               <div className="flex flex-col">
                 <FormField
-                  control={form.control}
                   name="state"
-                  render={({ field }) => (
+                  control={form.control}
+                  render={() => (
                     <FormItem>
                       <FormLabel>Estado</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value
-                                ? stateList.find(
-                                    (state) =>
-                                      state.id.toString() === field.value
-                                  )?.name
-                                : "Selecione o estado"}
-                              <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="solen-popover-content p-0">
-                          <Command>
-                            <CommandInput placeholder="Procure o estado" />
-                            <CommandEmpty>Não localizado...</CommandEmpty>
-                            <CommandGroup>
-                              {stateList.map((state) => (
-                                <CommandItem
-                                  value={state.name}
-                                  key={state.id.toString()}
-                                  onSelect={() => {
-                                    form.setValue("state", state.id.toString());
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      state.id.toString() === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {state.name}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                      <Select
+                        value={currentState?.toString()}
+                        onValueChange={(value) => onChangeState(value)}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Escolha o estado" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {stateList.map((stt) => {
+                            return (
+                              <SelectItem
+                                key={`state-${stt.id}`}
+                                value={stt.id.toString()}
+                              >
+                                {stt.name}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -283,59 +323,33 @@ export default function AddressForm() {
             <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
               <div className="flex flex-col">
                 <FormField
-                  control={form.control}
                   name="city"
-                  render={({ field }) => (
+                  control={form.control}
+                  render={() => (
                     <FormItem>
                       <FormLabel>Cidade</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value
-                                ? cityList.find(
-                                    (city) => city.id.toString() === field.value
-                                  )?.name
-                                : "Selecione a cidade"}
-                              <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="solen-popover-content p-0">
-                          <Command>
-                            <CommandInput placeholder="Procure a cidade" />
-                            <CommandEmpty>Não localizado...</CommandEmpty>
-                            <CommandGroup>
-                              {cityList.map((city) => (
-                                <CommandItem
-                                  value={city.name}
-                                  key={city.id.toString()}
-                                  onSelect={() => {
-                                    form.setValue("city", city.id.toString());
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      city.id.toString() === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {city.name}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                      <Select
+                        value={currentCity?.toString()}
+                        onValueChange={(value) => onChangeCity(value)}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Escolha a cidade" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {cityList.map((ct) => {
+                            return (
+                              <SelectItem
+                                key={`city-${ct.id}`}
+                                value={ct.id.toString()}
+                              >
+                                {ct.name}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -345,62 +359,32 @@ export default function AddressForm() {
               <div className="flex flex-col">
                 <FormField
                   control={form.control}
-                  name="districtId"
-                  render={({ field }) => (
+                  name="district"
+                  render={() => (
                     <FormItem>
                       <FormLabel>Bairro</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value
-                                ? districtList.find(
-                                    (district) =>
-                                      district.id.toString() === field.value
-                                  )?.name
-                                : "Selecione o bairro"}
-                              <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="solen-popover-content p-0">
-                          <Command>
-                            <CommandInput placeholder="Procure o bairro" />
-                            <CommandEmpty>Não localizado...</CommandEmpty>
-                            <CommandGroup>
-                              {districtList.map((district) => (
-                                <CommandItem
-                                  value={district.name}
-                                  key={district.id.toString()}
-                                  onSelect={() => {
-                                    form.setValue(
-                                      "districtId",
-                                      district.id.toString()
-                                    );
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      district.id.toString() === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {district.name}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                      <Select
+                        value={currentDistrict?.toString()}
+                        onValueChange={(value) => onChangeDistrict(value)}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Escolha o bairro" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {districtList.map((dst) => {
+                            return (
+                              <SelectItem
+                                key={`district-${dst.id}`}
+                                value={dst.id.toString()}
+                              >
+                                {dst.name}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -428,11 +412,15 @@ export default function AddressForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Residencial">
+                          <SelectItem key="Residencial" value="Residencial">
                             Residencial
                           </SelectItem>
-                          <SelectItem value="Comercial">Comercial</SelectItem>
-                          <SelectItem value="Cobranca">Cobrança</SelectItem>
+                          <SelectItem key="Comercial" value="Comercial">
+                            Comercial
+                          </SelectItem>
+                          <SelectItem key="Cobranca" value="Cobranca">
+                            Cobrança
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -444,13 +432,13 @@ export default function AddressForm() {
               <div className="flex flex-col">
                 <FormField
                   control={form.control}
-                  name="addressTypeId"
+                  name="addressType"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Tipo de endereço</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        defaultValue={field.value.toString()}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -499,12 +487,12 @@ export default function AddressForm() {
               <div className="flex flex-col">
                 <FormField
                   control={form.control}
-                  name="addressNumber"
+                  name="number"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Número</FormLabel>
                       <FormControl>
-                        <Input {...field} defaultValue={""} type="number" />
+                        <Input {...field} type="number" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -532,7 +520,6 @@ export default function AddressForm() {
           <div className="flex flex-col mb-4 mt-4">
             <Button type="submit">Salvar</Button>
           </div>
-
         </div>
       </form>
     </Form>

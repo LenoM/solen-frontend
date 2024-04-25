@@ -1,29 +1,48 @@
+import { toast } from "sonner";
+import { useParams } from "react-router-dom";
 import { Pencil, Trash } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import { deleteAddress } from "@/services/address";
+import AddressForm, { AddressDataProps } from "@/features/client/forms/address";
 
 type AddressType = {
+  id: string;
   abbreviation: string;
 };
 type District = {
-  abbreviation: string;
+  id: string;
   city: City;
+  abbreviation: string;
 };
 
 type State = {
+  id: string;
   abbreviation: string;
 };
 
 type City = {
+  id: string;
   abbreviation: string;
   state: State;
 };
 
-type Address = {
+export type Address = {
   id: number;
   address: string;
   addressType: AddressType;
+  addressCategory: string;
   district: District;
   city: City;
   state: State;
@@ -39,6 +58,42 @@ const formatAddress = (data: Address) => {
     (data.number ? `, ${data.number}` : "") +
     (data.complement ? `, ${data.complement}` : "")
   );
+};
+
+const editAddress = (data: Address): AddressDataProps => {
+  return {
+    cep: data.cep,
+    city: data.district.city.id,
+    state: data.district.city.state.id,
+    district: data.district.id,
+    address: data.address,
+    number: data.number,
+    complement: data.complement,
+    addressType: data.addressType.id,
+    addressCategory: data.addressCategory,
+  };
+};
+
+const handlerDelete = async (clientId: number, addressId: number) => {
+  try {
+    const result = await deleteAddress(clientId, addressId);
+
+    if (result.id) {
+      toast.success("Endereço cadastrado", {
+        description: `O endereço #${addressId} foi removido com sucesso!`,
+      });
+
+      return;
+    }
+
+    toast.error("Erro ao remover o Endereço", {
+      description: `Ocorreu um erro ao remover o endereço #${addressId}.`,
+    });
+  } catch (error) {
+    toast.error("Falha ao remover o Endereço", {
+      description: `Ocorreu uma falha ao remover o endereço.`,
+    });
+  }
 };
 
 export const columns: ColumnDef<Address>[] = [
@@ -74,18 +129,28 @@ export const columns: ColumnDef<Address>[] = [
 
       return (
         <>
-          <Link to={`${row.original.id}`}>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <Pencil className="h-4 w-4" />
-            </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Edit</span>
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Editar endereço</DialogTitle>
+              </DialogHeader>
+
+              <AddressForm {...editAddress(row.original)} />
+            </DialogContent>
+          </Dialog>
 
           <Dialog>
             <DialogTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <Trash className="h-4 w-4" />
-            </Button>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Trash className="h-4 w-4" />
+              </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>

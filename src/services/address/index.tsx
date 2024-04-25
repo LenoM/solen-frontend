@@ -1,4 +1,4 @@
-import { AddressType } from "@/features/client/forms/address";
+import { AddressDataProps } from "@/features/client/forms/address";
 import { getHeader } from "@/utils/headers-utils";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -50,7 +50,7 @@ const getStates = async () => {
   return states;
 };
 
-const getCity = async (stateId: number) => {
+const getCity = async (stateId: string) => {
   const headers = getHeader();
 
   const url = `${BASE_URL}/state/${stateId}/city`;
@@ -65,7 +65,7 @@ const getCity = async (stateId: number) => {
   return states;
 };
 
-const getDistrict = async (cityId: number) => {
+const getDistrict = async (cityId: string) => {
   const headers = getHeader();
 
   const url = `${BASE_URL}/city/${cityId}/district`;
@@ -85,12 +85,12 @@ const createAddress = async (
   {
     cep,
     address,
-    addressNumber,
+    number,
     complement,
     addressCategory,
-    addressTypeId,
-    districtId,
-  }: AddressType
+    addressType,
+    district,
+  }: AddressDataProps
 ) => {
   const headers = getHeader();
   const url = `${BASE_URL}/client/${id}/address`;
@@ -98,11 +98,11 @@ const createAddress = async (
   const body: BodyInit = JSON.stringify({
     cep,
     address,
-    number: Number(addressNumber),
+    number: Number(number),
     complement,
     addressCategory,
-    addressTypeId: Number(addressTypeId),
-    districtId: Number(districtId),
+    addressTypeId: Number(addressType),
+    districtId: district,
   });
 
   const params: RequestInit = {
