@@ -10,7 +10,7 @@ export default function Client() {
   const [data, setData] = useState([]);
 
   return (
-    <div className="p-6 h-screen space-y-4">
+    <div className="p-6 pt-1 h-screen space-y-4">
       <h1 className="text-3xl font-bold text-center">Clientes</h1>
       <div className="flex items-center justify-between">
         <FindClient setData={setData} />

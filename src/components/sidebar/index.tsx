@@ -18,7 +18,7 @@ export default function Sidebar() {
     <div className="relative">
       <Sheet key="left">
         <SheetTrigger asChild>
-          <Button variant="outline" className="w-14 m-2">
+          <Button variant="outline" className="w-14 m-2 ml-6">
             <span className="sr-only">Open sidebar</span>
             <Menu />
           </Button>
