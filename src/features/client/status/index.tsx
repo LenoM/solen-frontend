@@ -6,7 +6,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, InfoIcon } from "lucide-react";
-import { toInputValue } from "@/utils/date-utils";
+import { toDateValue } from "@/utils/format-utils";
 
 function PersonalStatus(data: any) {
   const { reason, cancelDate, registrationDate, isActive } = data;
@@ -34,8 +34,8 @@ function PersonalStatus(data: any) {
               <CalendarDays className="mr-2 h-4 w-4 opacity-70" />
               <span className="text-xs text-muted-foreground">
                 {isActive
-                  ? toInputValue(registrationDate)
-                  : toInputValue(cancelDate)}
+                  ? toDateValue(registrationDate)
+                  : toDateValue(cancelDate)}
               </span>
             </div>
           </div>

@@ -33,8 +33,7 @@ import {
 } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
-import { toInputValue } from "@/utils/date-utils";
-import { formatCPF, validateCPF } from "@/utils/document-utils";
+import { formatCPF, validateCPF, toDateValue } from "@/utils/format-utils";
 import { createClient, updateClient } from "@/services/client";
 import PersonalStatus from "@/features/client/status";
 
@@ -250,7 +249,7 @@ export default function Personal(data: any) {
                         <div className="relative w-full">
                           <Input
                             type="string"
-                            value={toInputValue(field.value)}
+                            value={toDateValue(field.value)}
                             onChange={(e) => {
                               const parsedDate = new Date(e.target.value);
                               if (parsedDate.toString() === "Invalid Date") {

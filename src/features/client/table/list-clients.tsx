@@ -36,8 +36,10 @@ export const columns: ColumnDef<Client>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
+      const newPath = `${window.origin}/client/${row.original.id}`;
+
       return (
-        <Link to={`${row.original.id}`}>
+        <Link to={newPath}>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
             <Eye className="h-4 w-4" />

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 
-import { normalizeCepNumber } from "@/utils/document-utils";
+import { normalizeCepNumber } from "@/utils/format-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
