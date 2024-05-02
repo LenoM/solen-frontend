@@ -36,7 +36,7 @@ import {
 import { cn } from "@/lib/utils";
 import { formatCPF, getNumbers, toDateValue } from "@/utils/format-utils";
 import { createClient, updateClient } from "@/services/client";
-import PersonalStatus from "@/features/client/status";
+import { KinshipBadge, StatusBadge } from "@/features/client/status";
 
 export const loadClientData = (data?: ClientType): ClientType => {
   return {
@@ -142,9 +142,11 @@ export default function Personal(data: any) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
         <div className="grid w-full items-center gap-4 xl:px-96">
-          <div className="text-right">
-            <PersonalStatus {...data} />
+          <div className="flex flex-row-reverse gap-4">
+            <StatusBadge {...data} />
+            <KinshipBadge {...data} />
           </div>
+
           <div className="flex flex-col space-y-2">
             <FormField
               control={form.control}
