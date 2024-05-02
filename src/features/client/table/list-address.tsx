@@ -62,6 +62,7 @@ const formatAddress = (data: Address) => {
 
 const editAddress = (data: Address): AddressDataType => {
   return {
+    id: data.id,
     cep: data.cep,
     city: data.district.city.id,
     state: data.district.city.state.id,

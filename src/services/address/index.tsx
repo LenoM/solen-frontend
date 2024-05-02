@@ -116,6 +116,43 @@ const createAddress = async (
   return newAddress;
 };
 
+const updateAddress = async (
+  clientId: number,
+  {
+    id,
+    cep,
+    address,
+    number,
+    complement,
+    addressCategory,
+    addressType,
+    district,
+  }: AddressDataType
+) => {
+  const headers = getHeader();
+  const url = `${BASE_URL}/client/${clientId}/address/${id}`;
+
+  const body: BodyInit = JSON.stringify({
+    cep,
+    address,
+    number: Number(number),
+    complement,
+    addressCategory,
+    addressTypeId: Number(addressType),
+    districtId: district,
+  });
+
+  const params: RequestInit = {
+    method: "PUT",
+    headers,
+    body,
+  };
+
+  const newAddress = await fetch(url, params).then((resp) => resp.json());
+
+  return newAddress;
+};
+
 const deleteAddress = async (clientId: number, addressId: number) => {
   const headers = getHeader();
   const url = `${BASE_URL}/client/${clientId}/address/${addressId}`;
@@ -132,6 +169,7 @@ const deleteAddress = async (clientId: number, addressId: number) => {
 
 export {
   createAddress,
+  updateAddress,
   deleteAddress,
   getAddressByCEP,
   getAddressType,

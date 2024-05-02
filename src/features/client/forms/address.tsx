@@ -1,11 +1,10 @@
 import * as yup from "yup";
-import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { normalizeCepNumber } from "@/utils/format-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -30,20 +29,23 @@ import {
   getAddressByCEP,
   getAddressType,
   createAddress,
+  updateAddress,
   getDistrict,
   getStates,
   getCity,
 } from "@/services/address";
+import { normalizeCepNumber } from "@/utils/format-utils";
 
 export const loadAddressData = (data?: AddressDataType) => {
   return {
+    id: data?.id || 0,
     cep: data?.cep || "",
     state: data?.state || "",
     city: data?.city || "",
     district: data?.district || "",
     address: data?.address || "",
     number: data?.number || 0,
-    complement: data?.complement,
+    complement: data?.complement || "",
     addressType: data?.addressType || "",
     addressCategory: data?.addressCategory || "",
   };
@@ -64,6 +66,7 @@ const customError = {
 };
 
 const addressSchema = yup.object({
+  id: yup.number(),
   cep: yup.string().required(customError.required),
   city: yup.string().required(customError.required),
   state: yup.string().required(customError.required),
@@ -207,11 +210,15 @@ export default function AddressForm(data: AddressDataType) {
 
   const onSubmit = async () => {
     try {
-      const newData: AddressDataType = form.getValues();
+      let newData: AddressDataType = form.getValues();
 
-      const newAddress = await createAddress(Number(id), newData);
+      if (newData.id! > 0) {
+        newData = await updateAddress(Number(id), newData);
+      } else {
+        newData = await createAddress(Number(id), newData);
+      }
 
-      if (!newAddress.id) {
+      if (!newData.id) {
         toast.error("Erro no cadastro", {
           description: "Ocorreu um erro ao tentar cadastrar o endereço",
         });
@@ -220,7 +227,7 @@ export default function AddressForm(data: AddressDataType) {
       }
 
       toast.info("Endereço salvo", {
-        description: `O endereço #${newAddress.id} foi salvo`,
+        description: `O endereço #${newData.id} foi salvo`,
       });
     } catch (error) {
       toast.error("Falha no cadastro", {
