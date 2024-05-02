@@ -29,8 +29,6 @@ export type Invoice = {
 const handlerSend = async (invoiceNumber: number) => {
   const urlFile = await sendInvoice([invoiceNumber]);
 
-  console.log("tatata", typeof urlFile, urlFile);
-
   if (urlFile) {
     toast.info("Envio de boleto", {
       description: `O boleto foi adicionado a fila para envio`,

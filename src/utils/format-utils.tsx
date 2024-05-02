@@ -1,4 +1,3 @@
-import { cpf } from "cpf-cnpj-validator";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import "dayjs/locale/pt-br";
@@ -34,14 +33,9 @@ export const normalizeCnpjNumber = (value: String | undefined) => {
 
 export const formatCPF = (value: string | undefined) => {
   if (!value) return "";
-
-  return cpf.format(value);
-};
-
-export const validateCPF = (value: string | undefined) => {
-  if (!value) return "";
-
-  return cpf.isValid(value);
+  return value
+    .replace(/[^\d]/g, "")
+    .replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
 };
 
 export const normalizeCepNumber = (value: String | undefined) => {
