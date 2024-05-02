@@ -88,10 +88,6 @@ export default function AddressForm(data: AddressDataType) {
   const [districtList, setDistrictList] = useState<AddressAttr[]>([]);
   const [addressTypeList, setAddressTypeList] = useState<AddressAttr[]>([]);
 
-  const [currentCity, setCurrentCity] = useState("");
-  const [currentState, setCurrentState] = useState("");
-  const [currentDistrict, setCurrentDistrict] = useState("");
-
   const form = useForm({
     resolver: yupResolver(addressSchema),
     values: loadAddressData(data),
@@ -115,7 +111,6 @@ export default function AddressForm(data: AddressDataType) {
 
   const loadInitialData = (data: AddressDataType) => {
     if (data.state) {
-      setCurrentState(data.state);
       onChangeState(data.state);
     }
 
@@ -145,8 +140,6 @@ export default function AddressForm(data: AddressDataType) {
         const { city } = district;
         const { state } = city;
 
-        /*** Set State */
-        setCurrentState(state.id);
         form.setValue("state", state.id);
 
         /*** Set City */
@@ -156,7 +149,6 @@ export default function AddressForm(data: AddressDataType) {
           onChangeState(state.id);
         }
 
-        setCurrentCity(city.id);
         form.setValue("city", city.id);
 
         /*** Set District */
@@ -168,10 +160,8 @@ export default function AddressForm(data: AddressDataType) {
           onChangeCity(city.id);
         }
 
-        setCurrentDistrict(district.id);
         form.setValue("district", district.id);
 
-        /*** Set Address */
         form.setValue("address", address);
 
         return;
@@ -185,7 +175,6 @@ export default function AddressForm(data: AddressDataType) {
 
       const allCities = await getCity(addressStateId);
       setCityList(allCities);
-      setCurrentState(addressStateId);
       form.setValue("state", addressStateId.toString());
     }
   };
@@ -194,7 +183,6 @@ export default function AddressForm(data: AddressDataType) {
     if (addressCityId) {
       const allDistricts = await getDistrict(addressCityId);
       setDistrictList(allDistricts);
-      setCurrentCity(addressCityId);
       form.setValue("city", addressCityId.toString());
     } else {
       setDistrictList([]);
@@ -202,8 +190,12 @@ export default function AddressForm(data: AddressDataType) {
   };
 
   const onChangeDistrict = async (districtId: string) => {
+    if (districtList.length === 0) {
+      const allDistricts = await getDistrict(form.getValues("city"));
+      setDistrictList(allDistricts);
+    }
+
     if (districtId) {
-      setCurrentDistrict(districtId);
       form.setValue("district", districtId.toString());
     }
   };
@@ -271,7 +263,8 @@ export default function AddressForm(data: AddressDataType) {
                     <FormItem>
                       <FormLabel>Estado</FormLabel>
                       <Select
-                        value={currentState?.toString()}
+                        value={form.getValues("state")}
+                        defaultValue={form.getValues("state")}
                         onValueChange={(value) => onChangeState(value)}
                       >
                         <FormControl>
@@ -310,7 +303,8 @@ export default function AddressForm(data: AddressDataType) {
                     <FormItem>
                       <FormLabel>Cidade</FormLabel>
                       <Select
-                        value={currentCity?.toString()}
+                        value={form.getValues("city")}
+                        defaultValue={form.getValues("city")}
                         onValueChange={(value) => onChangeCity(value)}
                       >
                         <FormControl>
@@ -345,7 +339,8 @@ export default function AddressForm(data: AddressDataType) {
                     <FormItem>
                       <FormLabel>Bairro</FormLabel>
                       <Select
-                        value={currentDistrict?.toString()}
+                        value={form.getValues("district")}
+                        defaultValue={form.getValues("district")}
                         onValueChange={(value) => onChangeDistrict(value)}
                       >
                         <FormControl>
