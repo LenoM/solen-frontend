@@ -46,6 +46,10 @@ export const normalizeCepNumber = (value: String | undefined) => {
     .replace(/(-\d{3})(\d+?)/, "$1");
 };
 
+export const getNumbers = (value: string) => {
+  return value.replace(/\D/g, "");
+};
+
 export const toDateValue = (dateString: Date) => {
   if (dateString) {
     return dayjs.utc(dateString).format("DD/MM/YYYY");

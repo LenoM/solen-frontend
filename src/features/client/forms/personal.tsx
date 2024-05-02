@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import validator from "validator";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -33,7 +34,7 @@ import {
 } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
-import { formatCPF, validateCPF, toDateValue } from "@/utils/format-utils";
+import { formatCPF, getNumbers, toDateValue } from "@/utils/format-utils";
 import { createClient, updateClient } from "@/services/client";
 import PersonalStatus from "@/features/client/status";
 
@@ -89,20 +90,21 @@ export default function Personal(data: any) {
   });
 
   const onChangeCPF = (e: React.FormEvent<HTMLInputElement>) => {
-    let input = e.currentTarget.value;
+    const input = e.currentTarget.value;
     const cpf = formatCPF(input);
     form.setValue("cpf", cpf);
   };
 
   const onBlurCPF = (e: React.FormEvent<HTMLInputElement>) => {
-    let input = e.currentTarget.value;
-    const isValid = validateCPF(input);
+    const input = getNumbers(e.currentTarget.value);
+
+    const isValid = validator.isTaxID(input, "pt-BR");
 
     if (!isValid) {
       form.setError("cpf", { message: customError.invalidCPF });
       return;
     }
-    form.setError("cpf", { message: "" });
+    form.clearErrors("cpf");
   };
 
   const onSubmit = async () => {
