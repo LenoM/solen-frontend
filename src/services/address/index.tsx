@@ -81,7 +81,7 @@ const getDistrict = async (cityId: string) => {
 };
 
 const createAddress = async (
-  id: number,
+  clientId: number,
   {
     cep,
     address,
@@ -93,7 +93,7 @@ const createAddress = async (
   }: AddressDataType
 ) => {
   const headers = getHeader();
-  const url = `${BASE_URL}/client/${id}/address`;
+  const url = `${BASE_URL}/client/${clientId}/address`;
 
   const body: BodyInit = JSON.stringify({
     cep,

@@ -9,6 +9,7 @@ import Invoice from "@/features/invoice";
 import Product from "@/features/product";
 import Logoff from "@/features/logoff";
 import Client from "@/features/client";
+import ClientDetails from "@/features/client/details";
 import User from "@/features/user";
 import UserDetail from "@/features/user/details";
 
@@ -31,7 +32,7 @@ export const features = [
     label: "Associados",
     path: "/client/:id",
     isMenuItem: false,
-    element: <Details />,
+    element: <ClientDetails />,
   },
   {
     label: "Boletos",

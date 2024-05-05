@@ -80,7 +80,7 @@ const createClient = async ({
   motherName,
 }: ClientType) => {
   const headers = getHeader();
-  const url = `${BASE_URL}`;
+  const url = BASE_URL;
 
   const body: BodyInit = JSON.stringify({
     name,

@@ -41,7 +41,7 @@ import ContactForm, { loadContactData } from "@/features/client/forms/contact";
 
 import { getClientByid } from "@/services/client";
 
-export default function Details() {
+export default function ClientDetails() {
   const { id } = useParams();
   const [data, setData] = useState([]);
 
@@ -52,7 +52,6 @@ export default function Details() {
   const getData = async (id: string | undefined) => {
     if (id) {
       const result = await getClientByid(Number(id));
-      console.log("data", result);
       setData(result);
     }
   };
