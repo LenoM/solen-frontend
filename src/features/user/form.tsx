@@ -32,6 +32,7 @@ export const loadUserData = (data?: UserType): UserType => {
     name: data?.name || "",
     email: data?.email || "",
     isActive: data?.isActive || true,
+    isChangePassword: true,
     passwordConfirmation: "",
     password: "",
   };
@@ -41,30 +42,40 @@ const userSchema = yup.object({
   id: yup.string(),
   name: yup.string().required(customError.required),
   isActive: yup.boolean().default(false),
+  isChangePassword: yup.boolean().default(true),
   email: yup
     .string()
     .email(customError.invalidEmail)
     .required(customError.required),
-  password: yup
-    .string()
-    .required(customError.required)
-    .min(7, customError.invalidLength),
-  passwordConfirmation: yup
-    .string()
-    .required(customError.required)
-    .min(7, customError.invalidLength)
-    .oneOf([yup.ref("password")], customError.invalidPassword),
+  password: yup.string().when("isChangePassword", {
+    is: (value: number) => value,
+    then: () =>
+      yup
+        .string()
+        .required(customError.required)
+        .min(7, customError.invalidLength),
+  }),
+  passwordConfirmation: yup.string().when("password", {
+    is: (value: number) => value,
+    then: () =>
+      yup
+        .string()
+        .required(customError.required)
+        .min(7, customError.invalidLength)
+        .oneOf([yup.ref("password")], customError.invalidPassword),
+  }),
 });
 
 export type UserType = yup.InferType<typeof userSchema>;
 
 export default function UserForm(data?: UserType) {
-  const { id } = useParams();
-
   const form = useForm({
     resolver: yupResolver(userSchema),
     values: loadUserData(data),
   });
+
+  const { id } = useParams();
+  const showPasswordField = form.getValues("isChangePassword") || !id;
 
   const onSubmit = async () => {
     try {
@@ -133,46 +144,6 @@ export default function UserForm(data?: UserType) {
           <div className="flex flex-col space-y-2">
             <FormField
               control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Senha</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      autoComplete="new-password"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <FormField
-              control={form.control}
-              name="passwordConfirmation"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirme a senha</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      autoComplete="new-password"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <FormField
-              control={form.control}
               name="isActive"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -193,6 +164,79 @@ export default function UserForm(data?: UserType) {
               )}
             />
           </div>
+
+          {!!id && (
+            <div className="flex flex-col space-y-2">
+              <FormField
+                control={form.control}
+                name="isChangePassword"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Trocar a senha?
+                      </FormLabel>
+                      <FormDescription>
+                        A nova senha entrará em vigou no próximo login ou após a
+                        cessão atual expirar.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        value={field.value?.toString()}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
+          {showPasswordField && (
+            <>
+              <div className="flex flex-col space-y-2">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Senha</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          autoComplete="new-password"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <FormField
+                  control={form.control}
+                  name="passwordConfirmation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirme a senha</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          autoComplete="new-password"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </>
+          )}
 
           <div className="flex flex-col mt-8">
             <Button type="submit">Salvar</Button>
