@@ -1,4 +1,4 @@
-import { Users } from "lucide-react";
+import { Users, User as UserIcon } from "lucide-react";
 import { LogOut } from "lucide-react";
 import { Receipt } from "lucide-react";
 import { BarChartBig } from "lucide-react";
@@ -9,7 +9,8 @@ import Invoice from "@/features/invoice";
 import Product from "@/features/product";
 import Logoff from "@/features/logoff";
 import Client from "@/features/client";
-import Details from "@/features/client/details";
+import User from "@/features/user";
+import UserDetail from "@/features/user/details";
 
 export const features = [
   {
@@ -45,6 +46,19 @@ export const features = [
     isMenuItem: true,
     element: <Product />,
     icon: <ShoppingBasket />,
+  },
+  {
+    label: "Usuarios",
+    path: "/user",
+    isMenuItem: true,
+    element: <User />,
+    icon: <UserIcon />,
+  },
+  {
+    label: "Usuario",
+    path: "/user/:id",
+    isMenuItem: false,
+    element: <UserDetail />,
   },
   {
     label: "Sair",
