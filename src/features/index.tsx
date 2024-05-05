@@ -7,6 +7,7 @@ import { ShoppingBasket } from "lucide-react";
 import Dashboard from "@/features/dashboard";
 import Invoice from "@/features/invoice";
 import Product from "@/features/product";
+import ProductDetails from "@/features/product/details";
 import Logoff from "@/features/logoff";
 import Client from "@/features/client";
 import ClientDetails from "@/features/client/details";
@@ -47,6 +48,12 @@ export const features = [
     isMenuItem: true,
     element: <Product />,
     icon: <ShoppingBasket />,
+  },
+  {
+    label: "Produto",
+    path: "/product/:id",
+    isMenuItem: false,
+    element: <ProductDetails />,
   },
   {
     label: "Usuarios",
