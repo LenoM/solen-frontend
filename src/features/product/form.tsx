@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { toast } from "sonner";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -50,7 +50,11 @@ const productSchema = yup.object({
   name: yup.string().required(customError.required),
   description: yup.string().required(customError.required),
   isActive: yup.boolean(),
-  supplierId: yup.number().required(customError.required),
+  supplierId: yup
+    .number()
+    .transform((value) => (Number.isNaN(value) ? null : value))
+    .required(customError.required)
+    .min(1, customError.equals),
   billingMethod: yup
     .string()
     .required(customError.required)
@@ -79,6 +83,7 @@ export default function ProductForm(data?: ProductType) {
   const form = useForm({
     resolver: yupResolver(productSchema),
     values: loadProductData(data),
+    mode: "onChange",
   });
 
   const onSubmit = async () => {
@@ -149,13 +154,13 @@ export default function ProductForm(data?: ProductType) {
             <FormField
               name="billingMethod"
               control={form.control}
-              render={({ field }) => (
+              render={({ field: { onChange, value } }) => (
                 <FormItem>
                   <FormLabel>Tipo cobrança</FormLabel>
                   <Select
-                    value={field.value.toString()}
-                    defaultValue={field.value}
-                    onValueChange={(value) => form.setValue("billingMethod", value)}
+                    value={value.toString()}
+                    defaultValue={value}
+                    onValueChange={onChange}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -177,18 +182,14 @@ export default function ProductForm(data?: ProductType) {
             />
           </div>
 
-          <div className="flex flex-col space-y-2">
-            <FormField
+          {suppliersList.length > 0 && <div className="flex flex-col space-y-2">
+            <Controller
               name="supplierId"
               control={form.control}
-              render={({ field }) => (
+              render={({ field: { onChange, value } }) => (
                 <FormItem>
                   <FormLabel>Fornecedor</FormLabel>
-                  <Select
-                    value={field.value.toString() ?? ""}
-                    defaultValue={field.value ?? ""}
-                    onValueChange={(value) => form.setValue("supplierId", Number(value))}
-                  >
+                  <Select value={value.toString()} onValueChange={onChange}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Escolha o fornecedor" />
@@ -197,10 +198,7 @@ export default function ProductForm(data?: ProductType) {
                     <SelectContent>
                       {suppliersList.map((stt) => {
                         return (
-                          <SelectItem
-                            key={stt.id}
-                            value={stt.id.toString()}
-                          >
+                          <SelectItem key={stt.id} value={stt.id.toString()}>
                             {stt.name}
                           </SelectItem>
                         );
@@ -211,13 +209,13 @@ export default function ProductForm(data?: ProductType) {
                 </FormItem>
               )}
             />
-          </div>
+          </div>}
 
           <div className="flex flex-col space-y-2">
-            <FormField
+            <Controller
               control={form.control}
               name="isActive"
-              render={({ field }) => (
+              render={({ field: { onChange, value } }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">Produto Ativo</FormLabel>
@@ -226,7 +224,7 @@ export default function ProductForm(data?: ProductType) {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Switch checked={field.value} value={field.value?.toString()} onCheckedChange={field.onChange} />
+                    <Switch onCheckedChange={onChange} checked={value} />
                   </FormControl>
                 </FormItem>
               )}

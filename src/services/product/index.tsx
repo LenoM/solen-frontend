@@ -55,9 +55,9 @@ const updateProduct = async (
   const body: BodyInit = JSON.stringify({
     name,
     description,
-    isActive,
     billingMethod,
-    supplierId,
+    supplierId: Number(supplierId),
+    isActive: Boolean(isActive),
   });
 
   const params: RequestInit = {
@@ -84,9 +84,9 @@ const createProduct = async ({
   const body: BodyInit = JSON.stringify({
     name,
     description,
-    isActive,
     billingMethod,
-    supplierId,
+    supplierId: Number(supplierId),
+    isActive: Boolean(isActive),
   });
 
   const params: RequestInit = {
