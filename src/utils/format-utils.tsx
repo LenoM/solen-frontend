@@ -5,7 +5,7 @@ import "dayjs/locale/pt-br";
 dayjs.locale("pt-br");
 dayjs.extend(utc);
 
-export const normalizePhoneNumber = (value: String | undefined) => {
+export const normalizePhoneNumber = (value: string | undefined) => {
   if (!value) return "";
 
   return value
@@ -15,11 +15,11 @@ export const normalizePhoneNumber = (value: String | undefined) => {
     .replace(/(-\d{4})(\d+?)/, "$1");
 };
 
-export const onlyNumbers = (value: String) => {
+export const onlyNumbers = (value: string) => {
   return value.replace(/\D/g, "");
 };
 
-export const normalizeCnpjNumber = (value: String | undefined) => {
+export const normalizeCnpjNumber = (value: string | undefined) => {
   if (!value) return "";
 
   return value
@@ -38,7 +38,7 @@ export const formatCPF = (value: string | undefined) => {
     .replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
 };
 
-export const normalizeCepNumber = (value: String | undefined) => {
+export const normalizeCepNumber = (value: string | undefined) => {
   if (!value) return "";
   return value
     .replace(/\D/g, "")

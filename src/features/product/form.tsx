@@ -36,12 +36,12 @@ const customError = {
 
 export const loadProductData = (data?: ProductType): ProductType => {
   return {
-    id: data?.id || 0,
-    name: data?.name || "",
-    description: data?.description || "",
-    isActive: data?.isActive || true,
-    billingMethod: data?.billingMethod || "",
-    supplierId: data?.supplierId || 0,
+    id: data?.id ?? 0,
+    name: data?.name ?? "",
+    description: data?.description ?? "",
+    isActive: data?.isActive ?? true,
+    billingMethod: data?.billingMethod ?? "",
+    supplierId: data?.supplierId ?? 0,
   };
 };
 
@@ -90,7 +90,7 @@ export default function ProductForm(data?: ProductType) {
     try {
       let newData: ProductType = form.getValues();
 
-      if (!!newData.id) {
+      if (newData.id) {
         newData = await updateProduct(Number(newData.id), newData);
       } else {
         newData = await createProduct(newData);
