@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { deleteAddress } from "@/services/address";
+import { normalizeCepNumber } from "@/utils/format-utils";
 import AddressForm, { AddressDataType } from "@/features/client/forms/address";
 
 type AddressType = {
@@ -122,6 +123,7 @@ export const columns: ColumnDef<Address>[] = [
   {
     accessorKey: "cep",
     header: "CEP",
+    accessorFn: (data: Address) => normalizeCepNumber(data.cep),
   },
   {
     id: "actions",

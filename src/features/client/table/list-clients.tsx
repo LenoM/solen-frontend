@@ -31,7 +31,7 @@ export const columns: ColumnDef<Client>[] = [
   },
   {
     accessorKey: "kinship",
-    header: "Titular?",
+    header: "Parentesco",
   },
   {
     id: "actions",

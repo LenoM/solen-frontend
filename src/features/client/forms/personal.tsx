@@ -216,7 +216,7 @@ export default function Personal(data: any) {
 
           <div className="flex flex-col space-y-2">
             <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
-              <div className="">
+              <div>
                 <FormField
                   control={form.control}
                   name="gender"
@@ -242,7 +242,7 @@ export default function Personal(data: any) {
                   )}
                 />
               </div>
-              <div className="">
+              <div>
                 <FormField
                   control={form.control}
                   name="birthday"
@@ -278,7 +278,7 @@ export default function Personal(data: any) {
                                 !date && "text-muted-foreground"
                               )}
                             >
-                              <CalendarIcon className="" />
+                              <CalendarIcon />
                             </Button>
                           </PopoverTrigger>
                         </div>
