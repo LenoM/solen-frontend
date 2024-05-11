@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { Pencil, Trash } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -41,18 +40,18 @@ const handlerDelete = async (contactId: number) => {
     const result = await deleteContact(contactId);
 
     if (result.id) {
-      toast.success("Endereço cadastrado", {
+      toast.success("Contato deletado", {
         description: `O contato #${contactId} foi removido com sucesso!`,
       });
 
       return;
     }
 
-    toast.error("Erro ao remover o Endereço", {
+    toast.error("Erro ao remover o Contato", {
       description: `Ocorreu um erro ao remover o contato #${contactId}.`,
     });
   } catch (error) {
-    toast.error("Falha ao remover o Endereço", {
+    toast.error("Falha ao remover o Contato", {
       description: `Ocorreu uma falha ao remover o contato.`,
     });
   }
@@ -111,9 +110,9 @@ export const columns: ColumnDef<Contact>[] = [
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Remover endereço</DialogTitle>
+                <DialogTitle>Remover contato</DialogTitle>
                 <DialogDescription>
-                  Tem certeza que deseja remover o endereço?
+                  Tem certeza que deseja remover o contato?
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
