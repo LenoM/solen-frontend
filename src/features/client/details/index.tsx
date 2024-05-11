@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
@@ -30,10 +31,11 @@ import {
 } from "lucide-react";
 
 import { Dependents } from "./dependents";
-import { Address } from "./address";
+import { Signatures } from "./signature";
+import { Discounts } from "./discount";
 import { Invoices } from "./invoices";
-import { Products } from "./products";
 import { Contacts } from "./contacts";
+import { Address } from "./address";
 
 import Personal from "@/features/client/forms/personal";
 import AddressForm, { loadAddressData } from "@/features/client/forms/address";
@@ -169,10 +171,21 @@ export default function ClientDetails() {
           <TabsContent value="products">
             <Card>
               <CardHeader className="text-center">
-                <CardTitle>Produtos</CardTitle>
+                <CardTitle>Assinaturas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Products {...data} />
+                <Signatures />
+              </CardContent>
+            </Card>
+
+            <Separator className="my-3"/>
+
+            <Card>
+              <CardHeader className="text-center">
+                <CardTitle>Descontos</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Discounts />
               </CardContent>
             </Card>
           </TabsContent>
