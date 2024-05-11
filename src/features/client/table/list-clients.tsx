@@ -2,6 +2,7 @@ import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
+import { formatCPF } from "@/utils/format-utils";
 
 type Client = {
   id: string;
@@ -23,15 +24,16 @@ export const columns: ColumnDef<Client>[] = [
   {
     accessorKey: "cpf",
     header: "CPF",
-  },
-  {
-    accessorKey: "isActive",
-    header: "Ativo?",
-    accessorFn: (status: Client) => (status.isActive === true ? "Sim" : "Não"),
+    accessorFn: (cli: Client) => formatCPF(cli.cpf),
   },
   {
     accessorKey: "kinship",
     header: "Parentesco",
+  },
+  {
+    accessorKey: "isActive",
+    header: "Ativo?",
+    accessorFn: (cli: Client) => (cli.isActive === true ? "Sim" : "Não"),
   },
   {
     id: "actions",
