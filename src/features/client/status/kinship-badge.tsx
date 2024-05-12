@@ -29,6 +29,7 @@ function KinshipBadge(data: any) {
             </Badge>
           </span>
         </HoverCardTrigger>
+
         {holderId && (
           <HoverCardContent className="w-50">
             <div className="flex">
