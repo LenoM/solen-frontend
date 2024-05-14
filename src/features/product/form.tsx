@@ -182,34 +182,36 @@ export default function ProductForm(data?: ProductType) {
             />
           </div>
 
-          {suppliersList.length > 0 && <div className="flex flex-col space-y-2">
-            <Controller
-              name="supplierId"
-              control={form.control}
-              render={({ field: { onChange, value } }) => (
-                <FormItem>
-                  <FormLabel>Fornecedor</FormLabel>
-                  <Select value={value.toString()} onValueChange={onChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Escolha o fornecedor" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {suppliersList.map((stt) => {
-                        return (
-                          <SelectItem key={stt.id} value={stt.id.toString()}>
-                            {stt.name}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>}
+          {suppliersList.length > 0 && (
+            <div className="flex flex-col space-y-2">
+              <Controller
+                name="supplierId"
+                control={form.control}
+                render={({ field: { onChange, value } }) => (
+                  <FormItem>
+                    <FormLabel>Fornecedor</FormLabel>
+                    <Select value={value.toString()} onValueChange={onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Escolha o fornecedor" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {suppliersList.map((stt) => {
+                          return (
+                            <SelectItem key={stt.id} value={stt.id.toString()}>
+                              {stt.name}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
 
           <div className="flex flex-col space-y-2">
             <Controller

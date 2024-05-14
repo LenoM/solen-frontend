@@ -80,7 +80,7 @@ const clientSchema = yup.object({
 
 export type ClientType = yup.InferType<typeof clientSchema>;
 
-export default function Personal(data: any) {
+export default function Personal(data: ClientType) {
   const [date, setDate] = useState<Date>();
   const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -141,7 +141,7 @@ export default function Personal(data: any) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
-        <div className="grid w-full items-center gap-4 xl:px-96">
+        <div className="grid w-full items-center gap-4 xl:px-196">
           <div className="flex flex-row-reverse gap-4">
             <StatusBadge {...data} />
             <KinshipBadge {...data} />
@@ -162,6 +162,7 @@ export default function Personal(data: any) {
               )}
             />
           </div>
+
           <div className="flex flex-col space-y-2">
             <FormField
               control={form.control}
@@ -242,6 +243,7 @@ export default function Personal(data: any) {
                   )}
                 />
               </div>
+
               <div>
                 <FormField
                   control={form.control}

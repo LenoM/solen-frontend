@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
@@ -37,7 +37,7 @@ import { Invoices } from "./invoices";
 import { Contacts } from "./contacts";
 import { Address } from "./address";
 
-import Personal from "@/features/client/forms/personal";
+import Personal, { loadClientData } from "@/features/client/forms/personal";
 import AddressForm, { loadAddressData } from "@/features/client/forms/address";
 import ContactForm, { loadContactData } from "@/features/client/forms/contact";
 
@@ -101,7 +101,7 @@ export default function ClientDetails() {
                 <CardTitle>Dados Pessoais</CardTitle>
               </CardHeader>
               <CardContent>
-                <Personal {...data} />
+                <Personal {...loadClientData(data)} />
               </CardContent>
             </Card>
           </TabsContent>
