@@ -68,14 +68,14 @@ const customError = {
 const addressSchema = yup.object({
   id: yup.number(),
   cep: yup.string().required(customError.required),
-  city: yup.string().required(customError.required),
-  state: yup.string().required(customError.required),
-  district: yup.string().required(customError.required),
+  city: yup.string().nullable().required(customError.required),
+  state: yup.string().nullable().required(customError.required),
+  district: yup.string().nullable().required(customError.required),
   address: yup.string().required(customError.required),
   number: yup.number().min(0, customError.min).required(customError.required),
   complement: yup.string(),
-  addressType: yup.string().required(customError.required),
-  addressCategory: yup.string().required(customError.required),
+  addressType: yup.string().nullable().required(customError.required),
+  addressCategory: yup.string().nullable().required(customError.required),
 });
 
 export type AddressDataType = yup.InferType<typeof addressSchema>;
@@ -384,7 +384,7 @@ export default function AddressForm(data: AddressDataType) {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue />
+                            <SelectValue placeholder="Escolha a categoria" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -418,7 +418,7 @@ export default function AddressForm(data: AddressDataType) {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue />
+                            <SelectValue placeholder="Escolha o tipo" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>

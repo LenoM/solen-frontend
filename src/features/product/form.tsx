@@ -53,10 +53,11 @@ const productSchema = yup.object({
   supplierId: yup
     .number()
     .transform((value) => (Number.isNaN(value) ? null : value))
-    .required(customError.required)
-    .min(1, customError.equals),
+    .nullable()
+    .required(customError.required),
   billingMethod: yup
     .string()
+    .nullable()
     .required(customError.required)
     .equals(["Fix", "Age"], customError.equals),
 });

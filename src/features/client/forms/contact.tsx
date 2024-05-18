@@ -69,6 +69,7 @@ const contactSchema = yup.object().shape({
   clientId: yup.number().required(customError.required),
   contactType: yup
     .string()
+    .nullable()
     .required(customError.required)
     .equals(contactTypeArray, customError.equals),
   isWhatsapp: yup.boolean().default(false),
