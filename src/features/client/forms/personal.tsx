@@ -80,10 +80,20 @@ const clientSchema = yup.object({
   isHolder: yup.boolean().default(true),
   isActive: yup.boolean().default(true),
   categoryId: yup
-    .number()
-    .transform((value) => (Number.isNaN(value) ? null : value))
-    .nullable()
-    .required(customError.required),
+    .string()
+    .when("isHolder", {
+      is: (value: boolean) => value === false,
+      then: () => yup.string().nullable(),
+    })
+    .when("isHolder", {
+      is: (value: boolean) => value === true,
+      then: () =>
+        yup
+          .number()
+          .transform((value) => (Number.isNaN(value) ? null : value))
+          .required(customError.required)
+          .min(1, customError.equals),
+    }),
   holderId: yup
     .string()
     .when("isHolder", {
@@ -215,6 +225,8 @@ export default function Personal(data: ClientType) {
 
   useEffect(() => {
     if (!holderArray && !isClientHolder) {
+      form.setValue("holderId", "");
+      form.setValue("kinship", "");
       getClientList();
     }
   });

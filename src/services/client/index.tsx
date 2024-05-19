@@ -57,6 +57,7 @@ const updateClient = async ({
   fatherName,
   motherName,
   categoryId,
+  holderId,
   kinship = "Titular",
 }: ClientType) => {
   const headers = getHeader();
@@ -72,6 +73,7 @@ const updateClient = async ({
     fatherName,
     motherName,
     categoryId: Number(categoryId),
+    holderId: Number(holderId),
     kinship,
   });
 
@@ -96,6 +98,7 @@ const createClient = async ({
   fatherName,
   motherName,
   categoryId,
+  holderId,
   kinship = "Titular",
 }: ClientType) => {
   const headers = getHeader();
@@ -111,6 +114,7 @@ const createClient = async ({
     fatherName,
     motherName,
     categoryId: Number(categoryId),
+    holderId: Number(holderId),
     kinship,
   });
 
