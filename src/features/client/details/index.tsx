@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -42,6 +42,8 @@ import AddressForm, { loadAddressData } from "@/features/client/forms/address";
 import ContactForm, { loadContactData } from "@/features/client/forms/contact";
 
 import { getClientByid } from "@/services/client";
+
+const pathNewClient = `${window.origin}/client/add`;
 
 export default function ClientDetails() {
   const { id } = useParams();
@@ -141,7 +143,9 @@ export default function ClientDetails() {
                 <Dependents {...data} />
               </CardContent>
               <CardFooter>
+<Link to={pathNewClient}>
                 <Button>Adicionar novo</Button>
+</Link>
               </CardFooter>
             </Card>
           </TabsContent>

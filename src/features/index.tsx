@@ -10,6 +10,7 @@ import Product from "@/features/product";
 import ProductDetails from "@/features/product/details";
 import Logoff from "@/features/logoff";
 import Client from "@/features/client";
+import ClientAdd from "@/features/client/add";
 import ClientDetails from "@/features/client/details";
 import User from "@/features/user";
 import UserDetail from "@/features/user/details";
@@ -39,7 +40,7 @@ export const features = [
     label: "Associados",
     path: "/client/add",
     isMenuItem: false,
-    element: <ClientDetails />,
+    element: <ClientAdd />,
   },
   {
     label: "Boletos",
