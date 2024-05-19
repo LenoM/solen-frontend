@@ -11,9 +11,9 @@ const getCategories = async () => {
     headers,
   };
 
-  const suppliers = await fetch(url, params).then((resp) => resp.json());
+  const categories = await fetch(url, params).then((resp) => resp.json());
 
-  return suppliers;
+  return categories;
 };
 
 export { getCategories };

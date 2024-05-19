@@ -36,6 +36,7 @@ import {
 import { createClient, getClients, updateClient } from "@/services/client";
 import { KinshipBadge, StatusBadge } from "@/features/client/status";
 import { getCategories } from "@/services/category";
+import { getCompanies } from "@/services/company";
 import { Entity } from "@/utils/utils";
 
 export const loadClientData = (data?: any): ClientType => {
@@ -46,6 +47,7 @@ export const loadClientData = (data?: any): ClientType => {
     isActive: !!data?.isActive,
     name: data?.name || "",
     categoryId: data?.categoryId || "",
+    companyId: data?.companyId || "",
     socialName: data?.socialName || "",
     gender: data?.gender || "",
     cpf: formatCPF(data?.cpf) || "",
@@ -80,6 +82,21 @@ const clientSchema = yup.object({
   isHolder: yup.boolean().default(true),
   isActive: yup.boolean().default(true),
   categoryId: yup
+    .string()
+    .when("isHolder", {
+      is: (value: boolean) => value === false,
+      then: () => yup.string().nullable(),
+    })
+    .when("isHolder", {
+      is: (value: boolean) => value === true,
+      then: () =>
+        yup
+          .number()
+          .transform((value) => (Number.isNaN(value) ? null : value))
+          .required(customError.required)
+          .min(1, customError.equals),
+    }),
+  companyId: yup
     .string()
     .when("isHolder", {
       is: (value: boolean) => value === false,
@@ -153,6 +170,7 @@ export default function Personal(data: ClientType) {
 
   const [holderArray, setHolderArray] = useState<ClientType[]>();
   const [categoryArray, setCategoryArray] = useState<Entity[]>();
+  const [companyArray, setCompanyArray] = useState<Entity[]>();
   const isClientHolder = form.watch("isHolder");
 
   const onChangeBirthdate = (e: React.FormEvent<HTMLInputElement>) => {
@@ -239,6 +257,10 @@ export default function Personal(data: ClientType) {
       if (!categoryArray) {
         getCategoryList();
       }
+
+      if (!companyArray) {
+        getCompanyList();
+      }
     }
   });
 
@@ -259,6 +281,16 @@ export default function Personal(data: ClientType) {
     form.resetField("categoryId");
     if (data.categoryId) {
       form.setValue("categoryId", data.categoryId);
+    }
+  };
+
+  const getCompanyList = async () => {
+    const companies = await getCompanies();
+    setCompanyArray(companies);
+
+    form.resetField("companyId");
+    if (data.companyId) {
+      form.setValue("companyId", data.companyId);
     }
   };
 
@@ -466,6 +498,40 @@ export default function Personal(data: ClientType) {
                               value={cat.id.toString()}
                             >
                               {cat.description}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
+          {isClientHolder && companyArray && (
+            <div className="flex flex-col">
+              <FormField
+                name="companyId"
+                control={form.control}
+                render={({ field: { onChange, value } }) => (
+                  <FormItem>
+                    <FormLabel>Empresa</FormLabel>
+                    <Select value={value?.toString()} onValueChange={onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Escolha a empresa" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {companyArray.map((comp: Entity) => {
+                          return (
+                            <SelectItem
+                              key={`comp-${comp.id}`}
+                              value={comp.id.toString()}
+                            >
+                              {comp.name}
                             </SelectItem>
                           );
                         })}
