@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
-import { toDateValue, toMoneyValue } from "@/utils/format-utils";
+import { toDateString, toMoneyValue } from "@/utils/format-utils";
 import { printInvoice, sendInvoice } from "@/services/invoice";
 
 export type Invoice = {
@@ -66,17 +66,17 @@ export const columns: ColumnDef<Invoice>[] = [
   {
     accessorKey: "referenceDate",
     header: "Referência",
-    accessorFn: (data: Invoice) => toDateValue(data.referenceDate),
+    accessorFn: (data: Invoice) => toDateString(data.referenceDate),
   },
   {
     accessorKey: "dueDate",
     header: "Vencimento",
-    accessorFn: (data: Invoice) => toDateValue(data.dueDate),
+    accessorFn: (data: Invoice) => toDateString(data.dueDate),
   },
   {
     accessorKey: "paymentDate",
     header: "Pagamento",
-    accessorFn: (data: Invoice) => toDateValue(data.paymentDate),
+    accessorFn: (data: Invoice) => toDateString(data.paymentDate),
   },
   {
     accessorKey: "price",
