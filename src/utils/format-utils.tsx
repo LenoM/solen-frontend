@@ -1,9 +1,11 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import "dayjs/locale/pt-br";
 
 dayjs.locale("pt-br");
 dayjs.extend(utc);
+dayjs.extend(customParseFormat);
 
 export const normalizePhoneNumber = (value: string | undefined) => {
   if (!value) return "";
@@ -38,6 +40,13 @@ export const formatCPF = (value: string | undefined) => {
     .replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
 };
 
+export const formatDate = (value: string | undefined) => {
+  if (!value) return "";
+  return value
+    .replace(/[^\d]/g, "")
+    .replace(/^(\d{2})(\d{2})(\d{4})$/, "$1/$2/$3");
+};
+
 export const normalizeCepNumber = (value: string | undefined) => {
   if (!value) return "";
   return value
@@ -50,12 +59,32 @@ export const getNumbers = (value: string) => {
   return value.replace(/\D/g, "");
 };
 
-export const toDateValue = (dateString: Date) => {
-  if (dateString) {
-    return dayjs.utc(dateString).format("DD/MM/YYYY");
+export const toDateValue = (
+  dateString: Date | string | null
+): Date | undefined => {
+  if (!dateString) {
+    return undefined;
   }
 
-  return "";
+  const value = dayjs.utc(dateString, "DD/MM/YYYY", true).toDate();
+  return value;
+};
+
+export const toDateString = (
+  dateString: Date | string | undefined
+): string | undefined => {
+  if (!dateString) return undefined;
+
+  if (dateString.toString().length > 10) {
+    dateString = dayjs.utc(dateString).format("DD/MM/YYYY");
+  } else {
+    dateString = dayjs.utc(dateString, "DD/MM/YYYY", true).format("DD/MM/YYYY");
+  }
+
+  const isValid = dayjs(dateString, "DD/MM/YYYY", true).isValid();
+  const result = isValid ? dateString : undefined;
+
+  return result;
 };
 
 export const toMoneyValue = (value: number) => {

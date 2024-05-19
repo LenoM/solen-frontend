@@ -1,20 +1,13 @@
 import * as yup from "yup";
 import validator from "validator";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import { Calendar } from "@/components/ui/calendar";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 import {
   Select,
@@ -27,28 +20,40 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
-import { cn } from "@/lib/utils";
-import { formatCPF, getNumbers, toDateValue } from "@/utils/format-utils";
-import { createClient, updateClient } from "@/services/client";
+import {
+  formatCPF,
+  formatDate,
+  getNumbers,
+  toDateString,
+} from "@/utils/format-utils";
+import { createClient, getClients, updateClient } from "@/services/client";
 import { KinshipBadge, StatusBadge } from "@/features/client/status";
+import { getCategories } from "@/services/category";
+import { Entity } from "@/utils/utils";
 
-export const loadClientData = (data?: ClientType): ClientType => {
+export const loadClientData = (data?: any): ClientType => {
   return {
     id: data?.id || 0,
+    holderId: data?.holderId || 0,
+    isHolder: data?.kinship === "Titular",
+    isActive: !!data?.isActive,
     name: data?.name || "",
+    categoryId: data?.categoryId || "",
     socialName: data?.socialName || "",
     gender: data?.gender || "",
     cpf: formatCPF(data?.cpf) || "",
     rg: data?.rg || "",
-    birthday: data?.birthday || new Date(),
+    birthday: formatDate(toDateString(data?.birthday)) || "",
     motherName: data?.motherName || "",
     fatherName: data?.fatherName || "",
+    kinship: data?.kinship || "Titular",
   };
 };
 
@@ -56,13 +61,54 @@ const customError = {
   required: "Campo obrigatório",
   equals: "Escolha um valor válido",
   invalidCPF: "CPF inválido",
+  invalidRG: "RG inválido",
+  invalidDate: "Data inválida",
 };
+
+const kinshipArray = [
+  { id: "Conjuge", name: "Cônjuge" },
+  { id: "Enteado", name: "Enteado" },
+  { id: "Filho", name: "Filho" },
+  { id: "Mae", name: "Mãe" },
+  { id: "Pai", name: "Pai" },
+];
 
 const clientSchema = yup.object({
   id: yup.number().nullable(),
   name: yup.string().required(customError.required),
-  kinship: yup.string(),
   socialName: yup.string().required(customError.required),
+  isHolder: yup.boolean().default(true),
+  isActive: yup.boolean().default(true),
+  categoryId: yup
+    .number()
+    .transform((value) => (Number.isNaN(value) ? null : value))
+    .nullable()
+    .required(customError.required),
+  holderId: yup
+    .string()
+    .when("isHolder", {
+      is: (value: boolean) => value === true,
+      then: () => yup.string().nullable(),
+    })
+    .when("isHolder", {
+      is: (value: boolean) => value === false,
+      then: () =>
+        yup
+          .number()
+          .transform((value) => (Number.isNaN(value) ? null : value))
+          .required(customError.required)
+          .min(1, customError.equals),
+    }),
+  kinship: yup
+    .string()
+    .when("isHolder", {
+      is: (value: boolean) => value === true,
+      then: () => yup.string().nullable(),
+    })
+    .when("isHolder", {
+      is: (value: boolean) => value === false,
+      then: () => yup.string().required(customError.required),
+    }),
   gender: yup
     .string()
     .required(customError.required)
@@ -72,8 +118,16 @@ const clientSchema = yup.object({
     .transform(formatCPF)
     .required(customError.required)
     .length(14),
-  rg: yup.string().required(customError.required).min(6).max(12),
-  birthday: yup.date().required(customError.required),
+  rg: yup
+    .string()
+    .required(customError.required)
+    .min(5, customError.invalidRG)
+    .max(12, customError.invalidRG),
+  birthday: yup
+    .string()
+    .transform((value) => formatDate(toDateString(value)))
+    .required(customError.invalidDate)
+    .length(10, customError.invalidDate),
   motherName: yup.string().required(customError.required),
   fatherName: yup.string().required(customError.required),
 });
@@ -81,13 +135,34 @@ const clientSchema = yup.object({
 export type ClientType = yup.InferType<typeof clientSchema>;
 
 export default function Personal(data: ClientType) {
-  const [date, setDate] = useState<Date>();
-  const [errorMessage, setErrorMessage] = useState<string>("");
-
   const form = useForm({
     resolver: yupResolver(clientSchema),
     values: loadClientData(data),
+    mode: "onChange",
   });
+
+  const [holderArray, setHolderArray] = useState<ClientType[]>();
+  const [categoryArray, setCategoryArray] = useState<Entity[]>();
+  const isClientHolder = form.watch("isHolder");
+
+  const onChangeBirthdate = (e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget.value;
+    const parsedDate = formatDate(input);
+    form.clearErrors("birthday");
+    form.setValue("birthday", parsedDate);
+  };
+
+  const onBlurBirthdate = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
+    const parsedDate = toDateString(value);
+
+    form.clearErrors("birthday");
+
+    if (!parsedDate) {
+      form.setError("birthday", { message: customError.invalidDate });
+      return;
+    }
+  };
 
   const onChangeCPF = (e: React.FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget.value;
@@ -117,7 +192,7 @@ export default function Personal(data: ClientType) {
         delete newData.id;
         response = await createClient({ ...newData });
       } else {
-        response = await updateClient({ ...newData, kinship: "Titular" });
+        response = await updateClient({ ...newData });
       }
 
       if (response?.id) {
@@ -138,14 +213,53 @@ export default function Personal(data: ClientType) {
     }
   };
 
+  useEffect(() => {
+    if (!holderArray && !isClientHolder) {
+      getClientList();
+    }
+  });
+
+  useEffect(() => {
+    if (isClientHolder) {
+      form.setValue("holderId", "");
+      form.setValue("kinship", "");
+
+      if (!categoryArray) {
+        getCategoryList();
+      }
+    }
+  });
+
+  const getClientList = async () => {
+    const clients = await getClients();
+    setHolderArray(clients);
+
+    if (!data.isHolder) {
+      form.setValue("holderId", data.holderId);
+      form.setValue("kinship", data.kinship);
+    }
+  };
+
+  const getCategoryList = async () => {
+    const categories = await getCategories();
+    setCategoryArray(categories);
+
+    form.resetField("categoryId");
+    if (data.categoryId) {
+      form.setValue("categoryId", data.categoryId);
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
         <div className="grid w-full items-center gap-4 xl:px-196">
-          <div className="flex flex-row-reverse gap-4">
-            <StatusBadge {...data} />
-            <KinshipBadge {...data} />
-          </div>
+          {data?.id !== 0 && (
+            <div className="flex flex-row-reverse gap-4">
+              <StatusBadge {...data} />
+              <KinshipBadge {...data} />
+            </div>
+          )}
 
           <div className="flex flex-col space-y-2">
             <FormField
@@ -230,7 +344,7 @@ export default function Personal(data: ClientType) {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue />
+                            <SelectValue placeholder="Escolha o sexo" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -251,49 +365,14 @@ export default function Personal(data: ClientType) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nascimento</FormLabel>
-                      <Popover>
-                        <div className="relative w-full">
-                          <Input
-                            type="string"
-                            value={toDateValue(field.value)}
-                            onChange={(e) => {
-                              const parsedDate = new Date(e.target.value);
-                              if (parsedDate.toString() === "Invalid Date") {
-                                setErrorMessage("Invalid Date");
-                                setDate(undefined);
-                              } else {
-                                setErrorMessage("");
-                                setDate(parsedDate);
-                              }
-                            }}
-                          />
-                          {errorMessage !== "" && (
-                            <div className="absolute text-red-400 text-sm">
-                              {errorMessage}
-                            </div>
-                          )}
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "font-normal absolute right-0 translate-y-[-50%] top-[50%] rounded-l-none",
-                                !date && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon />
-                            </Button>
-                          </PopoverTrigger>
-                        </div>
-                        <PopoverContent>
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            defaultMonth={date}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          onChange={onChangeBirthdate}
+                          onBlur={onBlurBirthdate}
+                          maxLength={10}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -332,6 +411,134 @@ export default function Personal(data: ClientType) {
               )}
             />
           </div>
+
+          <div className="flex flex-col space-y-2">
+            <Controller
+              control={form.control}
+              name="isHolder"
+              render={({ field: { onChange, value } }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Titular?</FormLabel>
+                    <FormDescription>
+                      Boletos são gerados apenas para titulares
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch onCheckedChange={onChange} checked={value} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {isClientHolder && categoryArray && (
+            <div className="flex flex-col">
+              <FormField
+                name="categoryId"
+                control={form.control}
+                render={({ field: { onChange, value } }) => (
+                  <FormItem>
+                    <FormLabel>Categoria</FormLabel>
+                    <Select value={value?.toString()} onValueChange={onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Escolha a categoria" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categoryArray.map((cat: Entity) => {
+                          return (
+                            <SelectItem
+                              key={`cat-${cat.id}`}
+                              value={cat.id.toString()}
+                            >
+                              {cat.description}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
+          {!isClientHolder && holderArray && (
+            <>
+              <div className="flex flex-col">
+                <FormField
+                  name="holderId"
+                  control={form.control}
+                  render={({ field: { onChange, value } }) => (
+                    <FormItem>
+                      <FormLabel>Nome do titular</FormLabel>
+                      <Select
+                        value={value?.toString()}
+                        defaultValue={value?.toString()}
+                        onValueChange={onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={`Escolha o titular`} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {holderArray.map((ctt: ClientType) => {
+                            return (
+                              <SelectItem
+                                key={`state-${ctt.id}`}
+                                value={ctt.id!.toString()}
+                              >
+                                {ctt.name}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex flex-col">
+                <FormField
+                  name="kinship"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Parentesco</FormLabel>
+                      <Select
+                        value={field.value?.toString()}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Escolha o parentesco" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {kinshipArray.map((ks) => {
+                            return (
+                              <SelectItem
+                                key={`kinship-${ks.id}`}
+                                value={ks.id}
+                              >
+                                {ks.name}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </>
+          )}
 
           <div className="flex flex-col mt-8">
             <Button type="submit">Salvar</Button>

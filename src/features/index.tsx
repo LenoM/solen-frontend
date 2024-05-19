@@ -36,6 +36,12 @@ export const features = [
     element: <ClientDetails />,
   },
   {
+    label: "Associados",
+    path: "/client/add",
+    isMenuItem: false,
+    element: <ClientDetails />,
+  },
+  {
     label: "Boletos",
     path: "/invoice",
     isMenuItem: true,

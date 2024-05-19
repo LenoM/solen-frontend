@@ -52,7 +52,7 @@ export default function ClientDetails() {
   }, [id]);
 
   const getData = async (id: string | undefined) => {
-    if (id) {
+    if (id && !isNaN(Number(id))) {
       const result = await getClientByid(Number(id));
       setData(result);
     }
@@ -96,13 +96,15 @@ export default function ClientDetails() {
           </TabsList>
 
           <TabsContent value="personal">
-            <Card className="p-8">
+            <Card>
+              <div className="xl:w-2/4 mx-auto">
               <CardHeader className="text-center">
                 <CardTitle>Dados Pessoais</CardTitle>
               </CardHeader>
               <CardContent>
                 <Personal {...loadClientData(data)} />
               </CardContent>
+              </div>
             </Card>
           </TabsContent>
 

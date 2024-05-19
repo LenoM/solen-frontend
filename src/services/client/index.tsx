@@ -1,7 +1,22 @@
 import { ClientType } from "@/features/client/forms/personal";
+import { toDateValue } from "@/utils/format-utils";
 import { getHeader } from "@/utils/headers-utils";
 
 const BASE_URL = import.meta.env.VITE_API_URL + "/client";
+
+const getClients = async () => {
+  const headers = getHeader();
+  const url = BASE_URL;
+
+  const params: RequestInit = {
+    method: "GET",
+    headers,
+  };
+
+  const clients = await fetch(url, params).then((resp) => resp.json());
+
+  return clients;
+};
 
 const getClient = async (input: string) => {
   const headers = getHeader();
@@ -41,7 +56,8 @@ const updateClient = async ({
   birthday,
   fatherName,
   motherName,
-  kinship,
+  categoryId,
+  kinship = "Titular",
 }: ClientType) => {
   const headers = getHeader();
   const url = `${BASE_URL}/${id}`;
@@ -52,9 +68,10 @@ const updateClient = async ({
     gender,
     cpf,
     rg,
-    birthday,
+    birthday: toDateValue(birthday),
     fatherName,
     motherName,
+    categoryId: Number(categoryId),
     kinship,
   });
 
@@ -78,6 +95,8 @@ const createClient = async ({
   birthday,
   fatherName,
   motherName,
+  categoryId,
+  kinship = "Titular",
 }: ClientType) => {
   const headers = getHeader();
   const url = BASE_URL;
@@ -88,9 +107,11 @@ const createClient = async ({
     gender,
     cpf,
     rg,
-    birthday,
+    birthday: toDateValue(birthday),
     fatherName,
     motherName,
+    categoryId: Number(categoryId),
+    kinship,
   });
 
   const params: RequestInit = {
@@ -104,4 +125,4 @@ const createClient = async ({
   return clients;
 };
 
-export { getClient, getClientByid, createClient, updateClient };
+export { getClients, getClient, getClientByid, createClient, updateClient };
