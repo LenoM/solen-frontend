@@ -42,7 +42,7 @@ import { Entity } from "@/utils/utils";
 export const loadClientData = (data?: any): ClientType => {
   return {
     id: data?.id || 0,
-    holderId: data?.holderId || 0,
+    holderId: data?.holderId || "",
     isHolder: data?.kinship === "Titular",
     isActive: !!data?.isActive,
     name: data?.name || "",
@@ -55,7 +55,7 @@ export const loadClientData = (data?: any): ClientType => {
     birthday: formatDate(toDateString(data?.birthday)) || "",
     motherName: data?.motherName || "",
     fatherName: data?.fatherName || "",
-    kinship: data?.kinship || "Titular",
+    kinship: data?.kinship || "",
   };
 };
 
@@ -245,15 +245,23 @@ export default function Personal(data: ClientType) {
     if (!holderArray && !isClientHolder) {
       form.setValue("holderId", "");
       form.setValue("kinship", "");
-      getClientList();
+    }
+
+    if (companyArray && !isClientHolder) {
+      form.setValue("companyId", "");
+    }
+
+    if (categoryArray && !isClientHolder) {
+      form.setValue("categoryId", "");
     }
   });
 
   useEffect(() => {
-    if (isClientHolder) {
-      form.setValue("holderId", "");
-      form.setValue("kinship", "");
+    if (!holderArray && !isClientHolder) {
+      getClientList();
+    }
 
+    if (isClientHolder) {
       if (!categoryArray) {
         getCategoryList();
       }
@@ -388,7 +396,7 @@ export default function Personal(data: ClientType) {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Escolha o sexo" />
+                            <SelectValue placeholder="Escolha o gênero" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
