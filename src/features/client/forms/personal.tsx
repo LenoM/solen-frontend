@@ -1,6 +1,7 @@
 import * as yup from "yup";
 import validator from "validator";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
@@ -184,6 +185,8 @@ const clientSchema = yup.object({
 export type ClientType = yup.InferType<typeof clientSchema>;
 
 export default function Personal(data: ClientType) {
+  const navigate = useNavigate();
+
   const form = useForm({
     resolver: yupResolver(clientSchema),
     values: loadClientData(data),
@@ -324,6 +327,7 @@ export default function Personal(data: ClientType) {
           description: `O cliente #${response.id} foi salvo`,
         });
 
+        navigate(`/client/${response.id}`)
         return;
       }
 
