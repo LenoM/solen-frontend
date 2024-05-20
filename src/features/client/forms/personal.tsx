@@ -43,7 +43,7 @@ export const loadClientData = (data?: any): ClientType => {
   return {
     id: data?.id || 0,
     holderId: data?.holderId || "",
-    isHolder: data?.kinship === "Titular",
+    isHolder: data?.kinship ? data?.kinship === "Titular" : true,
     isActive: !!data?.isActive,
     name: data?.name || "",
     categoryId: data?.categoryId || "",
@@ -53,6 +53,8 @@ export const loadClientData = (data?: any): ClientType => {
     cpf: formatCPF(data?.cpf) || "",
     rg: data?.rg || "",
     birthday: formatDate(toDateString(data?.birthday)) || "",
+    referenceDate: formatDate(toDateString(data?.referenceDate)) || "",
+    bondDate: formatDate(toDateString(data?.bondDate)) || "",
     motherName: data?.motherName || "",
     fatherName: data?.fatherName || "",
     kinship: data?.kinship || "",
@@ -121,7 +123,7 @@ const clientSchema = yup.object({
       is: (value: boolean) => value === false,
       then: () =>
         yup
-          .number()
+          .string()
           .transform((value) => (Number.isNaN(value) ? null : value))
           .required(customError.required)
           .min(1, customError.equals),
@@ -155,6 +157,26 @@ const clientSchema = yup.object({
     .transform((value) => formatDate(toDateString(value)))
     .required(customError.invalidDate)
     .length(10, customError.invalidDate),
+  referenceDate: yup
+    .string()
+    .transform((value) => formatDate(toDateString(value)))
+    .required(customError.invalidDate)
+    .length(10, customError.invalidDate),
+  bondDate: yup
+    .string()
+    .when("isHolder", {
+      is: (value: boolean) => value === true,
+      then: () => yup.string().nullable(),
+    })
+    .when("isHolder", {
+      is: (value: boolean) => value === false,
+      then: () =>
+        yup
+          .string()
+          .transform((value) => formatDate(toDateString(value)))
+          .required(customError.invalidDate)
+          .length(10, customError.invalidDate),
+    }),
   motherName: yup.string().required(customError.required),
   fatherName: yup.string().required(customError.required),
 });
@@ -165,13 +187,50 @@ export default function Personal(data: ClientType) {
   const form = useForm({
     resolver: yupResolver(clientSchema),
     values: loadClientData(data),
-    mode: "onChange",
+    mode: "onBlur",
   });
 
   const [holderArray, setHolderArray] = useState<ClientType[]>();
   const [categoryArray, setCategoryArray] = useState<Entity[]>();
   const [companyArray, setCompanyArray] = useState<Entity[]>();
   const isClientHolder = form.watch("isHolder");
+
+  useEffect(() => {
+    if (isClientHolder) {
+      form.setValue("bondDate", "");
+      form.setValue("kinship", "");
+      form.setValue("holderId", "");
+    } else {
+      if (!holderArray) {
+        form.setValue("holderId", "");
+        form.setValue("kinship", "");
+      }
+
+      if (companyArray) {
+        form.setValue("companyId", "");
+      }
+
+      if (categoryArray) {
+        form.setValue("categoryId", "");
+      }
+    }
+  }, [isClientHolder]);
+
+  useEffect(() => {
+    if (!holderArray && !isClientHolder) {
+      getClientList();
+    }
+
+    if (isClientHolder) {
+      if (!categoryArray) {
+        getCategoryList();
+      }
+
+      if (!companyArray) {
+        getCompanyList();
+      }
+    }
+  }, [isClientHolder]);
 
   const onChangeBirthdate = (e: React.FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget.value;
@@ -188,6 +247,44 @@ export default function Personal(data: ClientType) {
 
     if (!parsedDate) {
       form.setError("birthday", { message: customError.invalidDate });
+      return;
+    }
+  };
+
+  const onChangeBondDate = (e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget.value;
+    const parsedDate = formatDate(input);
+    form.clearErrors("bondDate");
+    form.setValue("bondDate", parsedDate);
+  };
+
+  const onBlurBondDate = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
+    const parsedDate = toDateString(value);
+
+    form.clearErrors("bondDate");
+
+    if (!parsedDate) {
+      form.setError("bondDate", { message: customError.invalidDate });
+      return;
+    }
+  };
+
+  const onChangeReferenceDate = (e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget.value;
+    const parsedDate = formatDate(input);
+    form.clearErrors("referenceDate");
+    form.setValue("referenceDate", parsedDate);
+  };
+
+  const onBlurReferenceDate = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
+    const parsedDate = toDateString(value);
+
+    form.clearErrors("referenceDate");
+
+    if (!parsedDate) {
+      form.setError("referenceDate", { message: customError.invalidDate });
       return;
     }
   };
@@ -217,7 +314,6 @@ export default function Personal(data: ClientType) {
       let response;
 
       if (data?.id == 0) {
-        delete newData.id;
         response = await createClient({ ...newData });
       } else {
         response = await updateClient({ ...newData });
@@ -240,37 +336,6 @@ export default function Personal(data: ClientType) {
       });
     }
   };
-
-  useEffect(() => {
-    if (!holderArray && !isClientHolder) {
-      form.setValue("holderId", "");
-      form.setValue("kinship", "");
-    }
-
-    if (companyArray && !isClientHolder) {
-      form.setValue("companyId", "");
-    }
-
-    if (categoryArray && !isClientHolder) {
-      form.setValue("categoryId", "");
-    }
-  });
-
-  useEffect(() => {
-    if (!holderArray && !isClientHolder) {
-      getClientList();
-    }
-
-    if (isClientHolder) {
-      if (!categoryArray) {
-        getCategoryList();
-      }
-
-      if (!companyArray) {
-        getCompanyList();
-      }
-    }
-  });
 
   const getClientList = async () => {
     const clients = await getClients();
@@ -484,72 +549,78 @@ export default function Personal(data: ClientType) {
             />
           </div>
 
-          {isClientHolder && categoryArray && (
-            <div className="flex flex-col">
-              <FormField
-                name="categoryId"
-                control={form.control}
-                render={({ field: { onChange, value } }) => (
-                  <FormItem>
-                    <FormLabel>Categoria</FormLabel>
-                    <Select value={value?.toString()} onValueChange={onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Escolha a categoria" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categoryArray.map((cat: Entity) => {
-                          return (
-                            <SelectItem
-                              key={`cat-${cat.id}`}
-                              value={cat.id.toString()}
-                            >
-                              {cat.description}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
+          {isClientHolder && categoryArray && companyArray && (
+            <>
+              <div className="flex flex-col">
+                <FormField
+                  name="categoryId"
+                  control={form.control}
+                  render={({ field: { onChange, value } }) => (
+                    <FormItem>
+                      <FormLabel>Categoria</FormLabel>
+                      <Select
+                        value={value?.toString()}
+                        onValueChange={onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Escolha a categoria" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categoryArray.map((cat: Entity) => {
+                            return (
+                              <SelectItem
+                                key={`cat-${cat.id}`}
+                                value={cat.id.toString()}
+                              >
+                                {cat.description}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-          {isClientHolder && companyArray && (
-            <div className="flex flex-col">
-              <FormField
-                name="companyId"
-                control={form.control}
-                render={({ field: { onChange, value } }) => (
-                  <FormItem>
-                    <FormLabel>Empresa</FormLabel>
-                    <Select value={value?.toString()} onValueChange={onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Escolha a empresa" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {companyArray.map((comp: Entity) => {
-                          return (
-                            <SelectItem
-                              key={`comp-${comp.id}`}
-                              value={comp.id.toString()}
-                            >
-                              {comp.name}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+              <div className="flex flex-col">
+                <FormField
+                  name="companyId"
+                  control={form.control}
+                  render={({ field: { onChange, value } }) => (
+                    <FormItem>
+                      <FormLabel>Empresa</FormLabel>
+                      <Select
+                        value={value?.toString()}
+                        onValueChange={onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Escolha a empresa" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {companyArray.map((comp: Entity) => {
+                            return (
+                              <SelectItem
+                                key={`comp-${comp.id}`}
+                                value={comp.id.toString()}
+                              >
+                                {comp.name}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </>
           )}
 
           {!isClientHolder && holderArray && (
@@ -589,42 +660,93 @@ export default function Personal(data: ClientType) {
                   )}
                 />
               </div>
-              <div className="flex flex-col">
+
+              <div className="flex flex-col space-y-2">
+                <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
+                  <div>
+                    <FormField
+                      name="kinship"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Parentesco</FormLabel>
+                          <Select
+                            value={field.value?.toString()}
+                            onValueChange={field.onChange}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Escolha o parentesco" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {kinshipArray.map((ks) => {
+                                return (
+                                  <SelectItem
+                                    key={`kinship-${ks.id}`}
+                                    value={ks.id}
+                                  >
+                                    {ks.name}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="bondDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Data de vínculo</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              onChange={onChangeBondDate}
+                              onBlur={onBlurBondDate}
+                              maxLength={10}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="flex flex-col space-y-2">
+            <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
+              <div>
                 <FormField
-                  name="kinship"
                   control={form.control}
+                  name="referenceDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Parentesco</FormLabel>
-                      <Select
-                        value={field.value?.toString()}
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Escolha o parentesco" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {kinshipArray.map((ks) => {
-                            return (
-                              <SelectItem
-                                key={`kinship-${ks.id}`}
-                                value={ks.id}
-                              >
-                                {ks.name}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Data de referência</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          onChange={onChangeReferenceDate}
+                          onBlur={onBlurReferenceDate}
+                          maxLength={10}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-            </>
-          )}
+            </div>
+          </div>
 
           <div className="flex flex-col mt-8">
             <Button type="submit">Salvar</Button>
