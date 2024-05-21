@@ -27,6 +27,10 @@ export default function User() {
     setData(result);
   };
 
+  const addNew = (newUser: UserType) => {
+    setData((prev: UserType[]) => [...prev, newUser]);
+  };
+
   return (
     <div className="p-6 pt-1 h-screen space-y-4">
       <h1 className="text-3xl font-bold text-center">Usuários</h1>
@@ -43,7 +47,7 @@ export default function User() {
               <DialogTitle>Convidar Usuário</DialogTitle>
             </DialogHeader>
 
-            <UserForm {...loadUserData()} />
+            <UserForm data={loadUserData()} setData={addNew} />
           </DialogContent>
         </Dialog>
       </div>

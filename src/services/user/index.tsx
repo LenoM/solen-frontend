@@ -31,7 +31,7 @@ const getUser = async (id: string) => {
   return user;
 };
 
-const createUser = async ({ name, email, password }: UserType) => {
+const createUser = async ({ name, email, password, isActive }: UserType) => {
   const headers = getHeader();
   const url = BASE_URL;
 
@@ -39,6 +39,7 @@ const createUser = async ({ name, email, password }: UserType) => {
     name,
     email,
     password,
+    isActive,
   });
 
   const params: RequestInit = {
@@ -52,7 +53,10 @@ const createUser = async ({ name, email, password }: UserType) => {
   return user;
 };
 
-const updateUser = async (id: string, { name, email, password }: UserType) => {
+const updateUser = async (
+  id: string,
+  { name, email, password, isActive }: UserType
+) => {
   const headers = getHeader();
   const url = `${BASE_URL}/${id}`;
 
@@ -60,6 +64,7 @@ const updateUser = async (id: string, { name, email, password }: UserType) => {
     name,
     email,
     password,
+    isActive,
   });
 
   const params: RequestInit = {

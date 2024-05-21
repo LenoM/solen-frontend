@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { createUser, updateUser } from "@/services/user";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const customError = {
   required: "Campo obrigatório",
@@ -31,7 +31,7 @@ export const loadUserData = (data?: UserType): UserType => {
     id: data?.id || "",
     name: data?.name || "",
     email: data?.email || "",
-    isActive: data?.isActive || true,
+    isActive: data?.isActive === true,
     isChangePassword: true,
     passwordConfirmation: "",
     password: "",
@@ -68,7 +68,14 @@ const userSchema = yup.object({
 
 export type UserType = yup.InferType<typeof userSchema>;
 
-export default function UserForm(data?: UserType) {
+interface UserProps {
+  data: UserType;
+  setData?: (user: UserType) => void;
+}
+
+export default function UserForm({ data, setData }: UserProps) {
+  const navigate = useNavigate();
+  
   const form = useForm({
     resolver: yupResolver(userSchema),
     values: loadUserData(data),
@@ -95,9 +102,15 @@ export default function UserForm(data?: UserType) {
         return;
       }
 
-      toast.info("Endereço salvo", {
-        description: `O usuario foi cadastrado`,
+      if (setData) {
+        setData(newData);
+      }
+
+      toast.info("Usuário salvo", {
+        description: `O usuario foi salvo`,
       });
+
+      navigate(`/user`);
     } catch (error) {
       toast.error("Falha no cadastro", {
         description: "Ocorreu uma falha ao tentar cadastrar o usuário",
