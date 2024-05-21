@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getProduct } from "@/services/product";
+
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ProductForm, { loadProductData } from "@/features/product/form";
+import { getProduct } from "@/services/product";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -19,10 +21,17 @@ export default function ProductDetails() {
   };
 
   return (
-    <div className="p-6 pt-1 h-screen space-y-4">
-      <h1 className="text-3xl font-bold text-center">Produtos</h1>
-
-      <ProductForm {...loadProductData(data)} />
+    <div className="relative">
+      <div className="flex flex-col items-center justify-center mx-auto">
+        <Card className="xl:w-[600px] md:w-[600px] mb-12">
+          <CardHeader>
+            <h1 className="text-3xl font-bold text-center">Produtos</h1>
+          </CardHeader>
+          <CardContent>
+            <ProductForm data={loadProductData(data)} />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

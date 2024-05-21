@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -41,7 +42,7 @@ export const loadProductData = (data?: ProductType): ProductType => {
     description: data?.description ?? "",
     isActive: data?.isActive ?? true,
     billingMethod: data?.billingMethod ?? "",
-    supplierId: data?.supplierId ?? 0,
+    supplierId: data?.supplierId ?? "",
   };
 };
 
@@ -51,10 +52,10 @@ const productSchema = yup.object({
   description: yup.string().required(customError.required),
   isActive: yup.boolean(),
   supplierId: yup
-    .number()
+    .string()
     .transform((value) => (Number.isNaN(value) ? null : value))
-    .nullable()
-    .required(customError.required),
+    .required(customError.required)
+    .min(1, customError.equals),
   billingMethod: yup
     .string()
     .nullable()
@@ -69,16 +70,32 @@ type Supplier = {
 
 export type ProductType = yup.InferType<typeof productSchema>;
 
-export default function ProductForm(data?: ProductType) {
+interface ProductProps {
+  data: ProductType;
+  setData?: (product: ProductType) => void;
+}
+
+export default function ProductForm({ data, setData }: ProductProps) {
+  const navigate = useNavigate();
   const [suppliersList, setSuppliersList] = useState<Supplier[]>([]);
 
   useEffect(() => {
     getData();
   }, []);
 
+  useEffect(() => {
+    if (suppliersList && data?.supplierId) {
+      form.setValue("supplierId", data.supplierId);
+    } else {
+      form.setValue("supplierId", "");
+    }
+  }, [suppliersList]);
+
   const getData = async () => {
-    const result = await getSuppliers();
-    setSuppliersList(result);
+    if (suppliersList.length === 0) {
+      const result = await getSuppliers();
+      setSuppliersList(result);
+    }
   };
 
   const form = useForm({
@@ -99,18 +116,24 @@ export default function ProductForm(data?: ProductType) {
 
       if (!newData.id) {
         toast.error("Erro no cadastro", {
-          description: "Ocorreu um erro ao tentar cadastrar o usuário",
+          description: "Ocorreu um erro ao tentar cadastrar o produto",
         });
 
         return;
       }
 
-      toast.info("Endereço salvo", {
-        description: `O usuario foi cadastrado`,
+      if (setData) {
+        setData(newData);
+      }
+
+      toast.info("Produto salvo", {
+        description: `O produto foi salvo`,
       });
+
+      navigate(`/product`);
     } catch (error) {
       toast.error("Falha no cadastro", {
-        description: "Ocorreu uma falha ao tentar cadastrar o usuário",
+        description: "Ocorreu uma falha ao tentar cadastrar o produto",
       });
     }
   };
@@ -185,13 +208,17 @@ export default function ProductForm(data?: ProductType) {
 
           {suppliersList.length > 0 && (
             <div className="flex flex-col space-y-2">
-              <Controller
+              <FormField
                 name="supplierId"
                 control={form.control}
                 render={({ field: { onChange, value } }) => (
                   <FormItem>
                     <FormLabel>Fornecedor</FormLabel>
-                    <Select value={value.toString()} onValueChange={onChange}>
+                    <Select
+                        value={value?.toString()}
+                        defaultValue={value?.toString()}
+                        onValueChange={onChange}
+                      >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Escolha o fornecedor" />
@@ -221,7 +248,7 @@ export default function ProductForm(data?: ProductType) {
               render={({ field: { onChange, value } }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">Produto Ativo</FormLabel>
+                    <FormLabel className="text-base">Produto Ativo?</FormLabel>
                     <FormDescription>
                       Produtos inativos não podem ser usados em algumas rotinas
                     </FormDescription>

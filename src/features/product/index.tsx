@@ -13,10 +13,13 @@ import {
 import { getProducts } from "@/services/product";
 import { DataTable } from "@/components/dataTable";
 import { columns } from "@/features/product/table";
-import ProductForm, { loadProductData } from "@/features/product/form";
+import ProductForm, {
+  ProductType,
+  loadProductData,
+} from "@/features/product/form";
 
 export default function Product() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<ProductType[]>([]);
 
   useEffect(() => {
     getData();
@@ -25,6 +28,10 @@ export default function Product() {
   const getData = async () => {
     const result = await getProducts();
     setData(result);
+  };
+
+  const addNew = (newProduct: ProductType) => {
+    setData((prev: ProductType[]) => [...prev, newProduct]);
   };
 
   return (
@@ -43,7 +50,7 @@ export default function Product() {
               <DialogTitle>Cadastro de Produtos</DialogTitle>
             </DialogHeader>
 
-            <ProductForm {...loadProductData()} />
+            <ProductForm data={loadProductData()} setData={addNew} />
           </DialogContent>
         </Dialog>
       </div>

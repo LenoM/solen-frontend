@@ -643,7 +643,7 @@ export default function Personal(data: ClientType) {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder={`Escolha o titular`} />
+                            <SelectValue placeholder="Escolha o titular" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
