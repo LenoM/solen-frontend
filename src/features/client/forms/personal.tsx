@@ -327,7 +327,7 @@ export default function Personal(data: ClientType) {
           description: `O cliente #${response.id} foi salvo`,
         });
 
-        navigate(`/client/${response.id}`)
+        navigate(`/client/${response.id}`);
         return;
       }
 
@@ -377,8 +377,8 @@ export default function Personal(data: ClientType) {
         <div className="grid w-full items-center gap-4 xl:px-196">
           {data?.id !== 0 && (
             <div className="flex flex-row-reverse gap-4">
-              <StatusBadge {...data} />
-              <KinshipBadge {...data} />
+              <StatusBadge isActive={data.isActive} />
+              <KinshipBadge kinship={data.kinship} />
             </div>
           )}
 
