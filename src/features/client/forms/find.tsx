@@ -8,19 +8,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
 import { getClient } from "@/services/client";
 
 const filterSchema = yup.object({
-  filter: yup.string().min(3, "Mínimo: 3 caracteres"),
+  filter: yup.string(),
 });
+
+const MIN_INPUT_LENGTH = 5;
 
 type FilterType = yup.InferType<typeof filterSchema>;
 
@@ -38,6 +34,12 @@ export function FindClient({ setData }: FindClientProps) {
 
   const onSubmit = async ({ filter }: FilterType) => {
     try {
+      if (!filter || filter.length < MIN_INPUT_LENGTH) {
+        toast.warning("Busca de clientes", {
+          description: `Informe ao menos ${MIN_INPUT_LENGTH} caracteres`,
+        });
+        return;
+      }
       if (filter) {
         const restult = await getClient(filter);
         setData(restult);
@@ -48,31 +50,28 @@ export function FindClient({ setData }: FindClientProps) {
       });
     }
   };
-  const { filter } = form?.formState?.errors;
 
   return (
     <Form {...form}>
-      <form
-        className="flex items-top gap-1"
-        onSubmit={form.handleSubmit(onSubmit)}
-      >
-        <FormField
-          control={form.control}
-          name="filter"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input placeholder="Nome" {...field} />
-              </FormControl>
-              <FormMessage>{filter?.message}</FormMessage>
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex flex-row content-center float-left">
+          <FormField
+            control={form.control}
+            name="filter"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="Nome" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <Button variant="link" type="submit">
-          <Search className="h-4 w-4 mr-2" />
-          Procurar
-        </Button>
+          <Button variant="default" className="ml-1" type="submit">
+            <Search className="h-4 w-4  md:mr-2" />
+            <span className="sr-only md:not-sr-only">Procurar</span>
+          </Button>
+        </div>
       </form>
     </Form>
   );
