@@ -47,7 +47,7 @@ const pathNewClient = `${window.origin}/client/add`;
 
 export default function ClientDetails() {
   const { id } = useParams();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any>([]);
 
   useEffect(() => {
     getData(id);
@@ -143,9 +143,11 @@ export default function ClientDetails() {
                 <Dependents {...data} />
               </CardContent>
               <CardFooter>
+                {!data?.holderId && (
 <Link to={pathNewClient}>
                 <Button>Adicionar novo</Button>
 </Link>
+                )}
               </CardFooter>
             </Card>
           </TabsContent>
