@@ -1,7 +1,38 @@
 import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { toast } from "sonner";
+import {
+  Ban,
+  EllipsisVertical,
+  ShieldCheck,
+  Eye,
+  PlusCircle,
+} from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import { Button } from "@/components/ui/button";
+
+import HiringForm from "@/features/client/forms/hiring";
+import { cancelClient, reactivateClient } from "@/services/client";
+import { DataTable } from "@/components/dataTable";
 import { formatCPF } from "@/utils/format-utils";
 
 type Client = {
@@ -51,3 +82,20 @@ export const columns: ColumnDef<Client>[] = [
     },
   },
 ];
+
+  return (
+    <>
+      <div className="text-right">
+        {isHolder && (
+          <Link to={pathNewClient}>
+            <Button>
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Novo
+            </Button>
+          </Link>
+        )}
+      </div>
+      <DataTable columns={columns} data={data} />
+    </>
+  );
+}

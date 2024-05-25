@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -30,19 +30,17 @@ import {
   PhoneCall,
 } from "lucide-react";
 
-import { Dependents } from "./dependents";
 import { Signatures } from "./signature";
 import { Discounts } from "./discount";
 import { Invoices } from "./invoices";
 import { Address } from "./address";
 import { Contacts } from "../table/list-contacts";
+import { Clients as Dependents } from "../table/list-clients";
 
 import Personal, { loadClientData } from "@/features/client/forms/personal";
 import AddressForm, { loadAddressData } from "@/features/client/forms/address";
 
 import { getClientByid } from "@/services/client";
-
-const pathNewClient = `${window.origin}/client/add`;
 
 export default function ClientDetails() {
   const { id } = useParams();
@@ -126,15 +124,8 @@ export default function ClientDetails() {
                 <CardTitle>Dependentes</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Dependents {...data} />
+                <Dependents data={data.dependents} isHolder={!data.holderId} />
               </CardContent>
-              <CardFooter>
-                {!data?.holderId && (
-<Link to={pathNewClient}>
-                <Button>Adicionar novo</Button>
-</Link>
-                )}
-              </CardFooter>
             </Card>
           </TabsContent>
 
