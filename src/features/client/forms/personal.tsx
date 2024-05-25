@@ -727,30 +727,32 @@ export default function Personal(data: ClientType) {
             </>
           )}
 
-          <div className="flex flex-col space-y-2">
-            <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
-              <div>
-                <FormField
-                  control={form.control}
-                  name="referenceDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Data de referência</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          onChange={onChangeReferenceDate}
-                          onBlur={onBlurReferenceDate}
-                          maxLength={10}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          {data?.id === 0 && (
+            <div className="flex flex-col space-y-2">
+              <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="referenceDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Data de referência</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            onChange={onChangeReferenceDate}
+                            onBlur={onBlurReferenceDate}
+                            maxLength={10}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="flex flex-col mt-8">
             <Button type="submit">Salvar</Button>
