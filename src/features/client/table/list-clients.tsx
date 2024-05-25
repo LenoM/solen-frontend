@@ -86,7 +86,7 @@ export const columns: ColumnDef<Client>[] = [
   return (
     <>
       <div className="text-right">
-        {isHolder && (
+        {showAddBtn && (
           <Link to={pathNewClient}>
             <Button>
               <PlusCircle className="h-4 w-4 mr-2" />

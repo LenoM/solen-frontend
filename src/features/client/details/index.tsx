@@ -123,7 +123,7 @@ export default function ClientDetails() {
                 <CardTitle>Dependentes</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Dependents data={data.dependents} isHolder={!data.holderId} />
+                <Dependents data={data.dependents} showAddBtn={!data.holderId} />
               </CardContent>
             </Card>
           </TabsContent>
