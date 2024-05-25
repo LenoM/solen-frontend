@@ -33,12 +33,11 @@ import {
 import { Signatures } from "./signature";
 import { Discounts } from "./discount";
 import { Invoices } from "./invoices";
-import { Address } from "./address";
+import { Address } from "../table/list-address";
 import { Contacts } from "../table/list-contacts";
 import { Clients as Dependents } from "../table/list-clients";
 
 import Personal, { loadClientData } from "@/features/client/forms/personal";
-import AddressForm, { loadAddressData } from "@/features/client/forms/address";
 
 import { getClientByid } from "@/services/client";
 
@@ -137,19 +136,6 @@ export default function ClientDetails() {
               <CardContent className="space-y-2">
                 <Address {...data} />
               </CardContent>
-              <CardFooter>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button>Adicionar novo</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Adicionar endereço</DialogTitle>
-                    </DialogHeader>
-                    <AddressForm {...loadAddressData()} />
-                  </DialogContent>
-                </Dialog>
-              </CardFooter>
             </Card>
           </TabsContent>
 

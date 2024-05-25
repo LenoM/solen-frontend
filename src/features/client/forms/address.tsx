@@ -1,9 +1,7 @@
 import * as yup from "yup";
 import React, { useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,8 +26,6 @@ import {
 import {
   getAddressByCEP,
   getAddressType,
-  createAddress,
-  updateAddress,
   getDistrict,
   getStates,
   getCity,
@@ -80,9 +76,12 @@ const addressSchema = yup.object({
 
 export type AddressDataType = yup.InferType<typeof addressSchema>;
 
-export default function AddressForm(data: AddressDataType) {
-  const { id } = useParams();
+type AddressFormProps = {
+  data: AddressDataType;
+  onSubmit: (newData: AddressDataType) => void;
+};
 
+export default function AddressForm({ data, onSubmit }: AddressFormProps) {
   const [cityList, setCityList] = useState<AddressAttr[]>([]);
   const [stateList, setStateList] = useState<AddressAttr[]>([]);
   const [districtList, setDistrictList] = useState<AddressAttr[]>([]);
@@ -197,34 +196,6 @@ export default function AddressForm(data: AddressDataType) {
 
     if (districtId) {
       form.setValue("district", districtId.toString());
-    }
-  };
-
-  const onSubmit = async () => {
-    try {
-      let newData: AddressDataType = form.getValues();
-
-      if (newData.id! > 0) {
-        newData = await updateAddress(Number(id), newData);
-      } else {
-        newData = await createAddress(Number(id), newData);
-      }
-
-      if (!newData.id) {
-        toast.error("Erro no cadastro", {
-          description: "Ocorreu um erro ao tentar cadastrar o endereço",
-        });
-
-        return;
-      }
-
-      toast.info("Endereço salvo", {
-        description: `O endereço #${newData.id} foi salvo`,
-      });
-    } catch (error) {
-      toast.error("Falha no cadastro", {
-        description: "Ocorreu uma falha ao tentar cadastrar o endereço",
-      });
     }
   };
 
