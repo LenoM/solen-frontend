@@ -34,12 +34,11 @@ import { Dependents } from "./dependents";
 import { Signatures } from "./signature";
 import { Discounts } from "./discount";
 import { Invoices } from "./invoices";
-import { Contacts } from "./contacts";
 import { Address } from "./address";
+import { Contacts } from "../table/list-contacts";
 
 import Personal, { loadClientData } from "@/features/client/forms/personal";
 import AddressForm, { loadAddressData } from "@/features/client/forms/address";
-import ContactForm, { loadContactData } from "@/features/client/forms/contact";
 
 import { getClientByid } from "@/services/client";
 
@@ -118,19 +117,6 @@ export default function ClientDetails() {
               <CardContent className="space-y-2">
                 <Contacts {...data} />
               </CardContent>
-              <CardFooter>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button>Adicionar novo</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Adicionar contato</DialogTitle>
-                    </DialogHeader>
-                    <ContactForm {...loadContactData()} />
-                  </DialogContent>
-                </Dialog>
-              </CardFooter>
             </Card>
           </TabsContent>
 

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,6 @@ import {
 } from "@/components/ui/form";
 
 import { normalizePhoneNumber } from "@/utils/format-utils";
-import { createContact, updateContact } from "@/services/contact";
 
 export const loadContactData = (data?: ContactType): ContactType => {
   const { id } = useParams();
@@ -90,7 +88,12 @@ const contactSchema = yup.object().shape({
 
 export type ContactType = yup.InferType<typeof contactSchema>;
 
-export default function ContactForm(data: ContactType) {
+type ContactFormProps = {
+  data: ContactType;
+  onSubmit: (newData: ContactType) => void;
+};
+
+export default function ContactForm({ data, onSubmit }: ContactFormProps) {
   const [currentType, setCurrentType] = useState("");
   const [formatedValue, setFormatedValue] = useState("");
 
@@ -127,34 +130,6 @@ export default function ContactForm(data: ContactType) {
 
     form.setValue("contactType", value);
     setCurrentType(value);
-  };
-
-  const onSubmit = async () => {
-    try {
-      let newData: ContactType = form.getValues();
-
-      if (newData.id! > 0) {
-        newData = await updateContact(newData);
-      } else {
-        newData = await createContact(newData);
-      }
-
-      if (!newData.id) {
-        toast.error("Erro no cadastro", {
-          description: "Ocorreu um erro ao tentar cadastrar o contato",
-        });
-
-        return;
-      }
-
-      toast.info("Contato salvo", {
-        description: `O contato #${newData.id} foi salvo`,
-      });
-    } catch (error) {
-      toast.error("Falha no cadastro", {
-        description: "Ocorreu uma falha ao tentar cadastrar o contato",
-      });
-    }
   };
 
   return (
