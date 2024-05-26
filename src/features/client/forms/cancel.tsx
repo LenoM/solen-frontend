@@ -31,7 +31,10 @@ import {
 } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
-import { toDateString } from "@/utils/format-utils";
+import {
+  toDateString,
+  isOutOfRange,
+} from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
 
 const reasonTypeArray = ["Debito", "Pedido", "Obito"];
@@ -104,10 +107,7 @@ export default function CancelForm({ referenceId, onSubmit }: CancelInput) {
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date("2025-12-31") ||
-                          date < new Date("2023-01-01")
-                        }
+                        disabled={(date) => isOutOfRange(date)}
                         initialFocus
                       />
                     </PopoverContent>

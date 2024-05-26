@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
-import { toDateString } from "@/utils/format-utils";
+import { isOutOfRange, toDateString } from "@/utils/format-utils";
 import { useEffect, useState } from "react";
 import { getFamily } from "@/services/client";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -120,10 +120,7 @@ export default function ReactivateForm({
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date("2025-12-31") ||
-                          date < new Date("2023-01-01")
-                        }
+                        disabled={(date) => isOutOfRange(date)}
                         initialFocus
                       />
                     </PopoverContent>
