@@ -11,7 +11,7 @@ const createDiscount = async (
   finalDate: Date | null | undefined
 ) => {
   const headers = getHeader();
-  const url = BASE_URL;
+  const url = `${BASE_URL}/client/${clientId}`;
 
   const body: BodyInit = JSON.stringify({
     clientId,

@@ -28,7 +28,7 @@ import { ErrorMessage } from "@/utils/error.enum";
 
 const hiringSchema = yup.object().shape({
   id: yup.number().nullable(),
-  clientId: yup.number().optional(),
+  referenceId: yup.number().optional(),
   referenceDate: yup.date().required(ErrorMessage.required),
 });
 
@@ -47,7 +47,7 @@ export default function HiringForm({ referenceId, onSubmit }: HiringInput) {
   const handleSubmit = () => {
     const newData = form.getValues();
     onSubmit({
-      clientId: referenceId,
+      referenceId: referenceId,
       referenceDate: newData.referenceDate,
     });
   };

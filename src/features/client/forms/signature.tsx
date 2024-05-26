@@ -72,7 +72,7 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
       productId: newData.productId,
       price: newData.price,
       initialDate: newData.initialDate,
-      finalDate: newData.initialDate,
+      finalDate: newData.finalDate,
     });
   };
 

@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { toDateValue, toMoneyValue } from "@/utils/format-utils";
+import { toDateString, toMoneyValue } from "@/utils/format-utils";
 import HiringForm, { HaringType } from "@/features/client/forms/hiring";
 import { createSignature, deleteSignature } from "@/services/signature";
 import { toast } from "sonner";
@@ -53,20 +53,18 @@ export function Signatures() {
         finalDate
       );
 
-      if (!newData.id) {
-        toast.error("Erro ao adicionar a assinatura", {
-          description: "Ocorreu um erro ao adicionar a assinatura.",
+      if (newData.length > 0) {
+        setSignatures(newData);
+
+        toast.success("Assinatura adicionada", {
+          description: "A assinatura foi adicionado com sucesso!",
         });
 
         return;
       }
 
-      setSignatures((prev: SignatureType[]) =>
-        prev.filter((d) => d.id !== newData.id).concat(newData)
-      );
-
-      toast.success("Assinatura adicionada", {
-        description: "A assinatura foi adicionado com sucesso!",
+      toast.error("Erro ao adicionar a assinatura", {
+        description: "Ocorreu um erro ao adicionar a assinatura.",
       });
     } catch (error) {
       toast.error("Falha ao adicionar a assinatura", {
@@ -75,11 +73,14 @@ export function Signatures() {
     }
   };
 
-  const handlerDelete = async ({ referenceDate }: HaringType) => {
+  const handlerDelete = async ({ referenceDate, referenceId }: HaringType) => {
     try {
-      const result = await deleteSignature(Number(clientId), referenceDate);
+      console.log('teste', referenceId)
+      const result = await deleteSignature(Number(referenceId), referenceDate);
 
-      if (result.id) {
+      if (result.length > 0) {
+        setSignatures(result);
+
         toast.success("Assinatura cancelada", {
           description: "A assinatura foi cancelada com sucesso!",
         });
@@ -110,7 +111,7 @@ export function Signatures() {
     {
       accessorKey: "finalDate",
       header: "Término",
-      accessorFn: (data: SignatureType) => toDateValue(data.finalDate ?? null),
+      accessorFn: (data: SignatureType) => toDateString(data.finalDate?.toString()),
     },
     {
       id: "actions",

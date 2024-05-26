@@ -9,14 +9,11 @@ const createSignature = async (
   price: number,
   initialDate: Date,
   finalDate: Date | null | undefined
-): Promise<SignatureType> => {
+): Promise<SignatureType[]> => {
   const headers = getHeader();
-  const url = BASE_URL;
+  const url = `${BASE_URL}/client/${clientId}/product/${productId}`;
 
   const body: BodyInit = JSON.stringify({
-    clientId,
-    productId,
-    price,
     initialDate,
     finalDate,
   });
@@ -46,7 +43,10 @@ const getSignatureByClient = async (clientId: number) => {
   return signature;
 };
 
-const deleteSignature = async (signatureId: number, finalDate: Date) => {
+const deleteSignature = async (
+  signatureId: number,
+  finalDate: Date
+): Promise<SignatureType[]> => {
   const headers = getHeader();
   const url = `${BASE_URL}/${signatureId}`;
 

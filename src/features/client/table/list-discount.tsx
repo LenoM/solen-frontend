@@ -61,20 +61,18 @@ export function Discounts() {
         finalDate
       );
 
-      if (!newData.id) {
-        toast.error("Erro ao adicionar o desconto", {
-          description: "Ocorreu um erro ao adicionar o desconto.",
+      if (newData.length > 0) {
+        setDiscounts(newData);
+
+        toast.success("Desconto adicionado", {
+          description: "O desconto foi adicionado com sucesso!",
         });
 
         return;
       }
 
-      setDiscounts((prev: DiscountType[]) =>
-        prev.filter((d) => d.id !== newData.id).concat(newData)
-      );
-
-      toast.success("Desconto adicionado", {
-        description: "O desconto foi adicionado com sucesso!",
+      toast.error("Erro ao adicionar o desconto", {
+        description: "Ocorreu um erro ao adicionar o desconto.",
       });
     } catch (error) {
       toast.error("Falha ao adicionar o desconto", {
@@ -83,14 +81,12 @@ export function Discounts() {
     }
   };
 
-  const handlerDelete = async ({ referenceDate }: HaringType) => {
+  const handlerDelete = async ({ referenceDate, referenceId }: HaringType) => {
     try {
-      const result = await deleteDiscount(Number(clientId), referenceDate);
+      const result = await deleteDiscount(Number(referenceId), referenceDate);
 
-      if (result.id) {
-        setDiscounts((prev: DiscountType[]) =>
-          prev.filter((d) => d.id !== result.id)
-        );
+      if (result.length > 0) {
+        setDiscounts(result);
 
         toast.success("Desconto cancelado", {
           description: "O desconto foi cancelado com sucesso!",

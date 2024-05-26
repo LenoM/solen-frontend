@@ -79,7 +79,7 @@ export default function DiscountForm({ onSubmit }: CancelInput) {
       price: newData.price,
       description: newData.description,
       initialDate: newData.initialDate,
-      finalDate: newData.initialDate,
+      finalDate: newData.finalDate,
     });
   };
 
