@@ -6,7 +6,6 @@ const BASE_URL = import.meta.env.VITE_API_URL + "/signature";
 const createSignature = async (
   clientId: number,
   productId: number,
-  price: number,
   initialDate: Date,
   finalDate: Date | null | undefined
 ): Promise<SignatureType[]> => {

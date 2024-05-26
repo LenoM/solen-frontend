@@ -40,7 +40,6 @@ export function Signatures() {
 
   const handlerSubmit = async ({
     productId,
-    price,
     initialDate,
     finalDate,
   }: SignatureType) => {
@@ -48,7 +47,6 @@ export function Signatures() {
       const newData = await createSignature(
         Number(clientId),
         productId,
-        Number(price),
         initialDate,
         finalDate
       );

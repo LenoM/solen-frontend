@@ -39,7 +39,7 @@ import { ProductType } from "@/features/product/form";
 
 const signatureSchema = yup.object().shape({
   id: yup.number().nullable(),
-  price: yup.string().required(ErrorMessage.required).default("0"),
+  price: yup.string().optional(),
   productId: yup.number().required(ErrorMessage.required),
   clientId: yup.number().optional(),
   initialDate: yup.date().required(ErrorMessage.required),
@@ -70,7 +70,6 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
 
     onSubmit({
       productId: newData.productId,
-      price: newData.price,
       initialDate: newData.initialDate,
       finalDate: newData.finalDate,
     });
