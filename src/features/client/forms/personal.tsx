@@ -39,6 +39,7 @@ import { KinshipBadge, StatusBadge } from "@/features/client/status";
 import { getCategories } from "@/services/category";
 import { getCompanies } from "@/services/company";
 import { Entity } from "@/utils/utils";
+import { ErrorMessage } from "@/utils/error.enum";
 
 export const loadClientData = (data?: any): ClientType => {
   return {
@@ -62,14 +63,6 @@ export const loadClientData = (data?: any): ClientType => {
   };
 };
 
-const customError = {
-  required: "Campo obrigatório",
-  equals: "Escolha um valor válido",
-  invalidCPF: "CPF inválido",
-  invalidRG: "RG inválido",
-  invalidDate: "Data inválida",
-};
-
 const kinshipArray = [
   { id: "Conjuge", name: "Cônjuge" },
   { id: "Enteado", name: "Enteado" },
@@ -80,8 +73,8 @@ const kinshipArray = [
 
 const clientSchema = yup.object({
   id: yup.number().nullable(),
-  name: yup.string().required(customError.required),
-  socialName: yup.string().required(customError.required),
+  name: yup.string().required(ErrorMessage.required),
+  socialName: yup.string().required(ErrorMessage.required),
   isHolder: yup.boolean().default(true),
   isActive: yup.boolean().default(true),
   categoryId: yup
@@ -96,8 +89,8 @@ const clientSchema = yup.object({
         yup
           .number()
           .transform((value) => (Number.isNaN(value) ? null : value))
-          .required(customError.required)
-          .min(1, customError.equals),
+          .required(ErrorMessage.required)
+          .min(1, ErrorMessage.equals),
     }),
   companyId: yup
     .string()
@@ -111,8 +104,8 @@ const clientSchema = yup.object({
         yup
           .number()
           .transform((value) => (Number.isNaN(value) ? null : value))
-          .required(customError.required)
-          .min(1, customError.equals),
+          .required(ErrorMessage.required)
+          .min(1, ErrorMessage.equals),
     }),
   holderId: yup
     .string()
@@ -126,8 +119,8 @@ const clientSchema = yup.object({
         yup
           .string()
           .transform((value) => (Number.isNaN(value) ? null : value))
-          .required(customError.required)
-          .min(1, customError.equals),
+          .required(ErrorMessage.required)
+          .min(1, ErrorMessage.equals),
     }),
   kinship: yup
     .string()
@@ -137,32 +130,32 @@ const clientSchema = yup.object({
     })
     .when("isHolder", {
       is: (value: boolean) => value === false,
-      then: () => yup.string().required(customError.required),
+      then: () => yup.string().required(ErrorMessage.required),
     }),
   gender: yup
     .string()
-    .required(customError.required)
-    .equals(["Masculino", "Feminino"], customError.equals),
+    .required(ErrorMessage.required)
+    .equals(["Masculino", "Feminino"], ErrorMessage.equals),
   cpf: yup
     .string()
     .transform(formatCPF)
-    .required(customError.required)
+    .required(ErrorMessage.required)
     .length(14),
   rg: yup
     .string()
-    .required(customError.required)
-    .min(5, customError.invalidRG)
-    .max(12, customError.invalidRG),
+    .required(ErrorMessage.required)
+    .min(5, ErrorMessage.invalidRG)
+    .max(12, ErrorMessage.invalidRG),
   birthday: yup
     .string()
     .transform((value) => formatDate(toDateString(value)))
-    .required(customError.invalidDate)
-    .length(10, customError.invalidDate),
+    .required(ErrorMessage.invalidDate)
+    .length(10, ErrorMessage.invalidDate),
   referenceDate: yup
     .string()
     .transform((value) => formatDate(toDateString(value)))
-    .required(customError.invalidDate)
-    .length(10, customError.invalidDate),
+    .required(ErrorMessage.invalidDate)
+    .length(10, ErrorMessage.invalidDate),
   bondDate: yup
     .string()
     .when("isHolder", {
@@ -175,11 +168,11 @@ const clientSchema = yup.object({
         yup
           .string()
           .transform((value) => formatDate(toDateString(value)))
-          .required(customError.invalidDate)
-          .length(10, customError.invalidDate),
+          .required(ErrorMessage.invalidDate)
+          .length(10, ErrorMessage.invalidDate),
     }),
-  motherName: yup.string().required(customError.required),
-  fatherName: yup.string().required(customError.required),
+  motherName: yup.string().required(ErrorMessage.required),
+  fatherName: yup.string().required(ErrorMessage.required),
 });
 
 export type ClientType = yup.InferType<typeof clientSchema>;
@@ -249,7 +242,7 @@ export default function Personal(data: ClientType) {
     form.clearErrors("birthday");
 
     if (!parsedDate) {
-      form.setError("birthday", { message: customError.invalidDate });
+      form.setError("birthday", { message: ErrorMessage.invalidDate });
       return;
     }
   };
@@ -268,7 +261,7 @@ export default function Personal(data: ClientType) {
     form.clearErrors("bondDate");
 
     if (!parsedDate) {
-      form.setError("bondDate", { message: customError.invalidDate });
+      form.setError("bondDate", { message: ErrorMessage.invalidDate });
       return;
     }
   };
@@ -287,7 +280,7 @@ export default function Personal(data: ClientType) {
     form.clearErrors("referenceDate");
 
     if (!parsedDate) {
-      form.setError("referenceDate", { message: customError.invalidDate });
+      form.setError("referenceDate", { message: ErrorMessage.invalidDate });
       return;
     }
   };
@@ -304,7 +297,7 @@ export default function Personal(data: ClientType) {
     const isValid = validator.isTaxID(input, "pt-BR");
 
     if (!isValid) {
-      form.setError("cpf", { message: customError.invalidCPF });
+      form.setError("cpf", { message: ErrorMessage.invalidCPF });
       return;
     }
     form.clearErrors("cpf");

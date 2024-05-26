@@ -32,22 +32,18 @@ import {
 
 import { cn } from "@/lib/utils";
 import { toDateString } from "@/utils/format-utils";
-
-const customError = {
-  required: "Campo obrigatório",
-  equals: "Escolha um valor válido",
-};
+import { ErrorMessage } from "@/utils/error.enum";
 
 const reasonTypeArray = ["Debito", "Pedido", "Obito"];
 
 const cancelSchema = yup.object().shape({
   id: yup.number().nullable(),
-  referenceDate: yup.date().required(customError.required),
+  referenceDate: yup.date().required(ErrorMessage.required),
   reason: yup
     .string()
     .nullable()
-    .required(customError.required)
-    .equals(reasonTypeArray, customError.equals),
+    .required(ErrorMessage.required)
+    .equals(reasonTypeArray, ErrorMessage.equals),
 });
 
 export type CancelType = yup.InferType<typeof cancelSchema>;

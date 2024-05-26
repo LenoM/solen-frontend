@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/form";
 
 import { normalizePhoneNumber } from "@/utils/format-utils";
+import { ErrorMessage } from "@/utils/error.enum";
 
 export const loadContactData = (data?: ContactType): ContactType => {
   const { id } = useParams();
@@ -39,12 +40,6 @@ export const loadContactData = (data?: ContactType): ContactType => {
     contactType: data?.contactType || "",
     isWhatsapp: data?.isWhatsapp || false,
   };
-};
-
-const customError = {
-  required: "Campo obrigatório",
-  equals: "Escolha um valor válido",
-  invalid: "Formato inválido",
 };
 
 const contactTypeArray = [
@@ -64,18 +59,18 @@ const formatValue = (value: string, currentType: string) => {
 
 const contactSchema = yup.object().shape({
   id: yup.number().nullable(),
-  clientId: yup.number().required(customError.required),
+  clientId: yup.number().required(ErrorMessage.required),
   contactType: yup
     .string()
     .nullable()
-    .required(customError.required)
-    .equals(contactTypeArray, customError.equals),
+    .required(ErrorMessage.required)
+    .equals(contactTypeArray, ErrorMessage.equals),
   isWhatsapp: yup.boolean().default(false),
   value: yup
     .string()
-    .required(customError.required)
+    .required(ErrorMessage.required)
     .test({
-      message: customError.invalid,
+      message: ErrorMessage.invalidContact,
       test: (values, ctx) => {
         if (ctx.parent.contactType === "Email") {
           return validator.isEmail(values);

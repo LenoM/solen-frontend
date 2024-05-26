@@ -29,14 +29,10 @@ import { Client } from "../table/list-clients";
 import { useEffect, useState } from "react";
 import { getFamily } from "@/services/client";
 import { Checkbox } from "@/components/ui/checkbox";
-
-const customError = {
-  required: "Campo obrigatório",
-  equals: "Escolha um valor válido",
-};
+import { ErrorMessage } from "@/utils/error.enum";
 
 const cancelSchema = yup.object().shape({
-  referenceDate: yup.date().required(customError.required),
+  referenceDate: yup.date().required(ErrorMessage.required),
   id: yup.number().nullable(),
   dependents: yup.array(),
 });

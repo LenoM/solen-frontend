@@ -1,0 +1,15 @@
+export enum ErrorMessage {
+  required = "Campo obrigatório",
+  equals = "Escolha o valor correto",
+  min = "Digite o valor correto",
+  max = "Digite o valor correto",
+  notEquals = "Senhas não conferem",
+  invalidRG = "RG inválido",
+  invalidCPF = "CPF inválido",
+  invalidPrice = "Preço inválido",
+  invalidDate = "Data inválida",
+  invalidEmail = "Email inválido",
+  invalidPassword = "Senhas inválida",
+  invalidLength = "Digite ao menos 7 digitos",
+  invalidContact = "Digite um contato válido",
+}

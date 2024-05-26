@@ -31,6 +31,7 @@ import {
   getCity,
 } from "@/services/address";
 import { normalizeCepNumber } from "@/utils/format-utils";
+import { ErrorMessage } from "@/utils/error.enum";
 
 export const loadAddressData = (data?: AddressDataType) => {
   return {
@@ -55,23 +56,17 @@ type AddressAttr = {
   stateId: string;
 };
 
-const customError = {
-  required: "Campo obrigatório",
-  equals: "Escolha o valor",
-  min: "Digite o número correto",
-};
-
 const addressSchema = yup.object({
   id: yup.number(),
-  cep: yup.string().required(customError.required),
-  city: yup.string().nullable().required(customError.required),
-  state: yup.string().nullable().required(customError.required),
-  district: yup.string().nullable().required(customError.required),
-  address: yup.string().required(customError.required),
-  number: yup.number().min(0, customError.min).required(customError.required),
+  cep: yup.string().required(ErrorMessage.required),
+  city: yup.string().nullable().required(ErrorMessage.required),
+  state: yup.string().nullable().required(ErrorMessage.required),
+  district: yup.string().nullable().required(ErrorMessage.required),
+  address: yup.string().required(ErrorMessage.required),
+  number: yup.number().min(0, ErrorMessage.min).required(ErrorMessage.required),
   complement: yup.string(),
-  addressType: yup.string().nullable().required(customError.required),
-  addressCategory: yup.string().nullable().required(customError.required),
+  addressType: yup.string().nullable().required(ErrorMessage.required),
+  addressCategory: yup.string().nullable().required(ErrorMessage.required),
 });
 
 export type AddressDataType = yup.InferType<typeof addressSchema>;

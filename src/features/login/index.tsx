@@ -7,7 +7,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import * as authService from "@/services/auth";
 
 import {
   Form,
@@ -18,9 +17,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import * as authService from "@/services/auth";
+import { ErrorMessage } from "@/utils/error.enum";
+
 const loginSchema = yup.object({
-  email: yup.string().required().email(),
-  password: yup.string().required().min(5),
+  email: yup
+    .string()
+    .required(ErrorMessage.required)
+    .email(ErrorMessage.invalidEmail),
+  password: yup
+    .string()
+    .required(ErrorMessage.required)
+    .min(5, ErrorMessage.invalidPassword),
 });
 
 type LoginType = yup.InferType<typeof loginSchema>;
@@ -79,7 +87,11 @@ export default function Login() {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input placeholder="Email" autoComplete="email" {...field} />
+                            <Input
+                              placeholder="Email"
+                              autoComplete="email"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

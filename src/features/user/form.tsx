@@ -18,13 +18,7 @@ import {
 } from "@/components/ui/form";
 import { createUser, updateUser } from "@/services/user";
 import { useNavigate, useParams } from "react-router-dom";
-
-const customError = {
-  required: "Campo obrigatório",
-  invalidEmail: "Email inválido",
-  invalidPassword: "Senhas não conferem",
-  invalidLength: "Digite ao menos 7 digitos",
-};
+import { ErrorMessage } from "@/utils/error.enum";
 
 export const loadUserData = (data?: UserType): UserType => {
   return {
@@ -40,29 +34,29 @@ export const loadUserData = (data?: UserType): UserType => {
 
 const userSchema = yup.object({
   id: yup.string(),
-  name: yup.string().required(customError.required),
+  name: yup.string().required(ErrorMessage.required),
   isActive: yup.boolean().default(false),
   isChangePassword: yup.boolean().default(true),
   email: yup
     .string()
-    .email(customError.invalidEmail)
-    .required(customError.required),
+    .email(ErrorMessage.invalidEmail)
+    .required(ErrorMessage.required),
   password: yup.string().when("isChangePassword", {
     is: (value: number) => value,
     then: () =>
       yup
         .string()
-        .required(customError.required)
-        .min(7, customError.invalidLength),
+        .required(ErrorMessage.required)
+        .min(7, ErrorMessage.invalidLength),
   }),
   passwordConfirmation: yup.string().when("password", {
     is: (value: number) => value,
     then: () =>
       yup
         .string()
-        .required(customError.required)
-        .min(7, customError.invalidLength)
-        .oneOf([yup.ref("password")], customError.invalidPassword),
+        .required(ErrorMessage.required)
+        .min(7, ErrorMessage.invalidLength)
+        .oneOf([yup.ref("password")], ErrorMessage.notEquals),
   }),
 });
 
@@ -75,7 +69,7 @@ interface UserProps {
 
 export default function UserForm({ data, setData }: UserProps) {
   const navigate = useNavigate();
-  
+
   const form = useForm({
     resolver: yupResolver(userSchema),
     values: loadUserData(data),

@@ -29,11 +29,7 @@ import {
 
 import { getSuppliers } from "@/services/supplier";
 import { createProduct, updateProduct } from "@/services/product";
-
-const customError = {
-  required: "Campo obrigatório",
-  equals: "Escolha um valor válido",
-};
+import { ErrorMessage } from "@/utils/error.enum";
 
 export const loadProductData = (data?: ProductType): ProductType => {
   return {
@@ -48,19 +44,19 @@ export const loadProductData = (data?: ProductType): ProductType => {
 
 const productSchema = yup.object({
   id: yup.number().nullable(),
-  name: yup.string().required(customError.required),
-  description: yup.string().required(customError.required),
+  name: yup.string().required(ErrorMessage.required),
+  description: yup.string().required(ErrorMessage.required),
   isActive: yup.boolean(),
   supplierId: yup
     .string()
     .transform((value) => (Number.isNaN(value) ? null : value))
-    .required(customError.required)
-    .min(1, customError.equals),
+    .required(ErrorMessage.required)
+    .min(1, ErrorMessage.equals),
   billingMethod: yup
     .string()
     .nullable()
-    .required(customError.required)
-    .equals(["Fix", "Age"], customError.equals),
+    .required(ErrorMessage.required)
+    .equals(["Fix", "Age"], ErrorMessage.equals),
 });
 
 type Supplier = {
