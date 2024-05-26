@@ -25,36 +25,31 @@ import {
 
 import { cn } from "@/lib/utils";
 import { toDateString } from "@/utils/format-utils";
-import { Client } from "../table/list-clients";
 import { useEffect, useState } from "react";
 import { getFamily } from "@/services/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ErrorMessage } from "@/utils/error.enum";
+import { ClientType } from "@/features/client/forms/personal";
 
-const cancelSchema = yup.object().shape({
+const reactivateSchema = yup.object().shape({
   referenceDate: yup.date().required(ErrorMessage.required),
   id: yup.number().nullable(),
+  clientId: yup.number().optional(),
   dependents: yup.array(),
 });
 
-export type CancelType = yup.InferType<typeof cancelSchema>;
-
-export type ReactivateParam = {
-  clientId: number;
-  referenceDate: Date;
-  dependents: number[];
-};
+export type ReativateType = yup.InferType<typeof reactivateSchema>;
 
 type ReactivateInput = {
   referenceId: number;
-  onSubmit: (param: ReactivateParam) => void;
+  onSubmit: (param: ReativateType) => void;
 };
 
 export default function ReactivateForm({
   referenceId,
   onSubmit,
 }: ReactivateInput) {
-  const [dependents, setDependents] = useState<Client[]>([]);
+  const [dependents, setDependents] = useState<ClientType[]>([]);
 
   useEffect(() => {
     if (dependents.length === 0) {
@@ -63,7 +58,7 @@ export default function ReactivateForm({
   });
 
   const form = useForm({
-    resolver: yupResolver(cancelSchema),
+    resolver: yupResolver(reactivateSchema),
   });
 
   const handleSubmit = () => {

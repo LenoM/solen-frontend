@@ -29,15 +29,7 @@ import ContactForm, {
   ContactType,
 } from "@/features/client/forms/contact";
 
-export type Contact = {
-  id: number;
-  clientId: number;
-  value: string;
-  isWhatsapp: boolean;
-  contactType: string;
-};
-
-const editContact = (data: Contact): ContactType => {
+const editContact = (data: ContactType): ContactType => {
   return {
     id: data.id,
     clientId: data.clientId,
@@ -137,7 +129,7 @@ export function Contacts(data: any) {
     }
   };
 
-  const columns: ColumnDef<Contact>[] = [
+  const columns: ColumnDef<ContactType>[] = [
     {
       accessorKey: "contactType",
       header: "Tipo",
@@ -145,12 +137,12 @@ export function Contacts(data: any) {
     {
       accessorKey: "value",
       header: "Contato",
-      accessorFn: (data: Contact) => formatContact(data),
+      accessorFn: (data: ContactType) => formatContact(data),
     },
     {
       accessorKey: "isWhatsapp",
       header: "WhatsApp?",
-      accessorFn: (data: Contact) => (data.isWhatsapp ? "Sim" : "Não"),
+      accessorFn: (data: ContactType) => (data.isWhatsapp ? "Sim" : "Não"),
     },
     {
       id: "actions",
@@ -188,7 +180,7 @@ export function Contacts(data: any) {
                     </Button>
                   </DialogClose>
                   <Button
-                    onClick={() => handlerDelete(row.original.id)}
+                    onClick={() => handlerDelete(Number(row.original.id))}
                     type="submit"
                     variant="destructive"
                     className="mb-2"

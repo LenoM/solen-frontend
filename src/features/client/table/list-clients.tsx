@@ -32,20 +32,15 @@ import { Button } from "@/components/ui/button";
 import { cancelClient, reactivateClient } from "@/services/client";
 import { DataTable } from "@/components/dataTable";
 import { formatCPF } from "@/utils/format-utils";
-import CancelForm, { CancelParam } from "@/features/client/forms/cancel";
-import ReactivateForm, { ReactivateParam } from "@/features/client/forms//reactivate";
-
-export type Client = {
-  id: string;
-  cpf: string;
-  name: string;
-  kinship: string;
-  isActive: boolean;
-};
+import CancelForm, { CancelType } from "@/features/client/forms/cancel";
+import ReactivateForm, {
+  ReativateType,
+} from "@/features/client/forms/reactivate";
+import { ClientType } from "@/features/client/forms/personal";
 
 type ClientTableProps = {
   showAddBtn: boolean;
-  clients: Client[];
+  clients: ClientType[];
 };
 
 const pathNewClient = `${window.origin}/client/add`;
@@ -54,24 +49,26 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
   const [data, setData] = useState(clients);
 
   useEffect(() => {
-    setData(clients)
-}, [clients]);
- 
+    setData(clients);
+  }, [clients]);
+
   const handlerCancel = async ({
     reason,
     clientId,
     referenceDate,
-  }: CancelParam) => {
-    const result = await cancelClient(clientId, referenceDate, reason);
+  }: CancelType) => {
+    const result = await cancelClient(Number(clientId), referenceDate, reason);
 
     if (!result.error) {
-      const clientIndex = clients.findIndex((cli) => Number(cli.id) === clientId);
-      const newClient = {...clients[clientIndex], isActive: false};
+      const clientIndex = clients.findIndex(
+        (cli) => Number(cli.id) === clientId
+      );
+      const newClient = { ...clients[clientIndex], isActive: false };
 
       const newClients = [
         ...clients.slice(0, clientIndex),
         newClient,
-        ...clients.slice(clientIndex + 1)
+        ...clients.slice(clientIndex + 1),
       ];
       setData(newClients);
 
@@ -89,24 +86,29 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
     clientId,
     dependents,
     referenceDate,
-  }: ReactivateParam) => {
-    const result = await reactivateClient(clientId, referenceDate, dependents);
+  }: ReativateType) => {
+    const result = await reactivateClient(
+      Number(clientId),
+      referenceDate,
+      dependents
+    );
 
     if (!result.error) {
-      const clientIndex = clients.findIndex((cli) => Number(cli.id) === clientId);
-      const newClient = {...clients[clientIndex], isActive: true};
+      const clientIndex = clients.findIndex(
+        (cli) => Number(cli.id) === clientId
+      );
+      const newClient = { ...clients[clientIndex], isActive: true };
 
       const newClients = [
         ...clients.slice(0, clientIndex),
         newClient,
-        ...clients.slice(clientIndex + 1)
+        ...clients.slice(clientIndex + 1),
       ];
       setData(newClients);
 
       toast.info("Reativação realizada", {
         description: `O cliente #${clientId} foi reativado`,
       });
-
     } else {
       toast.error("Erro na reativação", {
         description: "Ocorreu um erro ao tentar reativar o cliente",
@@ -114,7 +116,7 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
     }
   };
 
-  const columns: ColumnDef<Client>[] = [
+  const columns: ColumnDef<ClientType>[] = [
     {
       accessorKey: "id",
       header: "Id",
@@ -126,7 +128,7 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
     {
       accessorKey: "cpf",
       header: "CPF",
-      accessorFn: (cli: Client) => formatCPF(cli.cpf),
+      accessorFn: (cli: ClientType) => formatCPF(cli.cpf),
     },
     {
       accessorKey: "kinship",
@@ -135,7 +137,7 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
     {
       accessorKey: "isActive",
       header: "Ativo?",
-      accessorFn: (cli: Client) => (cli.isActive === true ? "Sim" : "Não"),
+      accessorFn: (cli: ClientType) => (cli.isActive === true ? "Sim" : "Não"),
     },
     {
       id: "actions",

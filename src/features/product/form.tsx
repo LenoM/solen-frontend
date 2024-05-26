@@ -30,6 +30,7 @@ import {
 import { getSuppliers } from "@/services/supplier";
 import { createProduct, updateProduct } from "@/services/product";
 import { ErrorMessage } from "@/utils/error.enum";
+import { Entity } from "@/utils/utils";
 
 export const loadProductData = (data?: ProductType): ProductType => {
   return {
@@ -59,11 +60,6 @@ const productSchema = yup.object({
     .equals(["Fix", "Age"], ErrorMessage.equals),
 });
 
-type Supplier = {
-  id: number;
-  name: string;
-};
-
 export type ProductType = yup.InferType<typeof productSchema>;
 
 interface ProductProps {
@@ -73,7 +69,7 @@ interface ProductProps {
 
 export default function ProductForm({ data, setData }: ProductProps) {
   const navigate = useNavigate();
-  const [suppliersList, setSuppliersList] = useState<Supplier[]>([]);
+  const [suppliersList, setSuppliersList] = useState<Entity[]>([]);
 
   useEffect(() => {
     getData();

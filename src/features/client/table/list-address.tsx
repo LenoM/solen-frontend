@@ -33,6 +33,7 @@ type AddressType = {
   id: string;
   abbreviation: string;
 };
+
 type District = {
   id: string;
   city: City;

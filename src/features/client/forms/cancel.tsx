@@ -38,6 +38,7 @@ const reasonTypeArray = ["Debito", "Pedido", "Obito"];
 
 const cancelSchema = yup.object().shape({
   id: yup.number().nullable(),
+  clientId: yup.number().optional(),
   referenceDate: yup.date().required(ErrorMessage.required),
   reason: yup
     .string()
@@ -48,15 +49,9 @@ const cancelSchema = yup.object().shape({
 
 export type CancelType = yup.InferType<typeof cancelSchema>;
 
-export type CancelParam = {
-  reason: string;
-  clientId: number;
-  referenceDate: Date;
-};
-
 type CancelInput = {
   referenceId: number;
-  onSubmit: (param: CancelParam) => void;
+  onSubmit: (param: CancelType) => void;
 };
 
 export default function CancelForm({ referenceId, onSubmit }: CancelInput) {
