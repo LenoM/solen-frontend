@@ -213,6 +213,7 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
 
                 <ReactivateForm
                   onSubmit={handlerReactivate}
+                  isHolder={row.original.kinship === "Titular"}
                   referenceId={Number(row.original.id)}
                 />
               </DialogContent>

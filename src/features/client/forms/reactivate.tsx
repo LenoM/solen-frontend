@@ -42,20 +42,22 @@ export type ReativateType = yup.InferType<typeof reactivateSchema>;
 
 type ReactivateInput = {
   referenceId: number;
+  isHolder: boolean;
   onSubmit: (param: ReativateType) => void;
 };
 
 export default function ReactivateForm({
   referenceId,
+  isHolder,
   onSubmit,
 }: ReactivateInput) {
   const [dependents, setDependents] = useState<ClientType[]>([]);
 
   useEffect(() => {
-    if (dependents.length === 0) {
+    if (isHolder && dependents.length === 0) {
       loadDependentsData(referenceId);
     }
-  });
+  }, [isHolder]);
 
   const form = useForm({
     resolver: yupResolver(reactivateSchema),
@@ -135,55 +137,62 @@ export default function ReactivateForm({
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="dependents"
-            render={() => (
-              <FormItem>
-                <div className="mb-4">
-                  <FormLabel>Dependentes</FormLabel>
-                  <FormDescription>Selecione os dependentes</FormDescription>
-                </div>
-                {dependents.filter(dp => dp.kinship !== 'Titular').map((item) => (
-                  <FormField
-                    key={item.id}
-                    control={form.control}
-                    name="dependents"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={item.id}
-                          className="flex flex-row items-start space-x-3 space-y-0"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(item.id)}
-                              onCheckedChange={(checked) => {
-                                const updatedValue = field.value || [];
-                                if (checked) {
-                                  field.onChange([...updatedValue, item.id]);
-                                } else {
-                                  field.onChange(
-                                    updatedValue.filter(
-                                      (value) => value !== item.id
-                                    )
-                                  );
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {item.name} - {item.kinship}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
-                  />
-                ))}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {isHolder && (
+            <FormField
+              control={form.control}
+              name="dependents"
+              render={() => (
+                <FormItem>
+                  <div className="mb-4">
+                    <FormLabel>Dependentes</FormLabel>
+                    <FormDescription>Selecione os dependentes</FormDescription>
+                  </div>
+                  {dependents
+                    .filter((dp) => dp.kinship !== "Titular")
+                    .map((item) => (
+                      <FormField
+                        key={item.id}
+                        control={form.control}
+                        name="dependents"
+                        render={({ field }) => {
+                          return (
+                            <FormItem
+                              key={item.id}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(item.id)}
+                                  onCheckedChange={(checked) => {
+                                    const updatedValue = field.value || [];
+                                    if (checked) {
+                                      field.onChange([
+                                        ...updatedValue,
+                                        item.id,
+                                      ]);
+                                    } else {
+                                      field.onChange(
+                                        updatedValue.filter(
+                                          (value) => value !== item.id
+                                        )
+                                      );
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                {item.name} - {item.kinship}
+                              </FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <div className="flex flex-col mb-4 mt-4">
             <Button type="submit">Salvar</Button>
