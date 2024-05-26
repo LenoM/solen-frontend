@@ -118,7 +118,7 @@ export default function AddressForm({ data, onSubmit }: AddressFormProps) {
   };
 
   const onChangeCEP = async (e: React.FormEvent<HTMLInputElement>) => {
-    let input = e.currentTarget.value;
+    const input = e.currentTarget.value;
     const cep = normalizeCepNumber(input);
     form.setValue("cep", cep);
   };

@@ -82,10 +82,10 @@ export default function UserForm({ data, setData }: UserProps) {
     try {
       let newData: UserType = form.getValues();
 
-      if (!!id) {
-        newData = await updateUser(id, newData);
-      } else {
+      if (!id) {
         newData = await createUser(newData);
+      } else {
+        newData = await updateUser(id, newData);
       }
 
       if (!newData.id) {

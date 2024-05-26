@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { Send, Printer } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -87,8 +86,6 @@ export const columns: ColumnDef<Invoice>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const { id } = useParams();
-
       return (
         <>
           <Dialog>
