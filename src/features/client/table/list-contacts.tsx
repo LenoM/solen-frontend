@@ -4,6 +4,7 @@ import { Pencil, Trash, PlusCircle } from "lucide-react";
 import { DataTable } from "@/components/dataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+
 import {
   Dialog,
   DialogClose,
@@ -156,7 +157,10 @@ export function Contacts(data: any) {
       cell: ({ row }) => {
         return (
           <>
-            <ContactDialog title="Editar contato" formData={editContact(row.original)}>
+            <ContactDialog
+              title="Editar contato"
+              formData={editContact(row.original)}
+            >
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Edit</span>
                 <Pencil className="h-4 w-4" />

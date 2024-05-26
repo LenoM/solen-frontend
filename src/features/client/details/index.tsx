@@ -30,11 +30,11 @@ import {
   PhoneCall,
 } from "lucide-react";
 
-import { Signatures } from "./signature";
-import { Discounts } from "./discount";
 import { Invoices } from "./invoices";
 import { Address } from "../table/list-address";
 import { Contacts } from "../table/list-contacts";
+import { Discounts } from "../table/list-discount";
+import { Signatures } from "../table/list-signatures";
 import { Clients as Dependents } from "../table/list-clients";
 
 import Personal, { loadClientData } from "@/features/client/forms/personal";
@@ -152,7 +152,7 @@ export default function ClientDetails() {
               </CardContent>
             </Card>
 
-            <Separator className="my-3"/>
+            <Separator className="my-3" />
 
             <Card>
               <CardHeader className="text-center">
