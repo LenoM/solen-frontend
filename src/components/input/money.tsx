@@ -26,6 +26,8 @@ const moneyFormatter = Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 2,
 });
 
+type CustomOnChange = (value: number) => void;
+
 export default function MoneyInput(props: TextInputProps) {
   const initialValue = props.form.getValues()[props.name]
     ? moneyFormatter.format(props.form.getValues()[props.name])
@@ -36,7 +38,7 @@ export default function MoneyInput(props: TextInputProps) {
     return moneyFormatter.format(Number(digits) / 100);
   }, initialValue);
 
-  function handleChange(realChangeFn: Function, formattedValue: string) {
+  function handleChange(realChangeFn: CustomOnChange, formattedValue: string) {
     const digits = formattedValue.replace(/\D/g, "");
     const realValue = Number(digits) / 100;
     realChangeFn(realValue);
