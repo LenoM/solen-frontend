@@ -32,6 +32,68 @@ const getClient = async (input: string) => {
   return clients;
 };
 
+const getFamily = async (id: number) => {
+  const headers = getHeader();
+  const url = `${BASE_URL}/family/${id}`;
+
+  const params: RequestInit = {
+    method: "GET",
+    headers,
+  };
+
+  const clients = await fetch(url, params).then((resp) => resp.json());
+
+  return clients;
+};
+
+const cancelClient = async (
+  id: number,
+  cancelDate: Date,
+  reason: string | undefined
+) => {
+  const headers = getHeader();
+  const url = `${BASE_URL}/${id}/cancel`;
+
+  const body: BodyInit = JSON.stringify({
+    cancelDate,
+    reason,
+  });
+
+  const params: RequestInit = {
+    method: "PATCH",
+    headers,
+    body,
+  };
+
+  const clients = await fetch(url, params).then((resp) => resp.json());
+
+  return clients;
+};
+
+const reactivateClient = async (
+  id: number,
+  reactivatedDate: Date,
+  dependents?: number[] | undefined
+) => {
+  const headers = getHeader();
+  const url = `${BASE_URL}/${id}/reactivate`;
+
+  const body: BodyInit = JSON.stringify({
+    reactivatedDate,
+    dependents,
+  });
+
+  const params: RequestInit = {
+    method: "PATCH",
+    headers,
+    body,
+  };
+
+  const clients = await fetch(url, params).then((resp) => resp.json());
+
+  return clients;
+};
+
 const getClientByid = async (id: number) => {
   const headers = getHeader();
   const url = `${BASE_URL}/${id}`;
@@ -141,4 +203,13 @@ const createClient = async ({
   return clients;
 };
 
-export { getClients, getClient, getClientByid, createClient, updateClient };
+export {
+  getClients,
+  getClient,
+  getFamily,
+  getClientByid,
+  createClient,
+  updateClient,
+  cancelClient,
+  reactivateClient,
+};

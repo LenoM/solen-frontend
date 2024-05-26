@@ -1,6 +1,5 @@
-import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   Ban,
@@ -30,12 +29,13 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import HiringForm from "@/features/client/forms/hiring";
 import { cancelClient, reactivateClient } from "@/services/client";
 import { DataTable } from "@/components/dataTable";
 import { formatCPF } from "@/utils/format-utils";
+import CancelForm, { CancelParam } from "@/features/client/forms/cancel";
+import ReactivateForm, { ReactivateParam } from "@/features/client/forms//reactivate";
 
-type Client = {
+export type Client = {
   id: string;
   cpf: string;
   name: string;
@@ -43,45 +43,183 @@ type Client = {
   isActive: boolean;
 };
 
-export const columns: ColumnDef<Client>[] = [
-  {
-    accessorKey: "id",
-    header: "Id",
-  },
-  {
-    accessorKey: "name",
-    header: "Nome",
-  },
-  {
-    accessorKey: "cpf",
-    header: "CPF",
-    accessorFn: (cli: Client) => formatCPF(cli.cpf),
-  },
-  {
-    accessorKey: "kinship",
-    header: "Parentesco",
-  },
-  {
-    accessorKey: "isActive",
-    header: "Ativo?",
-    accessorFn: (cli: Client) => (cli.isActive === true ? "Sim" : "Não"),
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const newPath = `${window.origin}/client/${row.original.id}`;
+type ClientTableProps = {
+  showAddBtn: boolean;
+  clients: Client[];
+};
 
-      return (
-        <Link to={newPath}>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <Eye className="h-4 w-4" />
-          </Button>
-        </Link>
-      );
+const pathNewClient = `${window.origin}/client/add`;
+
+export function Clients({ clients, showAddBtn }: ClientTableProps) {
+  const [data, setData] = useState(clients);
+
+  useEffect(() => {
+    setData(clients)
+}, [clients]);
+ 
+  const handlerCancel = async ({
+    reason,
+    clientId,
+    referenceDate,
+  }: CancelParam) => {
+    const result = await cancelClient(clientId, referenceDate, reason);
+
+    if (!result.error) {
+      const clientIndex = clients.findIndex((cli) => Number(cli.id) === clientId);
+      const newClient = {...clients[clientIndex], isActive: false};
+
+      const newClients = [
+        ...clients.slice(0, clientIndex),
+        newClient,
+        ...clients.slice(clientIndex + 1)
+      ];
+      setData(newClients);
+
+      toast.info("Cancelamento realizado", {
+        description: `O cliente #${clientId} foi cancelado`,
+      });
+    } else {
+      toast.error("Erro no cancelamento", {
+        description: "Ocorreu um erro ao tentar cancelar o cliente",
+      });
+    }
+  };
+
+  const handlerReactivate = async ({
+    clientId,
+    dependents,
+    referenceDate,
+  }: ReactivateParam) => {
+    const result = await reactivateClient(clientId, referenceDate, dependents);
+
+    if (!result.error) {
+      const clientIndex = clients.findIndex((cli) => Number(cli.id) === clientId);
+      const newClient = {...clients[clientIndex], isActive: true};
+
+      const newClients = [
+        ...clients.slice(0, clientIndex),
+        newClient,
+        ...clients.slice(clientIndex + 1)
+      ];
+      setData(newClients);
+
+      toast.info("Reativação realizada", {
+        description: `O cliente #${clientId} foi reativado`,
+      });
+
+    } else {
+      toast.error("Erro na reativação", {
+        description: "Ocorreu um erro ao tentar reativar o cliente",
+      });
+    }
+  };
+
+  const columns: ColumnDef<Client>[] = [
+    {
+      accessorKey: "id",
+      header: "Id",
     },
-  },
-];
+    {
+      accessorKey: "name",
+      header: "Nome",
+    },
+    {
+      accessorKey: "cpf",
+      header: "CPF",
+      accessorFn: (cli: Client) => formatCPF(cli.cpf),
+    },
+    {
+      accessorKey: "kinship",
+      header: "Parentesco",
+    },
+    {
+      accessorKey: "isActive",
+      header: "Ativo?",
+      accessorFn: (cli: Client) => (cli.isActive === true ? "Sim" : "Não"),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const [isOpenModalCancel, setIsOpenModalCancel] = useState(false);
+        const [isOpenModalReactivate, setIsOpenModalReactivate] =
+          useState(false);
+        const newPath = `${window.origin}/client/${row.original.id}`;
+
+        return (
+          <div className="flex flex-row-reverse gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="h-8 w-8 p-0">
+                  <span className="sr-only">Abrir opções</span>
+                  <EllipsisVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuLabel>Cadastro</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    disabled={!row.original.isActive}
+                    onSelect={() => setIsOpenModalCancel(true)}
+                  >
+                    <Ban className="mr-2 h-4 w-4" />
+                    <span>Cancelar</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    disabled={!!row.original.isActive}
+                    onSelect={() => setIsOpenModalReactivate(true)}
+                  >
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    <span>Reativar</span>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Link to={newPath}>
+              <Button variant="outline" className="h-8 w-8 p-0">
+                <span className="sr-only">Vizualizar cadastro</span>
+                <Eye className="h-4 w-4" />
+              </Button>
+            </Link>
+
+            <Dialog
+              open={isOpenModalCancel}
+              onOpenChange={setIsOpenModalCancel}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Efetuar cancelamento</DialogTitle>
+                </DialogHeader>
+
+                <CancelForm
+                  onSubmit={handlerCancel}
+                  referenceId={Number(row.original.id)}
+                />
+              </DialogContent>
+            </Dialog>
+
+            <Dialog
+              open={isOpenModalReactivate}
+              onOpenChange={setIsOpenModalReactivate}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Efetuar reativação</DialogTitle>
+                </DialogHeader>
+
+                <ReactivateForm
+                  onSubmit={handlerReactivate}
+                  referenceId={Number(row.original.id)}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
     <>

@@ -96,12 +96,12 @@ export default function ClientDetails() {
           <TabsContent value="personal">
             <Card>
               <div className="xl:w-2/4 mx-auto">
-              <CardHeader className="text-center">
-                <CardTitle>Dados Pessoais</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Personal {...loadClientData(data)} />
-              </CardContent>
+                <CardHeader className="text-center">
+                  <CardTitle>Dados Pessoais</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Personal {...loadClientData(data)} />
+                </CardContent>
               </div>
             </Card>
           </TabsContent>
@@ -123,7 +123,10 @@ export default function ClientDetails() {
                 <CardTitle>Dependentes</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Dependents data={data.dependents} showAddBtn={!data.holderId} />
+                <Dependents
+                  clients={data.dependents}
+                  showAddBtn={!data.holderId}
+                />
               </CardContent>
             </Card>
           </TabsContent>

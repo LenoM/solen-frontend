@@ -10,7 +10,7 @@ export default function Client() {
       <h1 className="text-3xl font-bold text-center">Clientes</h1>
       <FindClient setData={setData} />
 
-      <Clients data={data} showAddBtn={true} />
+      <Clients clients={data} showAddBtn={true} />
     </div>
   );
 }

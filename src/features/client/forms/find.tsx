@@ -38,12 +38,12 @@ export function FindClient({ setData }: FindClientProps) {
         toast.warning("Busca de clientes", {
           description: `Informe ao menos ${MIN_INPUT_LENGTH} caracteres`,
         });
+        setData([]);
         return;
       }
-      if (filter) {
-        const restult = await getClient(filter);
-        setData(restult);
-      }
+
+      const result = await getClient(filter);
+      setData(result);
     } catch (error: any) {
       toast.error("Falha na busca", {
         description: `Ocorreu uma falha ao procurar os clientes.`,
