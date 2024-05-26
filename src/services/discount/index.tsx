@@ -2,6 +2,37 @@ import { getHeader } from "@/utils/headers-utils";
 
 const BASE_URL = import.meta.env.VITE_API_URL + "/discount";
 
+const createDiscount = async (
+  clientId: number,
+  productId: number,
+  price: number,
+  description: string | undefined,
+  initialDate: Date,
+  finalDate: Date | null | undefined
+) => {
+  const headers = getHeader();
+  const url = BASE_URL;
+
+  const body: BodyInit = JSON.stringify({
+    clientId,
+    productId,
+    price,
+    description,
+    initialDate,
+    finalDate,
+  });
+
+  const params: RequestInit = {
+    method: "POST",
+    headers,
+    body,
+  };
+
+  const discount = await fetch(url, params).then((resp) => resp.json());
+
+  return discount;
+};
+
 const deleteDiscount = async (id: number, finalDate: Date) => {
   const headers = getHeader();
   const url = `${BASE_URL}/${id}`;
@@ -35,4 +66,4 @@ const getDiscountsByClient = async (clientId: number) => {
   return discount;
 };
 
-export { deleteDiscount, getDiscountsByClient };
+export { createDiscount, deleteDiscount, getDiscountsByClient };

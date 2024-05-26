@@ -8,6 +8,7 @@ export enum ErrorMessage {
   invalidCPF = "CPF inválido",
   invalidPrice = "Preço inválido",
   invalidDate = "Data inválida",
+  invalidMinDate = "Digite uma data posterior",
   invalidEmail = "Email inválido",
   invalidPassword = "Senhas inválida",
   invalidLength = "Digite ao menos 7 digitos",

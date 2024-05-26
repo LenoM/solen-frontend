@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { toDateString, toMoneyValue } from "@/utils/format-utils";
 import { printInvoice, sendInvoice } from "@/services/invoice";
 
+//TODO reutilizar tipo de boleto do yup - ainda nao implementado
 export type Invoice = {
   id: number;
   invoiceNumber: number;

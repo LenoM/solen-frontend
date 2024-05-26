@@ -1,6 +1,36 @@
+import { SignatureType } from "@/features/client/forms/signature";
 import { getHeader } from "@/utils/headers-utils";
 
 const BASE_URL = import.meta.env.VITE_API_URL + "/signature";
+
+const createSignature = async (
+  clientId: number,
+  productId: number,
+  price: number,
+  initialDate: Date,
+  finalDate: Date | null | undefined
+): Promise<SignatureType> => {
+  const headers = getHeader();
+  const url = BASE_URL;
+
+  const body: BodyInit = JSON.stringify({
+    clientId,
+    productId,
+    price,
+    initialDate,
+    finalDate,
+  });
+
+  const params: RequestInit = {
+    method: "POST",
+    headers,
+    body,
+  };
+
+  const discount = await fetch(url, params).then((resp) => resp.json());
+
+  return discount;
+};
 
 const getSignatureByClient = async (clientId: number) => {
   const headers = getHeader();
@@ -35,4 +65,4 @@ const deleteSignature = async (signatureId: number, finalDate: Date) => {
   return signature;
 };
 
-export { getSignatureByClient, deleteSignature };
+export { getSignatureByClient, deleteSignature, createSignature };

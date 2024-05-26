@@ -1,6 +1,9 @@
 import { toast } from "sonner";
-import { Info, Trash } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { Info, PlusCircle, Trash } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "@/components/dataTable";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -17,103 +20,189 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
-import { toDateValue, toMoneyValue } from "@/utils/format-utils";
-import HiringForm from "@/features/client/forms/hiring";
-import { deleteDiscount } from "@/services/discount";
+import HiringForm, { HaringType } from "@/features/client/forms/hiring";
+import DiscountForm, { DiscountType } from "@/features/client/forms/discount";
+import { toDateString, toMoneyValue } from "@/utils/format-utils";
+import {
+  createDiscount,
+  deleteDiscount,
+  getDiscountsByClient,
+} from "@/services/discount";
 
-const onSubmit = async (id: number, finalDate: Date) => {
-  try {
-    const result = await deleteDiscount(id, finalDate);
+export function Discounts() {
+  const { clientId } = useParams();
+  const [discounts, setDiscounts] = useState<DiscountType[]>([]);
 
-    if (result.id) {
-      toast.success("Desconto cancelado", {
-        description: "O desconto foi cancelado com sucesso!",
-      });
+  useEffect(() => {
+    getData(clientId);
+  }, [clientId]);
 
-      return;
+  const getData = async (clientId: string | undefined) => {
+    if (clientId) {
+      const result = await getDiscountsByClient(Number(clientId));
+      setDiscounts(result);
     }
+  };
 
-    toast.error("Erro ao remover o desconto", {
-      description: "Ocorreu um erro ao cancelar o desconto.",
-    });
-  } catch (error) {
-    toast.error("Falha ao remover o desconto", {
-      description: "Ocorreu uma falha ao cancelar o desconto.",
-    });
-  }
-};
+  const handlerSubmit = async ({
+    productId,
+    price,
+    description,
+    initialDate,
+    finalDate,
+  }: DiscountType) => {
+    try {
+      const newData = await createDiscount(
+        Number(clientId),
+        productId,
+        Number(price),
+        description,
+        initialDate,
+        finalDate
+      );
 
-export type Discount = {
-  id: number;
-  price: number;
-  finalDate: Date;
-  clientId: number;
-};
+      if (!newData.id) {
+        toast.error("Erro ao adicionar o desconto", {
+          description: "Ocorreu um erro ao adicionar o desconto.",
+        });
 
-export const columns: ColumnDef<Discount>[] = [
-  {
-    accessorKey: "product.description",
-    header: "Pruduto",
-  },
-  {
-    accessorKey: "description",
-    header: "Descrição",
-  },
-  {
-    accessorKey: "price",
-    header: "Preço",
-    accessorFn: (data: Discount) => toMoneyValue(Number(data.price)),
-  },
-  {
-    accessorKey: "finalDate",
-    header: "Término",
-    accessorFn: (data: Discount) => toDateValue(data.finalDate),
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      if (row.original.clientId) {
-        return (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Trash className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Remover Desconto</DialogTitle>
-              </DialogHeader>
-
-              <HiringForm referenceId={row.original.id} onSubmit={onSubmit} />
-            </DialogContent>
-          </Dialog>
-        );
-      } else {
-        return (
-          <HoverCard>
-            <HoverCardTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Info className="h-4 w-4" />
-              </Button>
-            </HoverCardTrigger>
-
-            <HoverCardContent className="w-50">
-              <div className="flex">
-                <div className="space-y-1 max-w-48">
-                  <h4 className="text-sm text-left font-semibold">Desconto compartilhado</h4>
-
-                  <p>
-                    Não é possível deletar esse desconto aqui, pois ele não é exclusivo deste cliente.
-                  </p>
-                </div>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
-        );
+        return;
       }
+
+      setDiscounts((prev: DiscountType[]) =>
+        prev.filter((d) => d.id !== newData.id).concat(newData)
+      );
+
+      toast.success("Desconto adicionado", {
+        description: "O desconto foi adicionado com sucesso!",
+      });
+    } catch (error) {
+      toast.error("Falha ao adicionar o desconto", {
+        description: "Ocorreu uma falha ao adicionar o desconto.",
+      });
+    }
+  };
+
+  const handlerDelete = async ({ referenceDate }: HaringType) => {
+    try {
+      const result = await deleteDiscount(Number(clientId), referenceDate);
+
+      if (result.id) {
+        setDiscounts((prev: DiscountType[]) =>
+          prev.filter((d) => d.id !== result.id)
+        );
+
+        toast.success("Desconto cancelado", {
+          description: "O desconto foi cancelado com sucesso!",
+        });
+
+        return;
+      }
+
+      toast.error("Erro ao remover o desconto", {
+        description: "Ocorreu um erro ao cancelar o desconto.",
+      });
+    } catch (error) {
+      toast.error("Falha ao remover o desconto", {
+        description: "Ocorreu uma falha ao cancelar o desconto.",
+      });
+    }
+  };
+
+  const columns: ColumnDef<DiscountType>[] = [
+    {
+      accessorKey: "product.description",
+      header: "Pruduto",
     },
-  },
-];
+    {
+      accessorKey: "description",
+      header: "Descrição",
+    },
+    {
+      accessorKey: "price",
+      header: "Preço",
+      accessorFn: (data: DiscountType) => toMoneyValue(Number(data.price)),
+    },
+    {
+      accessorKey: "finalDate",
+      header: "Término",
+      accessorFn: (data: DiscountType) =>
+        toDateString(data?.finalDate?.toString()),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        if (row.original.clientId) {
+          return (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Remover Desconto</DialogTitle>
+                </DialogHeader>
+
+                <HiringForm
+                  referenceId={Number(row.original.id)}
+                  onSubmit={handlerDelete}
+                />
+              </DialogContent>
+            </Dialog>
+          );
+        } else {
+          return (
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <Info className="h-4 w-4" />
+                </Button>
+              </HoverCardTrigger>
+
+              <HoverCardContent className="w-50">
+                <div className="flex">
+                  <div className="space-y-1 max-w-48">
+                    <h4 className="text-sm text-left font-semibold">
+                      Desconto compartilhado
+                    </h4>
+
+                    <p>
+                      Não é possível deletar esse desconto por aqui, pois ele
+                      não é exclusivo deste cliente.
+                    </p>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          );
+        }
+      },
+    },
+  ];
+
+  return (
+    <>
+      <div className="text-right">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Novo
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Adicionar descontos</DialogTitle>
+            </DialogHeader>
+            <DiscountForm onSubmit={handlerSubmit} />
+          </DialogContent>
+        </Dialog>
+      </div>
+      <DataTable columns={columns} data={discounts} />
+    </>
+  );
+}
