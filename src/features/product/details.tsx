@@ -6,16 +6,16 @@ import ProductForm, { loadProductData } from "@/features/product/form";
 import { getProduct } from "@/services/product";
 
 export default function ProductDetails() {
-  const { id } = useParams();
+  const { productId } = useParams();
   const [data, setData] = useState();
 
   useEffect(() => {
-    getData(id);
-  }, [id]);
+    getData(productId);
+  }, [productId]);
 
-  const getData = async (id: string | undefined) => {
-    if (id) {
-      const result = await getProduct(Number(id));
+  const getData = async (productId: string | undefined) => {
+    if (productId) {
+      const result = await getProduct(Number(productId));
       setData(result);
     }
   };

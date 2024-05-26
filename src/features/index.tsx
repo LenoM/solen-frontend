@@ -32,7 +32,7 @@ export const features = [
   },
   {
     label: "Associados",
-    path: "/client/:id",
+    path: "/client/:clientId",
     isMenuItem: false,
     element: <ClientDetails />,
   },
@@ -58,7 +58,7 @@ export const features = [
   },
   {
     label: "Produto",
-    path: "/product/:id",
+    path: "/product/:productId",
     isMenuItem: false,
     element: <ProductDetails />,
   },
@@ -71,7 +71,7 @@ export const features = [
   },
   {
     label: "Usuario",
-    path: "/user/:id",
+    path: "/user/:userId",
     isMenuItem: false,
     element: <UserDetail />,
   },

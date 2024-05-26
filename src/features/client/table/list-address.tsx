@@ -97,7 +97,7 @@ export interface AddressormProps {
 export function Address(data: any) {
   const [address, setAddress] = useState(data?.address);
 
-  const { id } = useParams();
+  const { clientId } = useParams();
 
   const AddressDialog = ({ title, children, formData }: AddressormProps) => {
     return (
@@ -121,9 +121,9 @@ export function Address(data: any) {
       const isUpdate = newData.id! > 0;
 
       if (isUpdate) {
-        newData = await updateAddress(Number(id), newData);
+        newData = await updateAddress(Number(clientId), newData);
       } else {
-        newData = await createAddress(Number(id), newData);
+        newData = await createAddress(Number(clientId), newData);
       }
 
       if (!newData.id) {
@@ -235,7 +235,7 @@ export function Address(data: any) {
                     </Button>
                   </DialogClose>
                   <Button
-                    onClick={() => handlerDelete(Number(id), row.original.id)}
+                    onClick={() => handlerDelete(Number(clientId), row.original.id)}
                     type="submit"
                     variant="destructive"
                     className="mb-2"

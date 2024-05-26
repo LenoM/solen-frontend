@@ -75,17 +75,17 @@ export default function UserForm({ data, setData }: UserProps) {
     values: loadUserData(data),
   });
 
-  const { id } = useParams();
-  const showPasswordField = form.getValues("isChangePassword") || !id;
+  const { userId } = useParams();
+  const showPasswordField = form.getValues("isChangePassword") || !userId;
 
   const onSubmit = async () => {
     try {
       let newData: UserType = form.getValues();
 
-      if (!id) {
+      if (!userId) {
         newData = await createUser(newData);
       } else {
-        newData = await updateUser(id, newData);
+        newData = await updateUser(userId, newData);
       }
 
       if (!newData.id) {
@@ -172,7 +172,7 @@ export default function UserForm({ data, setData }: UserProps) {
             />
           </div>
 
-          {!!id && (
+          {!!userId && (
             <div className="flex flex-col space-y-2">
               <FormField
                 control={form.control}

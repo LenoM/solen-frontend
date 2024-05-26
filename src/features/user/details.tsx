@@ -6,16 +6,16 @@ import UserForm, { loadUserData } from "@/features/user/form";
 import { getUser } from "@/services/user";
 
 export default function UserDetail() {
-  const { id } = useParams();
+  const { userId } = useParams();
   const [data, setData] = useState();
 
   useEffect(() => {
-    getData(id);
-  }, [id]);
+    getData(userId);
+  }, [userId]);
 
-  const getData = async (id: string | undefined) => {
-    if (id) {
-      const result = await getUser(id);
+  const getData = async (userId: string | undefined) => {
+    if (userId) {
+      const result = await getUser(userId);
       setData(result);
     }
   };

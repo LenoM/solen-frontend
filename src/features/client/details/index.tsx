@@ -32,16 +32,16 @@ import Personal, { loadClientData } from "@/features/client/forms/personal";
 import { getClientByid } from "@/services/client";
 
 export default function ClientDetails() {
-  const { id } = useParams();
+  const { clientId } = useParams();
   const [data, setData] = useState<any>([]);
 
   useEffect(() => {
-    getData(id);
-  }, [id]);
+    getData(clientId);
+  }, [clientId]);
 
-  const getData = async (id: string | undefined) => {
-    if (id && !isNaN(Number(id))) {
-      const result = await getClientByid(Number(id));
+  const getData = async (clientId: string | undefined) => {
+    if (clientId && !isNaN(Number(clientId))) {
+      const result = await getClientByid(Number(clientId));
       setData(result);
     }
   };
