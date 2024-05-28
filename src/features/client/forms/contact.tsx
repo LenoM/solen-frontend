@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import validator from "validator";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -114,7 +114,7 @@ export default function ContactForm({ data, onSubmit }: ContactFormProps) {
     setFormatedValue(value);
   };
 
-  const onChangeValue = (evt: React.FormEvent<HTMLInputElement>) => {
+  const onChangeValue = (evt: FormEvent<HTMLInputElement>) => {
     setValueInput(evt.currentTarget.value);
   };
 

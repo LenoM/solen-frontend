@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import validator from "validator";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -228,14 +228,14 @@ export default function Personal(data: ClientType) {
     }
   }, [isClientHolder]);
 
-  const onChangeBirthdate = (e: React.FormEvent<HTMLInputElement>) => {
+  const onChangeBirthdate = (e: FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget.value;
     const parsedDate = formatDate(input);
     form.clearErrors("birthday");
     form.setValue("birthday", parsedDate);
   };
 
-  const onBlurBirthdate = (e: React.FormEvent<HTMLInputElement>) => {
+  const onBlurBirthdate = (e: FormEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
     const parsedDate = toDateString(value);
 
@@ -247,14 +247,14 @@ export default function Personal(data: ClientType) {
     }
   };
 
-  const onChangeBondDate = (e: React.FormEvent<HTMLInputElement>) => {
+  const onChangeBondDate = (e: FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget.value;
     const parsedDate = formatDate(input);
     form.clearErrors("bondDate");
     form.setValue("bondDate", parsedDate);
   };
 
-  const onBlurBondDate = (e: React.FormEvent<HTMLInputElement>) => {
+  const onBlurBondDate = (e: FormEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
     const parsedDate = toDateString(value);
 
@@ -266,14 +266,14 @@ export default function Personal(data: ClientType) {
     }
   };
 
-  const onChangeReferenceDate = (e: React.FormEvent<HTMLInputElement>) => {
+  const onChangeReferenceDate = (e: FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget.value;
     const parsedDate = formatDate(input);
     form.clearErrors("referenceDate");
     form.setValue("referenceDate", parsedDate);
   };
 
-  const onBlurReferenceDate = (e: React.FormEvent<HTMLInputElement>) => {
+  const onBlurReferenceDate = (e: FormEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
     const parsedDate = toDateString(value);
 
@@ -285,13 +285,13 @@ export default function Personal(data: ClientType) {
     }
   };
 
-  const onChangeCPF = (e: React.FormEvent<HTMLInputElement>) => {
+  const onChangeCPF = (e: FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget.value;
     const cpf = formatCPF(input);
     form.setValue("cpf", cpf);
   };
 
-  const onBlurCPF = (e: React.FormEvent<HTMLInputElement>) => {
+  const onBlurCPF = (e: FormEvent<HTMLInputElement>) => {
     const input = getNumbers(e.currentTarget.value);
 
     const isValid = validator.isTaxID(input, "pt-BR");

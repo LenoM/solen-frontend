@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import React, { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 
@@ -117,13 +117,13 @@ export default function AddressForm({ data, onSubmit }: AddressFormProps) {
     }
   };
 
-  const onChangeCEP = async (e: React.FormEvent<HTMLInputElement>) => {
+  const onChangeCEP = async (e: FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget.value;
     const cep = normalizeCepNumber(input);
     form.setValue("cep", cep);
   };
 
-  const onBlurCEP = async (e: React.FormEvent<HTMLInputElement>) => {
+  const onBlurCEP = async (e: FormEvent<HTMLInputElement>) => {
     const cep = e.currentTarget.value;
 
     if (cep.length === 10) {
