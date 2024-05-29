@@ -1,3 +1,5 @@
+export const SERVER_ERROR_MESSAGE = "Sistema indisponível";
+
 export enum ErrorMessage {
   required = "Campo obrigatório",
   equals = "Escolha o valor correto",

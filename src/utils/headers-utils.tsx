@@ -1,16 +1,17 @@
-import { isExpired } from "@/services/auth";
+import useLogin from "@/features/login/useLogin";
 import { Navigate } from "react-router-dom";
 
 const getHeader = () => {
+  const login = useLogin();
   const token = localStorage.getItem("accessToken");
 
-  if (isExpired()) {
+  if (login.isExpired()) {
     <Navigate to={"/login"} />;
   }
 
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
   };
 
   return headers;

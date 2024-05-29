@@ -1,7 +1,5 @@
 import * as yup from "yup";
-import { toast } from "sonner";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -17,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import * as authService from "@/services/auth";
+import useLogin from "@/features/login/useLogin";
 import { ErrorMessage } from "@/utils/error.enum";
 
 const loginSchema = yup.object({
@@ -34,7 +32,7 @@ const loginSchema = yup.object({
 type LoginType = yup.InferType<typeof loginSchema>;
 
 export default function Login() {
-  const navigate = useNavigate();
+  const login = useLogin();
 
   const form = useForm({
     resolver: yupResolver(loginSchema),
@@ -45,23 +43,7 @@ export default function Login() {
   });
 
   const onSubmit = async ({ email, password }: LoginType) => {
-    try {
-      await authService.doLogIn(email, password);
-
-      if (authService.isLoggedIn() !== true) {
-        toast.error("Erro no login", {
-          description: "Verifique o e-mail e a senha",
-        });
-
-        return;
-      }
-
-      navigate("/");
-    } catch (error: any) {
-      toast.error("Falha no login", {
-        description: "Ocorreu uma falha no serviço de login.",
-      });
-    }
+    login.onLogin({ email, password });
   };
 
   return (
