@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import useLogin from "@/features/login/useLogin";
+import useLogin from "@/hooks/useLogin";
 
 import Layout from "@/components/default-page";
 

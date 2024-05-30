@@ -1,15 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { useCallback } from "react";
 import { toast } from "sonner";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
+import { LoginType } from "@/features/login";
 
 const url = import.meta.env.VITE_API_URL + "/auth/login";
-
-type LoginProps = {
-  email: string;
-  password: string;
-};
 
 const useLogin = () => {
   const navigate = useNavigate();
@@ -43,7 +38,7 @@ const useLogin = () => {
     return true;
   };
 
-  const onLogin = useCallback(async ({ email, password }: LoginProps) => {
+  const onLogin = async ({ email, password }: LoginType) => {
     const headers = { "Content-Type": "application/json" };
 
     const body: BodyInit = JSON.stringify({
@@ -75,7 +70,7 @@ const useLogin = () => {
         description: SERVER_ERROR_MESSAGE,
       });
     }
-  }, []);
+  };
 
   return {
     onLogin,

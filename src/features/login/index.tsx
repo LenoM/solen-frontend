@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import useLogin from "@/features/login/useLogin";
+import useLogin from "@/hooks/useLogin";
 import { ErrorMessage } from "@/utils/error.enum";
 
 const loginSchema = yup.object({
@@ -29,7 +29,7 @@ const loginSchema = yup.object({
     .min(5, ErrorMessage.invalidPassword),
 });
 
-type LoginType = yup.InferType<typeof loginSchema>;
+export type LoginType = yup.InferType<typeof loginSchema>;
 
 export default function Login() {
   const login = useLogin();
