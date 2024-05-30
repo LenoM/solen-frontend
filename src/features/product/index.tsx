@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -10,33 +10,24 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { getProducts } from "@/services/product";
 import { DataTable } from "@/components/dataTable";
 import { columns } from "@/features/product/table";
-import ProductForm, {
-  ProductType,
-  loadProductData,
-} from "@/features/product/form";
+import ProductForm from "@/features/product/form";
+import useProduct from "@/hooks/useProducts";
 
 export default function Product() {
-  const [data, setData] = useState<ProductType[]>([]);
+  const { productsList, getProducts } = useProduct();
 
   useEffect(() => {
-    getData();
-  }, []);
-
-  const getData = async () => {
-    const result = await getProducts();
-    setData(result);
-  };
-
-  const addNew = (newProduct: ProductType) => {
-    setData((prev: ProductType[]) => [...prev, newProduct]);
-  };
+    if (productsList.length === 0) {
+      getProducts();
+    }
+  }, [productsList]);
 
   return (
     <div className="p-6 pt-1 h-screen space-y-4">
       <h1 className="text-3xl font-bold text-center">Produtos</h1>
+
       <div className="flex place-content-end">
         <Dialog>
           <DialogTrigger asChild>
@@ -50,12 +41,12 @@ export default function Product() {
               <DialogTitle>Cadastro de Produtos</DialogTitle>
             </DialogHeader>
 
-            <ProductForm data={loadProductData()} setData={addNew} />
+            <ProductForm />
           </DialogContent>
         </Dialog>
       </div>
 
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={productsList} />
     </div>
   );
 }

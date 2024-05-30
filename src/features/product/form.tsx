@@ -1,8 +1,7 @@
 import * as yup from "yup";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
-import { useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Button } from "@/components/ui/button";
@@ -27,10 +26,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { getSuppliers } from "@/services/supplier";
-import { createProduct, updateProduct } from "@/services/product";
 import { ErrorMessage } from "@/utils/error.enum";
-import { Entity } from "@/utils/utils";
+import useSupplier from "@/hooks/useSupplier";
+import useProduct from "@/hooks/useProducts";
 
 export const loadProductData = (data?: ProductType): ProductType => {
   return {
@@ -62,71 +60,35 @@ const productSchema = yup.object({
 
 export type ProductType = yup.InferType<typeof productSchema>;
 
-interface ProductProps {
-  data: ProductType;
-  setData?: (product: ProductType) => void;
-}
-
-export default function ProductForm({ data, setData }: ProductProps) {
-  const navigate = useNavigate();
-  const [suppliersList, setSuppliersList] = useState<Entity[]>([]);
-
-  useEffect(() => {
-    getData();
-  }, []);
+export default function ProductForm() {
+  const { productId } = useParams();
+  const { currentData, getProduct, createProduct, updateProduct } =
+    useProduct();
+  const { suppliersList, getSuppliers } = useSupplier();
+  useMemo(async () => await getProduct(Number(productId)), [productId]);
+  useMemo(async () => await getSuppliers(), []);
 
   useEffect(() => {
-    if (suppliersList && data?.supplierId) {
-      form.setValue("supplierId", data.supplierId);
+    if (suppliersList.length > 0 && currentData?.supplierId) {
+      form.setValue("supplierId", currentData.supplierId);
     } else {
       form.setValue("supplierId", "");
     }
-  }, [suppliersList]);
-
-  const getData = async () => {
-    if (suppliersList.length === 0) {
-      const result = await getSuppliers();
-      setSuppliersList(result);
-    }
-  };
+  }, [suppliersList, currentData]);
 
   const form = useForm({
     resolver: yupResolver(productSchema),
-    values: loadProductData(data),
+    values: loadProductData(currentData),
     mode: "onChange",
   });
 
   const onSubmit = async () => {
-    try {
-      let newData: ProductType = form.getValues();
+    let newData: ProductType = form.getValues();
 
-      if (newData.id) {
-        newData = await updateProduct(Number(newData.id), newData);
-      } else {
-        newData = await createProduct(newData);
-      }
-
-      if (!newData.id) {
-        toast.error("Erro no cadastro", {
-          description: "Ocorreu um erro ao tentar cadastrar o produto",
-        });
-
-        return;
-      }
-
-      if (setData) {
-        setData(newData);
-      }
-
-      toast.info("Produto salvo", {
-        description: `O produto foi salvo`,
-      });
-
-      navigate(`/product`);
-    } catch (error) {
-      toast.error("Falha no cadastro", {
-        description: "Ocorreu uma falha ao tentar cadastrar o produto",
-      });
+    if (newData.id) {
+      await updateProduct(Number(newData.id), newData);
+    } else {
+      await createProduct(newData);
     }
   };
 
@@ -207,10 +169,10 @@ export default function ProductForm({ data, setData }: ProductProps) {
                   <FormItem>
                     <FormLabel>Fornecedor</FormLabel>
                     <Select
-                        value={value?.toString()}
-                        defaultValue={value?.toString()}
-                        onValueChange={onChange}
-                      >
+                      value={value?.toString()}
+                      defaultValue={value?.toString()}
+                      onValueChange={onChange}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Escolha o fornecedor" />
