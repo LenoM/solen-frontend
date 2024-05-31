@@ -1,7 +1,5 @@
 import * as yup from "yup";
-import { toast } from "sonner";
 import { Search } from "lucide-react";
-import { SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -10,21 +8,17 @@ import { Button } from "@/components/ui/button";
 
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
-import { getClient } from "@/services/client";
-
 const filterSchema = yup.object({
   filter: yup.string(),
 });
 
-const MIN_INPUT_LENGTH = 5;
-
 type FilterType = yup.InferType<typeof filterSchema>;
 
 type FindClientProps = {
-  setData: (data: SetStateAction<never[]>) => void;
+  getClient: (input: string | undefined) => void;
 };
 
-export function FindClient({ setData }: FindClientProps) {
+export function FindClient({ getClient }: FindClientProps) {
   const form = useForm({
     resolver: yupResolver(filterSchema),
     defaultValues: {
@@ -33,22 +27,7 @@ export function FindClient({ setData }: FindClientProps) {
   });
 
   const onSubmit = async ({ filter }: FilterType) => {
-    try {
-      if (!filter || filter.length < MIN_INPUT_LENGTH) {
-        toast.warning("Busca de clientes", {
-          description: `Informe ao menos ${MIN_INPUT_LENGTH} caracteres`,
-        });
-        setData([]);
-        return;
-      }
-
-      const result = await getClient(filter);
-      setData(result);
-    } catch (error: any) {
-      toast.error("Falha na busca", {
-        description: `Ocorreu uma falha ao procurar os clientes.`,
-      });
-    }
+    getClient(filter);
   };
 
   return (

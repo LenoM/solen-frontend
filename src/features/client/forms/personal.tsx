@@ -1,10 +1,8 @@
 import * as yup from "yup";
 import validator from "validator";
-import { FormEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { FormEvent, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -34,12 +32,13 @@ import {
   getNumbers,
   toDateString,
 } from "@/utils/format-utils";
-import { createClient, getClients, updateClient } from "@/services/client";
+
 import { KinshipBadge, StatusBadge } from "@/features/client/status";
-import { getCategories } from "@/services/category";
-import { getCompanies } from "@/services/company";
-import { Entity } from "@/utils/utils";
 import { ErrorMessage } from "@/utils/error.enum";
+import { Entity } from "@/utils/utils";
+import useCompany from "@/hooks/useCompany";
+import useCategory from "@/hooks/useCategory";
+import useClient from "@/hooks/useClient";
 
 export const loadClientData = (data?: any): ClientType => {
   return {
@@ -178,18 +177,21 @@ const clientSchema = yup.object({
 export type ClientType = yup.InferType<typeof clientSchema>;
 
 export default function Personal(data: ClientType) {
-  const navigate = useNavigate();
-
   const form = useForm({
     resolver: yupResolver(clientSchema),
     values: loadClientData(data),
     mode: "onBlur",
   });
 
-  const [holderArray, setHolderArray] = useState<ClientType[]>();
-  const [categoryArray, setCategoryArray] = useState<Entity[]>();
-  const [companyArray, setCompanyArray] = useState<Entity[]>();
+  const { companyList, getCompany } = useCompany();
+  const { categoryList, getCategories } = useCategory();
+  const { clientsList, getClients, createClient, updateClient } = useClient();
+
   const isClientHolder = form.watch("isHolder");
+
+  useMemo(async () => await getCompany(), []);
+  useMemo(async () => await getCategories(), []);
+  useMemo(async () => await getClients(), []);
 
   useEffect(() => {
     if (isClientHolder) {
@@ -197,33 +199,20 @@ export default function Personal(data: ClientType) {
       form.setValue("kinship", "");
       form.setValue("holderId", "");
     } else {
-      if (!holderArray) {
+      if (!clientsList) {
         form.setValue("holderId", "");
-        form.setValue("kinship", "");
       }
 
-      if (companyArray) {
+      if (companyList) {
         form.setValue("companyId", "");
       }
 
-      if (categoryArray) {
+      if (categoryList) {
         form.setValue("categoryId", "");
       }
-    }
-  }, [isClientHolder]);
 
-  useEffect(() => {
-    if (!holderArray && !isClientHolder) {
-      getClientList();
-    }
-
-    if (isClientHolder) {
-      if (!categoryArray) {
-        getCategoryList();
-      }
-
-      if (!companyArray) {
-        getCompanyList();
+      if (kinshipArray) {
+        form.setValue("kinship", "");
       }
     }
   }, [isClientHolder]);
@@ -304,63 +293,11 @@ export default function Personal(data: ClientType) {
   };
 
   const onSubmit = async () => {
-    try {
-      const newData: ClientType = form.getValues();
-
-      let response;
-
-      if (data?.id == 0) {
-        response = await createClient({ ...newData });
-      } else {
-        response = await updateClient({ ...newData });
-      }
-
-      if (response?.id) {
-        toast.info("Cadastro salvo", {
-          description: `O cliente #${response.id} foi salvo`,
-        });
-
-        navigate(`/client/${response.id}`);
-        return;
-      }
-
-      toast.error("Erro no cadastro", {
-        description: `Ocorreu um erro ao tentar cadastrar o cliente: ${response?.error}`,
-      });
-    } catch (error: any) {
-      toast.error("Falha no cadastro", {
-        description: "Ocorreu uma falha ao tentar cadastrar o cliente",
-      });
-    }
-  };
-
-  const getClientList = async () => {
-    const clients = await getClients();
-    setHolderArray(clients);
-
-    if (!data.isHolder) {
-      form.setValue("holderId", data.holderId);
-      form.setValue("kinship", data.kinship);
-    }
-  };
-
-  const getCategoryList = async () => {
-    const categories = await getCategories();
-    setCategoryArray(categories);
-
-    form.resetField("categoryId");
-    if (data.categoryId) {
-      form.setValue("categoryId", data.categoryId);
-    }
-  };
-
-  const getCompanyList = async () => {
-    const companies = await getCompanies();
-    setCompanyArray(companies);
-
-    form.resetField("companyId");
-    if (data.companyId) {
-      form.setValue("companyId", data.companyId);
+    const newData: ClientType = form.getValues();
+    if (data?.id == 0) {
+      await createClient({ ...newData });
+    } else {
+      await updateClient({ ...newData });
     }
   };
 
@@ -546,7 +483,7 @@ export default function Personal(data: ClientType) {
             />
           </div>
 
-          {isClientHolder && categoryArray && companyArray && (
+          {isClientHolder && categoryList && companyList && (
             <>
               <div className="flex flex-col">
                 <FormField
@@ -565,7 +502,7 @@ export default function Personal(data: ClientType) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categoryArray.map((cat: Entity) => {
+                          {categoryList.map((cat: Entity) => {
                             return (
                               <SelectItem
                                 key={`cat-${cat.id}`}
@@ -600,7 +537,7 @@ export default function Personal(data: ClientType) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {companyArray.map((comp: Entity) => {
+                          {companyList.map((comp: Entity) => {
                             return (
                               <SelectItem
                                 key={`comp-${comp.id}`}
@@ -620,7 +557,7 @@ export default function Personal(data: ClientType) {
             </>
           )}
 
-          {!isClientHolder && holderArray && (
+          {!isClientHolder && clientsList && (
             <>
               <div className="flex flex-col">
                 <FormField
@@ -640,7 +577,7 @@ export default function Personal(data: ClientType) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {holderArray.map((ctt: ClientType) => {
+                          {clientsList.map((ctt: ClientType) => {
                             return (
                               <SelectItem
                                 key={`state-${ctt.id}`}

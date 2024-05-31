@@ -1,15 +1,9 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
   User,
@@ -28,23 +22,13 @@ import { Signatures } from "../table/list-signatures";
 import { Clients as Dependents } from "../table/list-clients";
 
 import Personal, { loadClientData } from "@/features/client/forms/personal";
-
-import { getClientByid } from "@/services/client";
+import useClient from "@/hooks/useClient";
 
 export default function ClientDetails() {
   const { clientId } = useParams();
-  const [data, setData] = useState<any>([]);
+  const { getClientByid, currentClient } = useClient();
 
-  useEffect(() => {
-    getData(clientId);
-  }, [clientId]);
-
-  const getData = async (clientId: string | undefined) => {
-    if (clientId && !isNaN(Number(clientId))) {
-      const result = await getClientByid(Number(clientId));
-      setData(result);
-    }
-  };
+  useMemo(async () => await getClientByid(clientId), [clientId]);
 
   return (
     <div className="p-6 pt-1 h-screen space-y-4">
@@ -90,7 +74,7 @@ export default function ClientDetails() {
                   <CardTitle>Dados Pessoais</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Personal {...loadClientData(data)} />
+                  <Personal {...loadClientData(currentClient)} />
                 </CardContent>
               </div>
             </Card>
@@ -102,7 +86,7 @@ export default function ClientDetails() {
                 <CardTitle>Contatos</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Contacts {...data} />
+                <Contacts {...currentClient} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -114,8 +98,8 @@ export default function ClientDetails() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <Dependents
-                  clients={data.dependents}
-                  showAddBtn={!data.holderId}
+                  clients={currentClient?.dependents}
+                  showAddBtn={!currentClient?.holderId}
                 />
               </CardContent>
             </Card>
@@ -127,7 +111,7 @@ export default function ClientDetails() {
                 <CardTitle>Endereços</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Address {...data} />
+                <Address {...currentClient} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -160,7 +144,7 @@ export default function ClientDetails() {
                 <CardTitle>Boletos</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Invoices {...data} />
+                <Invoices {...currentClient} />
               </CardContent>
             </Card>
           </TabsContent>
