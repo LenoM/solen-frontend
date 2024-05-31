@@ -16,13 +16,13 @@ import ProductForm from "@/features/product/form";
 import useProduct from "@/hooks/useProducts";
 
 export default function Product() {
-  const { productsList, getProducts } = useProduct();
+  const { productsList, getProducts, setProductsList } = useProduct();
 
   useEffect(() => {
     if (productsList.length === 0) {
       getProducts();
     }
-  }, [productsList]);
+  }, []);
 
   return (
     <div className="p-6 pt-1 h-screen space-y-4">
@@ -41,7 +41,7 @@ export default function Product() {
               <DialogTitle>Cadastro de Produtos</DialogTitle>
             </DialogHeader>
 
-            <ProductForm />
+            <ProductForm setProductsList={setProductsList} />
           </DialogContent>
         </Dialog>
       </div>

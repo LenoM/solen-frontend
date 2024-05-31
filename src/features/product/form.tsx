@@ -1,8 +1,8 @@
 import * as yup from "yup";
-import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,7 +60,11 @@ const productSchema = yup.object({
 
 export type ProductType = yup.InferType<typeof productSchema>;
 
-export default function ProductForm() {
+type ProductFormProps = {
+  setProductsList?: Dispatch<SetStateAction<ProductType[]>>;
+};
+
+export default function ProductForm({ setProductsList }: ProductFormProps) {
   const { productId } = useParams();
   const { currentData, getProduct, createProduct, updateProduct } =
     useProduct();
@@ -85,10 +89,12 @@ export default function ProductForm() {
   const onSubmit = async () => {
     let newData: ProductType = form.getValues();
 
-    if (newData.id) {
-      await updateProduct(Number(newData.id), newData);
-    } else {
+    if (!productId) {
       await createProduct(newData);
+    } else {
+      await updateProduct(Number(newData.id), newData);
+      setProductsList &&
+        setProductsList((prev: ProductType[]) => [...prev, newData]);
     }
   };
 

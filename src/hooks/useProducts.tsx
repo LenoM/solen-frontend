@@ -41,8 +41,7 @@ export default function useProduct() {
       const res = await response.json();
 
       if (response.ok && res) {
-        setProductsList((prev: ProductType[]) => [...prev, res]);
-        return;
+        return res;
       }
 
       toast.error("Erro na inclusão do produto", {
@@ -194,6 +193,7 @@ export default function useProduct() {
 
   return {
     productsList,
+    setProductsList,
     currentData,
     loading,
     getProduct,
