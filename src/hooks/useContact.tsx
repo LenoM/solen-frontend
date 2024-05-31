@@ -1,8 +1,7 @@
 import { toast } from "sonner";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-import { ContactType, loadContactData } from "@/features/client/forms/contact";
+import { ContactType } from "@/features/client/forms/contact";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { getHeader } from "@/utils/headers-utils";
 
@@ -10,7 +9,6 @@ const BASE_URL = import.meta.env.VITE_API_URL + "/contact";
 
 export default function useContact() {
   const headers = getHeader();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [contactsList, setContactsList] = useState<ContactType[]>([]);
   const [currentData, setCurrentData] = useState<ContactType>();
@@ -93,7 +91,7 @@ export default function useContact() {
           description: `O contato #${res.id} foi salvo`,
         });
 
-        return
+        return;
       }
 
       toast.error("Erro na atualização do contato", {
