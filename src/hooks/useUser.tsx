@@ -34,8 +34,6 @@ export default function useUser() {
       const res = await response.json();
 
       if (response.ok && res) {
-        console.log(res);
-
         return res;
       }
 

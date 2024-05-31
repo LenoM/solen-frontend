@@ -12,13 +12,13 @@ export default function useSupplier() {
   const [loading, setLoading] = useState(true);
   const [suppliersList, setSuppliersList] = useState<Entity[]>([]);
 
-  const params: RequestInit = {
-    method: "GET",
-    headers,
-  };
-
   const getSuppliers = async () => {
     setLoading(true);
+
+    const params: RequestInit = {
+      method: "GET",
+      headers,
+    };
 
     try {
       const response = await fetch(BASE_URL, params);
