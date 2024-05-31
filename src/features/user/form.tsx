@@ -1,11 +1,12 @@
 import * as yup from "yup";
-import { toast } from "sonner";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 
 import {
   Form,
@@ -16,9 +17,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { createUser, updateUser } from "@/services/user";
-import { useNavigate, useParams } from "react-router-dom";
+
 import { ErrorMessage } from "@/utils/error.enum";
+import useUser from "@/hooks/useUser";
 
 export const loadUserData = (data?: UserType): UserType => {
   return {
@@ -62,53 +63,32 @@ const userSchema = yup.object({
 
 export type UserType = yup.InferType<typeof userSchema>;
 
-interface UserProps {
-  data: UserType;
-  setData?: (user: UserType) => void;
-}
+type UserFormProps = {
+  setUsersList?: Dispatch<SetStateAction<UserType[]>>;
+};
 
-export default function UserForm({ data, setData }: UserProps) {
-  const navigate = useNavigate();
+export default function UserForm({ setUsersList }: UserFormProps) {
+  const { userId } = useParams();
+
+  const { currentData, getUser, createUser, updateUser } = useUser();
+
+  useMemo(async () => await getUser(userId), [userId]);
 
   const form = useForm({
     resolver: yupResolver(userSchema),
-    values: loadUserData(data),
+    values: loadUserData(currentData),
   });
 
-  const { userId } = useParams();
   const showPasswordField = form.getValues("isChangePassword") || !userId;
 
   const onSubmit = async () => {
-    try {
-      let newData: UserType = form.getValues();
+    let newData: UserType = form.getValues();
 
-      if (!userId) {
-        newData = await createUser(newData);
-      } else {
-        newData = await updateUser(userId, newData);
-      }
-
-      if (!newData.id) {
-        toast.error("Erro no cadastro", {
-          description: "Ocorreu um erro ao tentar cadastrar o usuário",
-        });
-
-        return;
-      }
-
-      if (setData) {
-        setData(newData);
-      }
-
-      toast.info("Usuário salvo", {
-        description: `O usuario foi salvo`,
-      });
-
-      navigate(`/user`);
-    } catch (error) {
-      toast.error("Falha no cadastro", {
-        description: "Ocorreu uma falha ao tentar cadastrar o usuário",
-      });
+    if (!userId) {
+      newData = await createUser(newData);
+      setUsersList && setUsersList((prev: UserType[]) => [...prev, newData]);
+    } else {
+      await updateUser(userId, newData);
     }
   };
 
