@@ -1,5 +1,3 @@
-import { toast } from "sonner";
-import { useState } from "react";
 import { Pencil, Trash, PlusCircle } from "lucide-react";
 import { DataTable } from "@/components/dataTable";
 import { ColumnDef } from "@tanstack/react-table";
@@ -18,16 +16,12 @@ import {
 
 import { normalizePhoneNumber } from "@/utils/format-utils";
 
-import {
-  deleteContact,
-  createContact,
-  updateContact,
-} from "@/services/contact";
-
 import ContactForm, {
   loadContactData,
   ContactType,
 } from "@/features/client/forms/contact";
+import useContact from "@/hooks/useContact";
+import { useEffect } from "react";
 
 const editContact = (data: ContactType): ContactType => {
   return {
@@ -54,7 +48,17 @@ export interface ContactFormProps {
 }
 
 export function Contacts(data: any) {
-  const [contact, setContact] = useState(data?.contact);
+  const {
+    contactsList,
+    setContactsList,
+    updateContact,
+    createContact,
+    deleteContact,
+  } = useContact();
+
+  useEffect(() => {
+    setContactsList(data.contact);
+  }, []);
 
   const ContactDialog = ({ title, children, formData }: ContactFormProps) => {
     return (
@@ -74,59 +78,17 @@ export function Contacts(data: any) {
   };
 
   const handlerSubmit = async (newData: any) => {
-    try {
-      const isUpdate = newData.id! > 0;
+    const isUpdate = newData.id! > 0;
 
-      if (isUpdate) {
-        newData = await updateContact(newData);
-      } else {
-        newData = await createContact(newData);
-      }
-
-      if (!newData.id) {
-        toast.error("Erro no cadastro", {
-          description: "Ocorreu um erro ao tentar cadastrar o contato",
-        });
-
-        return;
-      }
-
-      setContact((prev: any[]) =>
-        prev.filter((d) => d.id !== newData.id).concat(newData)
-      );
-
-      toast.success("Contato salvo", {
-        description: `O contato #${newData.id} foi salvo`,
-      });
-    } catch (error) {
-      toast.error("Falha no cadastro", {
-        description: "Ocorreu uma falha ao tentar cadastrar o contato",
-      });
+    if (isUpdate) {
+      await updateContact(newData);
+    } else {
+      await createContact(newData);
     }
   };
 
   const handlerDelete = async (contactId: number) => {
-    try {
-      const result = await deleteContact(contactId);
-
-      if (result.id) {
-        setContact((prev: any[]) => prev.filter((d) => d.id !== result.id));
-
-        toast.success("Contato deletado", {
-          description: `O contato #${contactId} foi removido com sucesso!`,
-        });
-
-        return;
-      }
-
-      toast.error("Erro ao remover o Contato", {
-        description: `Ocorreu um erro ao remover o contato #${contactId}.`,
-      });
-    } catch (error) {
-      toast.error("Falha ao remover o Contato", {
-        description: `Ocorreu uma falha ao remover o contato.`,
-      });
-    }
+    await deleteContact(contactId);
   };
 
   const columns: ColumnDef<ContactType>[] = [
@@ -206,7 +168,7 @@ export function Contacts(data: any) {
           </Button>
         </ContactDialog>
       </div>
-      <DataTable columns={columns} data={contact} />
+      <DataTable columns={columns} data={contactsList} />
     </>
   );
 }
