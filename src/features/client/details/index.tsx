@@ -14,12 +14,12 @@ import {
   PhoneCall,
 } from "lucide-react";
 
-import { Invoices } from "./invoices";
-import { Address } from "../table/list-address";
-import { Contacts } from "../table/list-contacts";
-import { Discounts } from "../table/list-discount";
-import { Signatures } from "../table/list-signatures";
-import { Clients as Dependents } from "../table/list-clients";
+import { Address } from "@/features/client/table/list-address";
+import { Invoices } from "@/features/client/table/list-invoices";
+import { Contacts } from "@/features/client/table/list-contacts";
+import { Discounts } from "@/features/client/table/list-discount";
+import { Signatures } from "@/features/client/table/list-signatures";
+import { Clients as Dependents } from "@/features/client/table/list-clients";
 
 import Personal, { loadClientData } from "@/features/client/forms/personal";
 import useClient from "@/hooks/useClient";

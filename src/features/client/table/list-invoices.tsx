@@ -11,10 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
 
 import { toDateString, toMoneyValue } from "@/utils/format-utils";
-import { printInvoice, sendInvoice } from "@/services/invoice";
+import { DataTable } from "@/components/dataTable";
+import useInvoice from "@/hooks/useInvoice";
 
 //TODO reutilizar tipo de boleto do yup - ainda nao implementado
 export type Invoice = {
@@ -26,138 +26,119 @@ export type Invoice = {
   price: number;
 };
 
-const handlerSend = async (invoiceNumber: number) => {
-  const urlFile = await sendInvoice([invoiceNumber]);
+export function Invoices(data: any) {
+  const { sendInvoice, printInvoice } = useInvoice();
 
-  if (urlFile) {
-    toast.info("Envio de boleto", {
-      description: `O boleto foi adicionado a fila para envio`,
-    });
-  } else {
-    toast.error("Envio de boleto", {
-      description: `O boleto não está disponível`,
-    });
-  }
-};
+  const handlerSend = async (invoiceNumber: number) => {
+    await sendInvoice([invoiceNumber]);
+  };
 
-const handlerPrint = async (invoiceNumber: number) => {
-  const urlFile = await printInvoice([invoiceNumber]);
+  const handlerPrint = async (invoiceNumber: number) => {
+    await printInvoice([invoiceNumber]);
+  };
 
-  if (!urlFile) {
-    toast.error("Impressão de boleto", {
-      description: `O boleto não está disponível`,
-    });
-  } else {
-    toast.info("Impressão de boleto", {
-      description: `O boleto está disponível`,
-      action: {
-        label: "Baixar",
-        onClick: () => window.open(urlFile),
-      },
-    });
-  }
-};
-
-export const columns: ColumnDef<Invoice>[] = [
-  {
-    accessorKey: "id",
-    header: "Número",
-  },
-  {
-    accessorKey: "referenceDate",
-    header: "Referência",
-    accessorFn: (data: Invoice) => toDateString(data.referenceDate),
-  },
-  {
-    accessorKey: "dueDate",
-    header: "Vencimento",
-    accessorFn: (data: Invoice) => toDateString(data.dueDate),
-  },
-  {
-    accessorKey: "paymentDate",
-    header: "Pagamento",
-    accessorFn: (data: Invoice) => toDateString(data.paymentDate),
-  },
-  {
-    accessorKey: "price",
-    header: "Valor",
-    accessorFn: (data: Invoice) => toMoneyValue(data.price),
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      return (
-        <>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Printer className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Impressão de boleto</DialogTitle>
-                <DialogDescription>
-                  Tem certeza que deseja imprimir o boleto?
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary" className="mb-2">
-                    Cancelar
-                  </Button>
-                </DialogClose>
-                <DialogClose asChild>
-                  <Button
-                    onClick={() => handlerPrint(Number(row.original.id))}
-                    type="submit"
-                    variant="destructive"
-                    className="mb-2"
-                  >
-                    Imprimir
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Send className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Envio de boleto</DialogTitle>
-                <DialogDescription>
-                  Tem certeza que deseja enviar o boleto para o e-mail
-                  cadastrado?
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary" className="mb-2">
-                    Cancelar
-                  </Button>
-                </DialogClose>
-                <DialogClose asChild>
-                  <Button
-                    onClick={() => handlerSend(Number(row.original.id))}
-                    type="submit"
-                    variant="destructive"
-                    className="mb-2"
-                  >
-                    Enviar
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </>
-      );
+  const columns: ColumnDef<Invoice>[] = [
+    {
+      accessorKey: "id",
+      header: "Número",
     },
-  },
-];
+    {
+      accessorKey: "referenceDate",
+      header: "Referência",
+      accessorFn: (data: Invoice) => toDateString(data.referenceDate),
+    },
+    {
+      accessorKey: "dueDate",
+      header: "Vencimento",
+      accessorFn: (data: Invoice) => toDateString(data.dueDate),
+    },
+    {
+      accessorKey: "paymentDate",
+      header: "Pagamento",
+      accessorFn: (data: Invoice) => toDateString(data.paymentDate),
+    },
+    {
+      accessorKey: "price",
+      header: "Valor",
+      accessorFn: (data: Invoice) => toMoneyValue(data.price),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        return (
+          <>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <Printer className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Impressão de boleto</DialogTitle>
+                  <DialogDescription>
+                    Tem certeza que deseja imprimir o boleto?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button" variant="secondary" className="mb-2">
+                      Cancelar
+                    </Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button
+                      onClick={() => handlerPrint(Number(row.original.id))}
+                      type="submit"
+                      variant="destructive"
+                      className="mb-2"
+                    >
+                      Imprimir
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Envio de boleto</DialogTitle>
+                  <DialogDescription>
+                    Tem certeza que deseja enviar o boleto para o e-mail
+                    cadastrado?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button" variant="secondary" className="mb-2">
+                      Cancelar
+                    </Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button
+                      onClick={() => handlerSend(Number(row.original.id))}
+                      type="submit"
+                      variant="destructive"
+                      className="mb-2"
+                    >
+                      Enviar
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
+        );
+      },
+    },
+  ];
+
+  return <DataTable columns={columns} data={data?.invoice} />;
+}
