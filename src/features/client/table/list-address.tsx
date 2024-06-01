@@ -1,9 +1,9 @@
-import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Pencil, PlusCircle, Trash } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+
 import {
   Dialog,
   DialogClose,
@@ -15,12 +15,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import {
-  createAddress,
-  deleteAddress,
-  updateAddress,
-} from "@/services/address";
-
 import AddressForm, {
   AddressDataType,
   loadAddressData,
@@ -28,6 +22,7 @@ import AddressForm, {
 
 import { normalizeCepNumber } from "@/utils/format-utils";
 import { DataTable } from "@/components/dataTable";
+import useAddress from "@/hooks/useAddress";
 
 type AddressType = {
   id: string;
@@ -88,18 +83,28 @@ const editAddress = (data: Address): AddressDataType => {
   };
 };
 
-export interface AddressormProps {
+export interface AddressFormProps {
   title: string;
   children: JSX.Element[] | JSX.Element;
   formData: AddressDataType;
 }
 
 export function Address(data: any) {
-  const [address, setAddress] = useState(data?.address);
+  const {
+    addressList,
+    setAddresssList,
+    createAddress,
+    deleteAddress,
+    updateAddress,
+  } = useAddress();
+
+  useEffect(() => {
+    setAddresssList(data?.address);
+  }, []);
 
   const { clientId } = useParams();
 
-  const AddressDialog = ({ title, children, formData }: AddressormProps) => {
+  const AddressDialog = ({ title, children, formData }: AddressFormProps) => {
     return (
       <Dialog>
         <DialogTrigger asChild>{children}</DialogTrigger>
@@ -117,59 +122,21 @@ export function Address(data: any) {
   };
 
   const handlerSubmit = async (newData: any) => {
-    try {
-      const isUpdate = newData.id! > 0;
+    const isUpdate = newData.id! > 0;
 
-      if (isUpdate) {
-        newData = await updateAddress(Number(clientId), newData);
-      } else {
-        newData = await createAddress(Number(clientId), newData);
-      }
-
-      if (!newData.id) {
-        toast.error("Erro no cadastro", {
-          description: "Ocorreu um erro ao tentar cadastrar o endereço",
-        });
-
-        return;
-      }
-
-      setAddress((prev: any[]) =>
-        prev.filter((d) => d.id !== newData.id).concat(newData)
-      );
-
-      toast.success("Endereço salvo", {
-        description: `O endereço #${newData.id} foi salvo`,
-      });
-    } catch (error) {
-      toast.error("Falha no cadastro", {
-        description: "Ocorreu uma falha ao tentar cadastrar o endereço",
-      });
+    if (isUpdate) {
+      newData = await updateAddress(Number(clientId), newData);
+    } else {
+      newData = await createAddress(Number(clientId), newData);
     }
+
+    setAddresssList((prev) =>
+      prev.filter((end) => end.id !== newData.id).concat(newData)
+    );
   };
 
   const handlerDelete = async (clientId: number, addressId: number) => {
-    try {
-      const result = await deleteAddress(clientId, addressId);
-
-      if (result.id) {
-        setAddress((prev: any[]) => prev.filter((d) => d.id !== result.id));
-
-        toast.success("Endereço deletado", {
-          description: `O endereço #${addressId} foi removido com sucesso!`,
-        });
-
-        return;
-      }
-
-      toast.error("Erro ao remover o Endereço", {
-        description: `Ocorreu um erro ao remover o endereço #${addressId}.`,
-      });
-    } catch (error) {
-      toast.error("Falha ao remover o Endereço", {
-        description: `Ocorreu uma falha ao remover o endereço.`,
-      });
-    }
+    await deleteAddress(clientId, addressId);
   };
 
   const columns: ColumnDef<Address>[] = [
@@ -235,7 +202,9 @@ export function Address(data: any) {
                     </Button>
                   </DialogClose>
                   <Button
-                    onClick={() => handlerDelete(Number(clientId), row.original.id)}
+                    onClick={() =>
+                      handlerDelete(Number(clientId), row.original.id)
+                    }
                     type="submit"
                     variant="destructive"
                     className="mb-2"
@@ -262,7 +231,7 @@ export function Address(data: any) {
         </AddressDialog>
       </div>
 
-      <DataTable columns={columns} data={address} />
+      <DataTable columns={columns} data={addressList} />
     </>
   );
 }

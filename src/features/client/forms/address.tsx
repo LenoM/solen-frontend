@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 
@@ -23,15 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import {
-  getAddressByCEP,
-  getAddressType,
-  getDistrict,
-  getStates,
-  getCity,
-} from "@/services/address";
 import { normalizeCepNumber } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
+import useAddress from "@/hooks/useAddress";
 
 export const loadAddressData = (data?: AddressDataType) => {
   return {
@@ -46,14 +40,6 @@ export const loadAddressData = (data?: AddressDataType) => {
     addressType: data?.addressType || "",
     addressCategory: data?.addressCategory || "",
   };
-};
-
-type AddressAttr = {
-  id: string;
-  name: string;
-  description: string;
-  cityId: string;
-  stateId: string;
 };
 
 const addressSchema = yup.object({
@@ -77,31 +63,47 @@ type AddressFormProps = {
 };
 
 export default function AddressForm({ data, onSubmit }: AddressFormProps) {
-  const [cityList, setCityList] = useState<AddressAttr[]>([]);
-  const [stateList, setStateList] = useState<AddressAttr[]>([]);
-  const [districtList, setDistrictList] = useState<AddressAttr[]>([]);
-  const [addressTypeList, setAddressTypeList] = useState<AddressAttr[]>([]);
+  const {
+    getAddressByCEP,
+    getStates,
+    stateList,
+    cityList,
+    districtList,
+    addressTypeList,
+    currentState,
+    currentCity,
+    getAddressType,
+    setCurrentState,
+    setCurrentCity,
+    setCurrentDistrict,
+    currentDistrict,
+    getDistrict,
+    getCity,
+  } = useAddress();
 
   const form = useForm({
     resolver: yupResolver(addressSchema),
     values: loadAddressData(data),
   });
 
+  useMemo(async () => await getStates(), []);
+  useMemo(async () => await getAddressType(), []);
+
   useEffect(() => {
-    getAllStates();
-    getAllAddressType();
     loadInitialData(data);
   }, [data]);
 
-  const getAllStates = async () => {
-    const allStates = await getStates();
-    setStateList(allStates);
-  };
+  useEffect(() => {
+    form.setValue("state", currentState);
+  }, [currentState]);
 
-  const getAllAddressType = async () => {
-    const allAddressTypes = await getAddressType();
-    setAddressTypeList(allAddressTypes);
-  };
+  useEffect(() => {
+    form.setValue("city", currentCity);
+  }, [currentCity]);
+
+  useEffect(() => {
+    form.setValue("district", currentDistrict);
+  }, [currentDistrict]);
 
   const loadInitialData = (data: AddressDataType) => {
     if (data.state) {
@@ -127,70 +129,27 @@ export default function AddressForm({ data, onSubmit }: AddressFormProps) {
     const cep = e.currentTarget.value;
 
     if (cep.length === 10) {
-      const result = await getAddressByCEP(cep);
-
-      if (result.length > 0) {
-        const { district, address } = result[0];
-        const { city } = district;
-        const { state } = city;
-
-        form.setValue("state", state.id);
-
-        /*** Set City */
-        const hasCity = cityList.filter((el) => el.cityId === city.id).length;
-
-        if (cityList.length === 0 || !hasCity) {
-          onChangeState(state.id);
-        }
-
-        form.setValue("city", city.id);
-
-        /*** Set District */
-        const hasDistrict = districtList.filter(
-          (el) => el.id === district.id
-        ).length;
-
-        if (districtList.length === 0 || !hasDistrict) {
-          onChangeCity(city.id);
-        }
-
-        form.setValue("district", district.id);
-
-        form.setValue("address", address);
-
-        return;
-      }
+      await getAddressByCEP(cep);
     }
   };
 
   const onChangeState = async (addressStateId: string) => {
-    if (addressStateId) {
-      setDistrictList([]);
-
-      const allCities = await getCity(addressStateId);
-      setCityList(allCities);
-      form.setValue("state", addressStateId.toString());
+    if (addressStateId && addressStateId !== currentState) {
+      await getCity(addressStateId);
+      setCurrentState(addressStateId);
     }
   };
 
   const onChangeCity = async (addressCityId: string) => {
-    if (addressCityId) {
-      const allDistricts = await getDistrict(addressCityId);
-      setDistrictList(allDistricts);
-      form.setValue("city", addressCityId.toString());
-    } else {
-      setDistrictList([]);
+    if (addressCityId && addressCityId !== currentCity) {
+      await getDistrict(addressCityId);
+      setCurrentCity(addressCityId);
     }
   };
 
   const onChangeDistrict = async (districtId: string) => {
-    if (districtList.length === 0) {
-      const allDistricts = await getDistrict(form.getValues("city"));
-      setDistrictList(allDistricts);
-    }
-
-    if (districtId) {
-      form.setValue("district", districtId.toString());
+    if (districtId && districtId !== currentDistrict) {
+      setCurrentDistrict(districtId);
     }
   };
 
