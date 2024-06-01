@@ -25,9 +25,6 @@ export default function useInvoice() {
       const response = await fetch(url, params);
       const res = await response.text();
 
-      console.log("response", response);
-      console.log("res", res);
-
       if (response.ok && res) {
         toast.success("Impressão de boleto", {
           description: `O boleto está disponível`,

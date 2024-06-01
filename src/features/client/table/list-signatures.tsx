@@ -1,5 +1,4 @@
 import { PlusCircle, Trash } from "lucide-react";
-import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -12,88 +11,44 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { toDateString, toMoneyValue } from "@/utils/format-utils";
-import HiringForm, { HaringType } from "@/features/client/forms/hiring";
-import { createSignature, deleteSignature } from "@/services/signature";
-import { toast } from "sonner";
-
-import { DataTable } from "@/components/dataTable";
-import { getSignatureByClient } from "@/services/signature";
 import SignatureForm, {
   SignatureType,
 } from "@/features/client/forms/signature";
+import HiringForm, { HaringType } from "@/features/client/forms/hiring";
+import { toDateString, toMoneyValue } from "@/utils/format-utils";
+import { DataTable } from "@/components/dataTable";
+import useSignature from "@/hooks/useSignature";
+import { Dispatch, SetStateAction } from "react";
 
-export function Signatures() {
+type SignatureProps = {
+  data: SignatureType[];
+  setSignatureList?: Dispatch<SetStateAction<SignatureType[]>>;
+};
+
+export function Signatures({ data, setSignatureList }: SignatureProps) {
   const { clientId } = useParams();
-  const [signatures, setSignatures] = useState<SignatureType[]>([]);
-
-  useEffect(() => {
-    getData(clientId);
-  }, [clientId]);
-
-  const getData = async (clientId: string | undefined) => {
-    if (clientId) {
-      const result = await getSignatureByClient(Number(clientId));
-      setSignatures(result);
-    }
-  };
+  const { createSignature, deleteSignature } = useSignature();
 
   const handlerSubmit = async ({
     productId,
     initialDate,
     finalDate,
   }: SignatureType) => {
-    try {
-      const newData = await createSignature(
-        Number(clientId),
-        productId,
-        initialDate,
-        finalDate
-      );
-
-      if (newData.length > 0) {
-        setSignatures(newData);
-
-        toast.success("Assinatura adicionada", {
-          description: "A assinatura foi adicionado com sucesso!",
-        });
-
-        return;
-      }
-
-      toast.error("Erro ao adicionar a assinatura", {
-        description: "Ocorreu um erro ao adicionar a assinatura.",
-      });
-    } catch (error) {
-      toast.error("Falha ao adicionar a assinatura", {
-        description: "Ocorreu uma falha ao adicionar a assinatura.",
-      });
-    }
+    const newData = await createSignature(
+      Number(clientId),
+      productId,
+      initialDate,
+      finalDate
+    );
+    setSignatureList && setSignatureList(newData);
   };
 
   const handlerDelete = async ({ referenceDate, referenceId }: HaringType) => {
-    try {
-      console.log('teste', referenceId)
-      const result = await deleteSignature(Number(referenceId), referenceDate);
-
-      if (result.length > 0) {
-        setSignatures(result);
-
-        toast.success("Assinatura cancelada", {
-          description: "A assinatura foi cancelada com sucesso!",
-        });
-
-        return;
-      }
-
-      toast.error("Erro ao remover a assinatura", {
-        description: "Ocorreu um erro ao cancelar a assinatura.",
-      });
-    } catch (error) {
-      toast.error("Falha ao remover a assinatura", {
-        description: "Ocorreu uma falha ao cancelar a assinatura.",
-      });
-    }
+    await deleteSignature(Number(referenceId), referenceDate);
+    setSignatureList &&
+      setSignatureList((prev: SignatureType[]) =>
+        prev.filter((d) => d.id !== referenceId)
+      );
   };
 
   const columns: ColumnDef<SignatureType>[] = [
@@ -109,7 +64,8 @@ export function Signatures() {
     {
       accessorKey: "finalDate",
       header: "Término",
-      accessorFn: (data: SignatureType) => toDateString(data.finalDate?.toString()),
+      accessorFn: (data: SignatureType) =>
+        toDateString(data.finalDate?.toString()),
     },
     {
       id: "actions",
@@ -156,7 +112,7 @@ export function Signatures() {
           </DialogContent>
         </Dialog>
       </div>
-      <DataTable columns={columns} data={signatures} />
+      <DataTable columns={columns} data={data} />
     </>
   );
 }

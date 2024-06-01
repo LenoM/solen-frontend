@@ -1,5 +1,3 @@
-import { toast } from "sonner";
-import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Info, PlusCircle, Trash } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
@@ -23,26 +21,17 @@ import {
 import HiringForm, { HaringType } from "@/features/client/forms/hiring";
 import DiscountForm, { DiscountType } from "@/features/client/forms/discount";
 import { toDateString, toMoneyValue } from "@/utils/format-utils";
-import {
-  createDiscount,
-  deleteDiscount,
-  getDiscountsByClient,
-} from "@/services/discount";
+import useDiscount from "@/hooks/useDiscount";
+import { Dispatch, SetStateAction } from "react";
 
-export function Discounts() {
+type DiscountProps = {
+  data: DiscountType[];
+  setDiscountList?: Dispatch<SetStateAction<DiscountType[]>>;
+};
+
+export function Discounts({ data, setDiscountList }: DiscountProps) {
   const { clientId } = useParams();
-  const [discounts, setDiscounts] = useState<DiscountType[]>([]);
-
-  useEffect(() => {
-    getData(clientId);
-  }, [clientId]);
-
-  const getData = async (clientId: string | undefined) => {
-    if (clientId) {
-      const result = await getDiscountsByClient(Number(clientId));
-      setDiscounts(result);
-    }
-  };
+  const { createDiscount, deleteDiscount } = useDiscount();
 
   const handlerSubmit = async ({
     productId,
@@ -51,58 +40,24 @@ export function Discounts() {
     initialDate,
     finalDate,
   }: DiscountType) => {
-    try {
-      const newData = await createDiscount(
-        Number(clientId),
-        productId,
-        Number(price),
-        description,
-        initialDate,
-        finalDate
-      );
+    const newData = await createDiscount(
+      Number(clientId),
+      productId,
+      Number(price),
+      description,
+      initialDate,
+      finalDate
+    );
 
-      if (newData.length > 0) {
-        setDiscounts(newData);
-
-        toast.success("Desconto adicionado", {
-          description: "O desconto foi adicionado com sucesso!",
-        });
-
-        return;
-      }
-
-      toast.error("Erro ao adicionar o desconto", {
-        description: "Ocorreu um erro ao adicionar o desconto.",
-      });
-    } catch (error) {
-      toast.error("Falha ao adicionar o desconto", {
-        description: "Ocorreu uma falha ao adicionar o desconto.",
-      });
-    }
+    setDiscountList && setDiscountList(newData);
   };
 
   const handlerDelete = async ({ referenceDate, referenceId }: HaringType) => {
-    try {
-      const result = await deleteDiscount(Number(referenceId), referenceDate);
-
-      if (result.length > 0) {
-        setDiscounts(result);
-
-        toast.success("Desconto cancelado", {
-          description: "O desconto foi cancelado com sucesso!",
-        });
-
-        return;
-      }
-
-      toast.error("Erro ao remover o desconto", {
-        description: "Ocorreu um erro ao cancelar o desconto.",
-      });
-    } catch (error) {
-      toast.error("Falha ao remover o desconto", {
-        description: "Ocorreu uma falha ao cancelar o desconto.",
-      });
-    }
+    await deleteDiscount(Number(referenceId), referenceDate);
+    setDiscountList &&
+      setDiscountList((prev: DiscountType[]) =>
+        prev.filter((d) => d.id !== referenceId)
+      );
   };
 
   const columns: ColumnDef<DiscountType>[] = [
@@ -198,7 +153,7 @@ export function Discounts() {
           </DialogContent>
         </Dialog>
       </div>
-      <DataTable columns={columns} data={discounts} />
+      <DataTable columns={columns} data={data} />
     </>
   );
 }

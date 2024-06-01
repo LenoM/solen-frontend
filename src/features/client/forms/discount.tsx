@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,8 +36,8 @@ import {
 import MoneyInput from "@/components/input/money";
 import { isOutOfRange, toDateString } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
-import { getProducts } from "@/services/product";
 import { ProductType } from "@/features/product/form";
+import useProduct from "@/hooks/useProducts";
 
 const discountSchema = yup.object().shape({
   id: yup.number().nullable(),
@@ -59,17 +59,13 @@ type CancelInput = {
 };
 
 export default function DiscountForm({ onSubmit }: CancelInput) {
-  const [productArray, setProductArray] = useState<ProductType[]>([]);
+  const { getProducts, productsList } = useProduct();
 
   const form = useForm({
     resolver: yupResolver(discountSchema),
   });
 
-  useEffect(() => {
-    if (productArray.length == 0) {
-      getProductList();
-    }
-  }, [productArray]);
+  useMemo(async () => await getProducts(), []);
 
   const handleSubmit = () => {
     const newData = form.getValues();
@@ -81,11 +77,6 @@ export default function DiscountForm({ onSubmit }: CancelInput) {
       initialDate: newData.initialDate,
       finalDate: newData.finalDate,
     });
-  };
-
-  const getProductList = async () => {
-    const products = await getProducts();
-    setProductArray(products);
   };
 
   return (
@@ -184,7 +175,7 @@ export default function DiscountForm({ onSubmit }: CancelInput) {
             />
           </div>
 
-          {productArray && (
+          {productsList && (
             <div className="flex flex-col mb-2">
               <FormField
                 name="productId"
@@ -199,7 +190,7 @@ export default function DiscountForm({ onSubmit }: CancelInput) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {productArray.map((comp: ProductType) => {
+                        {productsList.map((comp: ProductType) => {
                           return (
                             <SelectItem
                               key={`comp-${comp.id}`}

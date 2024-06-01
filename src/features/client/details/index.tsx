@@ -23,12 +23,18 @@ import { Clients as Dependents } from "@/features/client/table/list-clients";
 
 import Personal, { loadClientData } from "@/features/client/forms/personal";
 import useClient from "@/hooks/useClient";
+import useDiscount from "@/hooks/useDiscount";
+import useSignature from "@/hooks/useSignature";
 
 export default function ClientDetails() {
   const { clientId } = useParams();
   const { getClientByid, currentClient } = useClient();
+  const { discountList, setDiscountList, getDiscountsByClient } = useDiscount();
+  const { signatureList, setSignatureList, getSignatureByClient } = useSignature();
 
-  useMemo(async () => await getClientByid(clientId), [clientId]);
+  useMemo(async () => await getClientByid(clientId), []);
+  useMemo(async () => await getDiscountsByClient(Number(clientId)), []);
+  useMemo(async () => await getSignatureByClient(Number(clientId)), []);
 
   return (
     <div className="p-6 pt-1 h-screen space-y-4">
@@ -122,7 +128,7 @@ export default function ClientDetails() {
                 <CardTitle>Assinaturas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Signatures />
+                <Signatures data={signatureList} setSignatureList={setSignatureList} />
               </CardContent>
             </Card>
 
@@ -133,7 +139,7 @@ export default function ClientDetails() {
                 <CardTitle>Descontos</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Discounts />
+                <Discounts data={discountList} setDiscountList={setDiscountList} />
               </CardContent>
             </Card>
           </TabsContent>

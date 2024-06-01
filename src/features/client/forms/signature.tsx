@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,11 +31,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import MoneyInput from "@/components/input/money";
+// import MoneyInput from "@/components/input/money";
 import { isOutOfRange, toDateString } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
-import { getProducts } from "@/services/product";
 import { ProductType } from "@/features/product/form";
+import useProduct from "@/hooks/useProducts";
 
 const signatureSchema = yup.object().shape({
   id: yup.number().nullable(),
@@ -43,7 +43,10 @@ const signatureSchema = yup.object().shape({
   productId: yup.number().required(ErrorMessage.required),
   clientId: yup.number().optional(),
   initialDate: yup.date().required(ErrorMessage.required),
-  finalDate: yup.date().nullable().min(yup.ref("initialDate"), ErrorMessage.invalidMinDate),
+  finalDate: yup
+    .date()
+    .nullable()
+    .min(yup.ref("initialDate"), ErrorMessage.invalidMinDate),
 });
 
 export type SignatureType = yup.InferType<typeof signatureSchema>;
@@ -53,17 +56,13 @@ type CancelInput = {
 };
 
 export default function SignatureForm({ onSubmit }: CancelInput) {
-  const [productArray, setProductArray] = useState<ProductType[]>([]);
+  const { getProducts, productsList } = useProduct();
 
   const form = useForm({
     resolver: yupResolver(signatureSchema),
   });
 
-  useEffect(() => {
-    if (productArray.length == 0) {
-      getProductList();
-    }
-  }, [productArray]);
+  useMemo(async () => await getProducts(), []);
 
   const handleSubmit = () => {
     const newData = form.getValues();
@@ -73,11 +72,6 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
       initialDate: newData.initialDate,
       finalDate: newData.finalDate,
     });
-  };
-
-  const getProductList = async () => {
-    const products = await getProducts();
-    setProductArray(products);
   };
 
   return (
@@ -121,8 +115,8 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    O desconto será adicionado aos boletos gerados a partir desta
-                    data
+                    O desconto será adicionado aos boletos gerados a partir
+                    desta data
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -167,8 +161,8 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    O desconto será adicionado aos boletos gerados até desta data
-                    (Opcional)
+                    O desconto será adicionado aos boletos gerados até desta
+                    data (Opcional)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -176,7 +170,7 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
             />
           </div>
 
-          {productArray && (
+          {productsList && (
             <div className="flex flex-col mb-2">
               <FormField
                 name="productId"
@@ -191,7 +185,7 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {productArray.map((comp: ProductType) => {
+                        {productsList.map((comp: ProductType) => {
                           return (
                             <SelectItem
                               key={`comp-${comp.id}`}
@@ -209,7 +203,7 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
               />
             </div>
           )}
-
+          {/* 
           <div className="flex flex-col mb-2">
             <MoneyInput
               form={form}
@@ -217,7 +211,7 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
               name="price"
               placeholder="Valor do desconto"
             />
-          </div>
+          </div> */}
 
           <div className="flex flex-col mb-4 mt-4">
             <Button type="submit">Salvar</Button>
