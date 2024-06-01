@@ -1,6 +1,5 @@
 import { toast } from "sonner";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { AddressDataType } from "@/features/client/forms/address";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
@@ -364,6 +363,7 @@ export default function useAddress() {
     addressTypeList,
     stateList,
     cityList,
+    loading,
     districtList,
     currentState,
     currentCity,

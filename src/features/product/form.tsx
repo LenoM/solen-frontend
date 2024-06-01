@@ -87,7 +87,7 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
   });
 
   const onSubmit = async () => {
-    let newData: ProductType = form.getValues();
+    const newData: ProductType = form.getValues();
 
     if (!productId) {
       await createProduct(newData);

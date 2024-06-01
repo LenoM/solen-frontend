@@ -11,7 +11,6 @@ export default function useContact() {
   const headers = getHeader();
   const [loading, setLoading] = useState(true);
   const [contactsList, setContactsList] = useState<ContactType[]>([]);
-  const [currentData, setCurrentData] = useState<ContactType>();
 
   const createContact = async ({
     value,
@@ -83,7 +82,7 @@ export default function useContact() {
       const res = await response.json();
 
       if (response.ok && res) {
-        setContactsList((prev: any[]) =>
+        setContactsList((prev: ContactType[]) =>
           prev.filter((d) => d.id !== res.id).concat(res)
         );
 
@@ -121,7 +120,7 @@ export default function useContact() {
       const res = await response.json();
 
       if (response.ok && res) {
-        setContactsList((prev: any[]) => prev.filter((d) => d.id !== res.id));
+        setContactsList((prev: ContactType[]) => prev.filter((d) => d.id !== res.id));
 
         toast.success("Contato deletado", {
           description: `O contato #${id} foi removido com sucesso!`,
@@ -144,7 +143,6 @@ export default function useContact() {
   return {
     contactsList,
     setContactsList,
-    currentData,
     loading,
     deleteContact,
     createContact,
