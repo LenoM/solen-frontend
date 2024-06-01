@@ -99,7 +99,8 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
-        return res;
+        setClientsList(res);
+        return;
       }
 
       toast.error("Erro na lista de dependentes", {
@@ -139,6 +140,10 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
+        toast.success("Cancelamento registrado", {
+          description: "O cancelamento foi registrado",
+        });
+
         return res;
       }
 
@@ -179,6 +184,9 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
+        toast.success("Reativação registrada", {
+          description: "A reativação foi registrada",
+        });
         return res;
       }
 

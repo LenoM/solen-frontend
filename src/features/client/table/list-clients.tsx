@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+
 import {
   Ban,
   EllipsisVertical,
@@ -29,7 +29,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import { cancelClient, reactivateClient } from "@/services/client";
 import { DataTable } from "@/components/dataTable";
 import { formatCPF } from "@/utils/format-utils";
 import CancelForm, { CancelType } from "@/features/client/forms/cancel";
@@ -37,6 +36,7 @@ import ReactivateForm, {
   ReativateType,
 } from "@/features/client/forms/reactivate";
 import { ClientType } from "@/features/client/forms/personal";
+import useClient from "@/hooks/useClient";
 
 type ClientTableProps = {
   showAddBtn: boolean;
@@ -46,6 +46,7 @@ type ClientTableProps = {
 const pathNewClient = `${window.origin}/client/add`;
 
 export function Clients({ clients, showAddBtn }: ClientTableProps) {
+  const { cancelClient, reactivateClient } = useClient();
   const [data, setData] = useState(clients);
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
   }: CancelType) => {
     const result = await cancelClient(Number(clientId), referenceDate, reason);
 
-    if (!result.error) {
+    if (result) {
       const clientIndex = clients.findIndex(
         (cli) => Number(cli.id) === clientId
       );
@@ -71,14 +72,6 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
         ...clients.slice(clientIndex + 1),
       ];
       setData(newClients);
-
-      toast.info("Cancelamento realizado", {
-        description: `O cliente #${clientId} foi cancelado`,
-      });
-    } else {
-      toast.error("Erro no cancelamento", {
-        description: "Ocorreu um erro ao tentar cancelar o cliente",
-      });
     }
   };
 
@@ -93,26 +86,16 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
       dependents
     );
 
-    if (!result.error) {
-      const clientIndex = clients.findIndex(
-        (cli) => Number(cli.id) === clientId
-      );
+    if (result) {
+      const clientIndex = clients.findIndex((cli) => Number(cli.id) === clientId);
       const newClient = { ...clients[clientIndex], isActive: true };
-
+  
       const newClients = [
         ...clients.slice(0, clientIndex),
         newClient,
         ...clients.slice(clientIndex + 1),
       ];
       setData(newClients);
-
-      toast.info("Reativação realizada", {
-        description: `O cliente #${clientId} foi reativado`,
-      });
-    } else {
-      toast.error("Erro na reativação", {
-        description: "Ocorreu um erro ao tentar reativar o cliente",
-      });
     }
   };
 

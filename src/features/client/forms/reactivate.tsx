@@ -1,9 +1,10 @@
 import * as yup from "yup";
-import { toast } from "sonner";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { CalendarIcon } from "lucide-react";
+import { yupResolver } from "@hookform/resolvers/yup";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 
@@ -25,11 +26,8 @@ import {
 
 import { cn } from "@/lib/utils";
 import { isOutOfRange, toDateString } from "@/utils/format-utils";
-import { useEffect, useState } from "react";
-import { getFamily } from "@/services/client";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ErrorMessage } from "@/utils/error.enum";
-import { ClientType } from "@/features/client/forms/personal";
+import useClient from "@/hooks/useClient";
 
 const reactivateSchema = yup.object().shape({
   referenceDate: yup.date().required(ErrorMessage.required),
@@ -51,38 +49,22 @@ export default function ReactivateForm({
   isHolder,
   onSubmit,
 }: ReactivateInput) {
-  const [dependents, setDependents] = useState<ClientType[]>([]);
-
-  useEffect(() => {
-    if (isHolder && dependents.length === 0) {
-      loadDependentsData(referenceId);
-    }
-  }, [isHolder]);
+  const { getFamily, clientsList } = useClient();
 
   const form = useForm({
     resolver: yupResolver(reactivateSchema),
   });
 
+  useMemo(async () => await getFamily(referenceId), [referenceId]);
+
   const handleSubmit = () => {
     const newData = form.getValues();
+
     onSubmit({
       clientId: referenceId,
       referenceDate: newData.referenceDate,
       dependents: newData.dependents || [],
     });
-  };
-
-  const loadDependentsData = async (clientId: number) => {
-    const result = await getFamily(clientId);
-
-    if (result.error) {
-      toast.error("Erro na consulta", {
-        description: `Não foi possivel listar os dependentes`,
-      });
-      return;
-    }
-
-    setDependents(result);
   };
 
   return (
@@ -144,7 +126,7 @@ export default function ReactivateForm({
                     <FormLabel>Dependentes</FormLabel>
                     <FormDescription>Selecione os dependentes</FormDescription>
                   </div>
-                  {dependents
+                  {clientsList
                     .filter((dp) => dp.kinship !== "Titular")
                     .map((item) => (
                       <FormField
