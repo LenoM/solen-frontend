@@ -65,7 +65,7 @@ export default function useInvoice() {
       const res = await response.json();
 
       if (response.ok && res) {
-        toast.error("Boleto enviado com sucesso", {
+        toast.success("Boleto enviado com sucesso", {
           description: `O boleto foi adicionado a fila para envio`,
         });
 
