@@ -11,10 +11,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import SignatureForm, {
-  SignatureType,
-} from "@/features/client/forms/signature";
-import HiringForm, { HaringType } from "@/features/client/forms/hiring";
+import SignatureForm from "@/features/client/forms/signature";
+import type { SignatureType } from "@/features/client/forms/signature";
+import HiringForm from "@/features/client/forms/hiring";
+import type { HaringType } from "@/features/client/forms/hiring";
 import { toDateString, toMoneyValue } from "@/utils/format-utils";
 import { DataTable } from "@/components/dataTable";
 import useSignature from "@/hooks/useSignature";

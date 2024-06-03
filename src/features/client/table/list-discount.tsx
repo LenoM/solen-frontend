@@ -18,8 +18,10 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
-import HiringForm, { HaringType } from "@/features/client/forms/hiring";
-import DiscountForm, { DiscountType } from "@/features/client/forms/discount";
+import HiringForm from "@/features/client/forms/hiring";
+import type { HaringType } from "@/features/client/forms/hiring";
+import DiscountForm from "@/features/client/forms/discount";
+import type { DiscountType } from "@/features/client/forms/discount";
 import { toDateString, toMoneyValue } from "@/utils/format-utils";
 import useDiscount from "@/hooks/useDiscount";
 import { Dispatch, SetStateAction } from "react";

@@ -31,11 +31,12 @@ import { Button } from "@/components/ui/button";
 
 import { DataTable } from "@/components/dataTable";
 import { formatCPF } from "@/utils/format-utils";
-import CancelForm, { CancelType } from "@/features/client/forms/cancel";
-import ReactivateForm, {
-  ReativateType,
-} from "@/features/client/forms/reactivate";
-import { ClientType } from "@/features/client/forms/personal";
+import CancelForm from "@/features/client/forms/cancel";
+import type { CancelType } from "@/features/client/forms/cancel";
+
+import ReactivateForm from "@/features/client/forms/reactivate";
+import type { ReativateType } from "@/features/client/forms/reactivate";
+import type { ClientType } from "@/features/client/forms/personal";
 import useClient from "@/hooks/useClient";
 
 type ClientTableProps = {
@@ -87,9 +88,11 @@ export function Clients({ clients, showAddBtn }: ClientTableProps) {
     );
 
     if (result) {
-      const clientIndex = clients.findIndex((cli) => Number(cli.id) === clientId);
+      const clientIndex = clients.findIndex(
+        (cli) => Number(cli.id) === clientId
+      );
       const newClient = { ...clients[clientIndex], isActive: true };
-  
+
       const newClients = [
         ...clients.slice(0, clientIndex),
         newClient,

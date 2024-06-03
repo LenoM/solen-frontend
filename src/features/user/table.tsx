@@ -2,7 +2,7 @@ import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { UserType } from "@/features/user/form";
+import type { UserType } from "@/features/user/form";
 
 export const columns: ColumnDef<UserType>[] = [
   {

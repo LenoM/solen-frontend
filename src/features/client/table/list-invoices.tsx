@@ -17,7 +17,7 @@ import { DataTable } from "@/components/dataTable";
 import useInvoice from "@/hooks/useInvoice";
 
 //TODO reutilizar tipo de boleto do yup - ainda nao implementado
-export type Invoice = {
+type Invoice = {
   id: number;
   invoiceNumber: number;
   referenceDate: Date;

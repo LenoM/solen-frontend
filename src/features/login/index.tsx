@@ -29,7 +29,7 @@ const loginSchema = yup.object({
     .min(5, ErrorMessage.invalidPassword),
 });
 
-export type LoginType = yup.InferType<typeof loginSchema>;
+type LoginType = yup.InferType<typeof loginSchema>;
 
 export default function Login() {
   const login = useLogin();

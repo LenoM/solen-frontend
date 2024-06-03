@@ -15,10 +15,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import AddressForm, {
-  AddressDataType,
-  loadAddressData,
-} from "@/features/client/forms/address";
+import AddressForm, { loadAddressData } from "@/features/client/forms/address";
+
+import type { AddressDataType } from "@/features/client/forms/address";
 
 import { normalizeCepNumber } from "@/utils/format-utils";
 import { DataTable } from "@/components/dataTable";
@@ -46,7 +45,7 @@ type City = {
   state: State;
 };
 
-export type Address = {
+type Address = {
   id: number;
   address: string;
   addressType: AddressType;

@@ -16,10 +16,8 @@ import {
 
 import { normalizePhoneNumber } from "@/utils/format-utils";
 
-import ContactForm, {
-  loadContactData,
-  ContactType,
-} from "@/features/client/forms/contact";
+import ContactForm, { loadContactData } from "@/features/client/forms/contact";
+import type { ContactType } from "@/features/client/forms/contact";
 import useContact from "@/hooks/useContact";
 import { useEffect } from "react";
 

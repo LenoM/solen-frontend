@@ -36,7 +36,7 @@ import {
 import MoneyInput from "@/components/input/money";
 import { isOutOfRange, toDateString } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
-import { ProductType } from "@/features/product/form";
+import type { ProductType } from "@/features/product/form";
 import useProduct from "@/hooks/useProducts";
 
 const discountSchema = yup.object().shape({
