@@ -105,11 +105,6 @@ export const toDateString = (
   return result;
 };
 
-export const toMoneyValue = (value: string) => {
-  value = onlyNumbers(value);
-  return Number(value) / 100;
-};
-
 export const toMoneyString = (value: number) => {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
