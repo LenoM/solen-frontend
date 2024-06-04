@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
+
 import {
   Popover,
   PopoverContent,
@@ -31,7 +32,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-// import MoneyInput from "@/components/input/money";
 import { isOutOfRange, toDateString } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
 import type { ProductType } from "@/features/product/form";
@@ -203,15 +203,6 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
               />
             </div>
           )}
-          {/* 
-          <div className="flex flex-col mb-2">
-            <MoneyInput
-              form={form}
-              label="Valor"
-              name="price"
-              placeholder="Valor do desconto"
-            />
-          </div> */}
 
           <div className="flex flex-col mb-4 mt-4">
             <Button type="submit">Salvar</Button>

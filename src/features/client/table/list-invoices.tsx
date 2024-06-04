@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { toDateString, toMoneyValue } from "@/utils/format-utils";
+import { toDateString, toMoneyString } from "@/utils/format-utils";
 import { DataTable } from "@/components/dataTable";
 import useInvoice from "@/hooks/useInvoice";
 
@@ -60,7 +60,7 @@ export function Invoices(data: any) {
     {
       accessorKey: "price",
       header: "Valor",
-      accessorFn: (data: Invoice) => toMoneyValue(data.price),
+      accessorFn: (data: Invoice) => toMoneyString(data.price),
     },
     {
       id: "actions",

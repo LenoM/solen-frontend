@@ -61,21 +61,21 @@ export const getNumbers = (value: string) => {
 
 // TODO: O valor (-90) deve vir da config do sistema (DB)
 export const getMinDate = () => {
-  return dayjs().add(-90, "D")
-}
+  return dayjs().add(-90, "D");
+};
 // TODO: O valor (90) deve vir da config do sistema (DB)
 export const getMaxDate = () => {
-  return dayjs().add(90, "D")
-}
+  return dayjs().add(90, "D");
+};
 
 export const isOutOfRange = (date: Date) => {
-  const currenteDate = dayjs(date)
-  
-  const bf = currenteDate.diff(getMinDate(), "M")
-  const af = currenteDate.diff(getMaxDate(), "M")
+  const currenteDate = dayjs(date);
 
-  return af > 3 || bf < -3
-}
+  const bf = currenteDate.diff(getMinDate(), "M");
+  const af = currenteDate.diff(getMaxDate(), "M");
+
+  return af > 3 || bf < -3;
+};
 
 export const toDateValue = (
   dateString: Date | string | null
@@ -105,7 +105,12 @@ export const toDateString = (
   return result;
 };
 
-export const toMoneyValue = (value: number) => {
+export const toMoneyValue = (value: string) => {
+  value = onlyNumbers(value);
+  return Number(value) / 100;
+};
+
+export const toMoneyString = (value: number) => {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",

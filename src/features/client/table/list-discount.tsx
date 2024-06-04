@@ -22,7 +22,7 @@ import HiringForm from "@/features/client/forms/hiring";
 import type { HaringType } from "@/features/client/forms/hiring";
 import DiscountForm from "@/features/client/forms/discount";
 import type { DiscountType } from "@/features/client/forms/discount";
-import { toDateString, toMoneyValue } from "@/utils/format-utils";
+import { toDateString, toMoneyString } from "@/utils/format-utils";
 import useDiscount from "@/hooks/useDiscount";
 import { Dispatch, SetStateAction } from "react";
 
@@ -74,7 +74,7 @@ export function Discounts({ data, setDiscountList }: DiscountProps) {
     {
       accessorKey: "price",
       header: "Preço",
-      accessorFn: (data: DiscountType) => toMoneyValue(Number(data.price)),
+      accessorFn: (data: DiscountType) => toMoneyString(Number(data.price)),
     },
     {
       accessorKey: "finalDate",
