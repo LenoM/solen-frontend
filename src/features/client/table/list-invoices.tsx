@@ -1,4 +1,5 @@
 import { Send, Printer } from "lucide-react";
+import { useParams } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,19 +15,14 @@ import {
 
 import { toDateString, toMoneyString } from "@/utils/format-utils";
 import { DataTable } from "@/components/dataTable";
+import { InvoiceType } from "@/features/invoice";
 import useInvoice from "@/hooks/useInvoice";
+import useClient from "@/hooks/useClient";
 
-//TODO reutilizar tipo de boleto do yup - ainda nao implementado
-type Invoice = {
-  id: number;
-  invoiceNumber: number;
-  referenceDate: Date;
-  paymentDate: Date;
-  dueDate: Date;
-  price: number;
-};
-
-export function Invoices(data: any) {
+export function Invoices() {
+  const { clientId } = useParams();
+  const { getClientByid } = useClient();
+  const { data: client } = getClientByid(Number(clientId));
   const { sendInvoice, printInvoice } = useInvoice();
 
   const handlerSend = async (invoiceNumber: number) => {
@@ -37,7 +33,7 @@ export function Invoices(data: any) {
     await printInvoice([invoiceNumber]);
   };
 
-  const columns: ColumnDef<Invoice>[] = [
+  const columns: ColumnDef<InvoiceType>[] = [
     {
       accessorKey: "id",
       header: "Número",
@@ -45,22 +41,22 @@ export function Invoices(data: any) {
     {
       accessorKey: "referenceDate",
       header: "Referência",
-      accessorFn: (data: Invoice) => toDateString(data.referenceDate),
+      accessorFn: (data: InvoiceType) => toDateString(data.referenceDate),
     },
     {
       accessorKey: "dueDate",
       header: "Vencimento",
-      accessorFn: (data: Invoice) => toDateString(data.dueDate),
+      accessorFn: (data: InvoiceType) => toDateString(data.dueDate),
     },
     {
       accessorKey: "paymentDate",
       header: "Pagamento",
-      accessorFn: (data: Invoice) => toDateString(data.paymentDate),
+      accessorFn: (data: InvoiceType) => toDateString(data.paymentDate),
     },
     {
       accessorKey: "price",
       header: "Valor",
-      accessorFn: (data: Invoice) => toMoneyString(data.price),
+      accessorFn: (data: InvoiceType) => toMoneyString(data.price),
     },
     {
       id: "actions",
@@ -140,5 +136,11 @@ export function Invoices(data: any) {
     },
   ];
 
-  return <DataTable columns={columns} data={data?.invoice} />;
+  return (
+    <>
+      {client?.invoices && (
+        <DataTable columns={columns} data={client.invoices} />
+      )}
+    </>
+  );
 }
