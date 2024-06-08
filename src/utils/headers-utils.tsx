@@ -1,12 +1,12 @@
-import useLogin from "@/hooks/useLogin";
-import { Navigate } from "react-router-dom";
+import { isExpired, isLoggedIn } from "@/utils/local-storage-utils";
+import { useNavigate } from "react-router-dom";
 
 const getHeader = () => {
-  const login = useLogin();
+  const navigate = useNavigate();
   const token = localStorage.getItem("accessToken");
 
-  if (login.isExpired()) {
-    <Navigate to={"/login"} />;
+  if (isExpired() || !isLoggedIn()) {
+    navigate("/login");
   }
 
   const headers = {
