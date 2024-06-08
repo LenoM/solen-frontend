@@ -19,7 +19,8 @@ import { normalizePhoneNumber } from "@/utils/format-utils";
 import ContactForm, { loadContactData } from "@/features/client/forms/contact";
 import type { ContactType } from "@/features/client/forms/contact";
 import useContact from "@/hooks/useContact";
-import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import useClient from "@/hooks/useClient";
 
 const editContact = (data: ContactType): ContactType => {
   return {
@@ -45,18 +46,11 @@ export interface ContactFormProps {
   formData: ContactType;
 }
 
-export function Contacts(data: any) {
-  const {
-    contactsList,
-    setContactsList,
-    updateContact,
-    createContact,
-    deleteContact,
-  } = useContact();
-
-  useEffect(() => {
-    setContactsList(data.contact);
-  }, []);
+export function Contacts() {
+  const { clientId } = useParams();
+  const { getClientByid } = useClient();
+  const { data: client } = getClientByid(Number(clientId));
+  const { updateContact, createContact, deleteContact } = useContact();
 
   const ContactDialog = ({ title, children, formData }: ContactFormProps) => {
     return (
@@ -85,8 +79,8 @@ export function Contacts(data: any) {
     }
   };
 
-  const handlerDelete = async (contactId: number) => {
-    await deleteContact(contactId);
+  const handlerDelete = async (clientId: number, contactId: number) => {
+    await deleteContact(clientId, contactId);
   };
 
   const columns: ColumnDef<ContactType>[] = [
@@ -140,7 +134,12 @@ export function Contacts(data: any) {
                     </Button>
                   </DialogClose>
                   <Button
-                    onClick={() => handlerDelete(Number(row.original.id))}
+                    onClick={() =>
+                      handlerDelete(
+                        Number(row.original.clientId),
+                        Number(row.original.id)
+                      )
+                    }
                     type="submit"
                     variant="destructive"
                     className="mb-2"
@@ -166,7 +165,9 @@ export function Contacts(data: any) {
           </Button>
         </ContactDialog>
       </div>
-      <DataTable columns={columns} data={contactsList} />
+      {client?.contacts && (
+        <DataTable columns={columns} data={client.contacts} />
+      )}
     </>
   );
 }

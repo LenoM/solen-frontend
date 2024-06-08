@@ -57,7 +57,7 @@ const formatValue = (value: string, currentType: string) => {
   return normalizePhoneNumber(value);
 };
 
-const contactSchema = yup.object().shape({
+export const contactBaseSchema = {
   id: yup.number().nullable(),
   clientId: yup.number().required(ErrorMessage.required),
   contactType: yup
@@ -79,7 +79,11 @@ const contactSchema = yup.object().shape({
         }
       },
     }),
-});
+};
+
+const contactSchema = yup.object().shape({
+  ...contactBaseSchema
+})
 
 export type ContactType = yup.InferType<typeof contactSchema>;
 

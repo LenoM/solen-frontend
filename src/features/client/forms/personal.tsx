@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import validator from "validator";
+import { useParams } from "react-router-dom";
 import { FormEvent, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -34,6 +35,7 @@ import {
 } from "@/utils/format-utils";
 
 import { KinshipBadge, StatusBadge } from "@/features/client/status";
+import { contactBaseSchema } from "@/features/client/forms/contact";
 import { ErrorMessage } from "@/utils/error.enum";
 import { Entity } from "@/utils/utils";
 import useCompany from "@/hooks/useCompany";
@@ -59,6 +61,8 @@ export const loadClientData = (data?: any): ClientType => {
     motherName: data?.motherName || "",
     fatherName: data?.fatherName || "",
     kinship: data?.kinship || "",
+    contacts: data?.contacts || [],
+    dependents: data?.dependents || [],
   };
 };
 
@@ -70,12 +74,41 @@ const kinshipArray = [
   { id: "Pai", name: "Pai" },
 ];
 
-const clientSchema = yup.object({
+const clientBaseSchema = {
   id: yup.number().nullable(),
   name: yup.string().required(ErrorMessage.required),
   socialName: yup.string().required(ErrorMessage.required),
   isHolder: yup.boolean().default(true),
   isActive: yup.boolean().default(true),
+  gender: yup
+    .string()
+    .required(ErrorMessage.required)
+    .equals(["Masculino", "Feminino"], ErrorMessage.equals),
+  cpf: yup
+    .string()
+    .transform(formatCPF)
+    .required(ErrorMessage.required)
+    .length(14),
+  rg: yup
+    .string()
+    .required(ErrorMessage.required)
+    .min(5, ErrorMessage.invalidRG)
+    .max(12, ErrorMessage.invalidRG),
+  birthday: yup
+    .string()
+    .transform((value) => formatDate(toDateString(value)))
+    .required(ErrorMessage.invalidDate)
+    .length(10, ErrorMessage.invalidDate),
+  referenceDate: yup
+    .string()
+    .transform((value) => formatDate(toDateString(value)))
+    .required(ErrorMessage.invalidDate)
+    .length(10, ErrorMessage.invalidDate),
+  motherName: yup.string().required(ErrorMessage.required),
+  fatherName: yup.string().required(ErrorMessage.required),
+};
+
+const holderBaseSchema = {
   categoryId: yup
     .string()
     .when("isHolder", {
@@ -131,30 +164,6 @@ const clientSchema = yup.object({
       is: (value: boolean) => value === false,
       then: () => yup.string().required(ErrorMessage.required),
     }),
-  gender: yup
-    .string()
-    .required(ErrorMessage.required)
-    .equals(["Masculino", "Feminino"], ErrorMessage.equals),
-  cpf: yup
-    .string()
-    .transform(formatCPF)
-    .required(ErrorMessage.required)
-    .length(14),
-  rg: yup
-    .string()
-    .required(ErrorMessage.required)
-    .min(5, ErrorMessage.invalidRG)
-    .max(12, ErrorMessage.invalidRG),
-  birthday: yup
-    .string()
-    .transform((value) => formatDate(toDateString(value)))
-    .required(ErrorMessage.invalidDate)
-    .length(10, ErrorMessage.invalidDate),
-  referenceDate: yup
-    .string()
-    .transform((value) => formatDate(toDateString(value)))
-    .required(ErrorMessage.invalidDate)
-    .length(10, ErrorMessage.invalidDate),
   bondDate: yup
     .string()
     .when("isHolder", {
@@ -170,22 +179,39 @@ const clientSchema = yup.object({
           .required(ErrorMessage.invalidDate)
           .length(10, ErrorMessage.invalidDate),
     }),
-  motherName: yup.string().required(ErrorMessage.required),
-  fatherName: yup.string().required(ErrorMessage.required),
+};
+
+const clientSchema = yup.object().shape({
+  ...clientBaseSchema,
+  ...holderBaseSchema,
+  dependents: yup.array(
+    yup.object().shape({
+      ...clientBaseSchema,
+    })
+  ),
+  contacts: yup.array(
+    yup.object().shape({
+      ...contactBaseSchema,
+    })
+  ),
 });
 
 export type ClientType = yup.InferType<typeof clientSchema>;
 
-export default function Personal(data: ClientType) {
+export default function Personal() {
+  const { companyList, getCompany } = useCompany();
+  const { categoryList, getCategories } = useCategory();
+  const { clientsList, getClientByid, getClients, createClient, updateClient } =
+    useClient();
+
+  const { clientId } = useParams();
+  const { data } = getClientByid(Number(clientId));
+
   const form = useForm({
     resolver: yupResolver(clientSchema),
     values: loadClientData(data),
     mode: "onBlur",
   });
-
-  const { companyList, getCompany } = useCompany();
-  const { categoryList, getCategories } = useCategory();
-  const { clientsList, getClients, createClient, updateClient } = useClient();
 
   const isClientHolder = form.watch("isHolder");
 
@@ -307,8 +333,8 @@ export default function Personal(data: ClientType) {
         <div className="grid w-full items-center gap-4 xl:px-196">
           {data?.id !== 0 && (
             <div className="flex flex-row-reverse gap-4">
-              <StatusBadge isActive={data.isActive} />
-              <KinshipBadge kinship={data.kinship} />
+              <StatusBadge isActive={data?.isActive} />
+              <KinshipBadge kinship={data?.kinship} />
             </div>
           )}
 

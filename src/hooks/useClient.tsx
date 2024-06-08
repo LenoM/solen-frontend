@@ -1,11 +1,13 @@
 import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 import { ClientType, loadClientData } from "@/features/client/forms/personal";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { toDateValue } from "@/utils/format-utils";
 import { getHeader } from "@/utils/headers-utils";
+import { queryClient } from "@/lib/react-query";
 
 const MIN_INPUT_LENGTH = 5;
 const BASE_URL = import.meta.env.VITE_API_URL + "/client";
@@ -46,6 +48,14 @@ export default function useClient() {
     }
   };
 
+  const getFilterClient = async (input: string | undefined) => {
+    return useQuery<ClientType[]>({
+      queryKey: ["getClient"],
+      queryFn: () => getClient(input),
+      enabled: !!input && input.length > 5 && input.length % 2 == 0,
+    });
+  };
+
   const getClient = async (input: string | undefined) => {
     if (!input || input.length < MIN_INPUT_LENGTH) {
       toast.warning("Busca de clientes", {
@@ -68,8 +78,8 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
-        setClientsList(res);
-        return;
+        queryClient.setQueryData(["getClient"], res);
+        return res;
       }
 
       toast.error("Erro na lista de clientes", {
@@ -116,13 +126,14 @@ export default function useClient() {
   };
 
   const cancelClient = async (
-    id: number,
+    holderId: number,
+    clientId: number,
     cancelDate: Date,
     reason: string | undefined
   ) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${id}/cancel`;
+    const url = `${BASE_URL}/${clientId}/cancel`;
 
     const body: BodyInit = JSON.stringify({
       cancelDate,
@@ -140,11 +151,35 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
+        queryClient.setQueryData(
+          ["getClientById", { clientId: holderId }],
+          (prev: ClientType) => {
+            if (prev?.dependents) {
+              const clientIndex = prev.dependents.findIndex(
+                (cli) => Number(cli.id) === clientId
+              );
+
+              const newClient = {
+                ...prev.dependents[clientIndex],
+                isActive: false,
+              };
+
+              const deps = [
+                ...prev.dependents.slice(0, clientIndex),
+                newClient,
+                ...prev.dependents.slice(clientIndex + 1),
+              ];
+
+              return { ...prev, dependents: deps };
+            }
+          }
+        );
+
         toast.success("Cancelamento registrado", {
           description: "O cancelamento foi registrado",
         });
 
-        return res;
+        return;
       }
 
       toast.error("Erro no cancelamento de clientes", {
@@ -160,13 +195,14 @@ export default function useClient() {
   };
 
   const reactivateClient = async (
-    id: number,
+    holderId: number,
+    clientId: number,
     reactivatedDate: Date,
     dependents?: number[] | undefined
   ) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${id}/reactivate`;
+    const url = `${BASE_URL}/${clientId}/reactivate`;
 
     const body: BodyInit = JSON.stringify({
       reactivatedDate,
@@ -184,10 +220,35 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
+        queryClient.setQueryData(
+          ["getClientById", { clientId: holderId }],
+          (prev: ClientType) => {
+            if (prev?.dependents) {
+              const clientIndex = prev.dependents.findIndex(
+                (cli) => Number(cli.id) === clientId
+              );
+
+              const newClient = {
+                ...prev.dependents[clientIndex],
+                isActive: true,
+              };
+
+              const deps = [
+                ...prev.dependents.slice(0, clientIndex),
+                newClient,
+                ...prev.dependents.slice(clientIndex + 1),
+              ];
+
+              return { ...prev, dependents: deps };
+            }
+          }
+        );
+
         toast.success("Reativação registrada", {
           description: "A reativação foi registrada",
         });
-        return res;
+
+        return;
       }
 
       toast.error("Erro na reativação de clientes", {
@@ -202,7 +263,15 @@ export default function useClient() {
     }
   };
 
-  const getClientByid = async (clientId: string | undefined) => {
+  const getClientByid = (clientId: number) => {
+    return useQuery<ClientType>({
+      queryKey: ["getClientById", { clientId }],
+      queryFn: () => retrieveClientByid(clientId),
+      refetchOnMount: false,
+    });
+  };
+
+  const retrieveClientByid = async (clientId: number) => {
     setLoading(true);
     const url = `${BASE_URL}/${clientId}`;
 
@@ -217,8 +286,7 @@ export default function useClient() {
         const res = await response.json();
 
         if (response.ok && res) {
-          setCurrentClient(res);
-          return;
+          return res;
         }
 
         toast.error("Erro na lista de clientes", {
@@ -401,12 +469,12 @@ export default function useClient() {
     loading,
     getClientByid,
     getFamily,
-    getClient,
     getClients,
     createClient,
     deleteClient,
     updateClient,
     cancelClient,
     reactivateClient,
+    getFilterClient,
   };
 }

@@ -14,33 +14,32 @@ import {
   PhoneCall,
 } from "lucide-react";
 
+import Personal from "@/features/client/forms/personal";
 import { Address } from "@/features/client/table/list-address";
 import { Invoices } from "@/features/client/table/list-invoices";
 import { Contacts } from "@/features/client/table/list-contacts";
 import { Discounts } from "@/features/client/table/list-discount";
 import { Signatures } from "@/features/client/table/list-signatures";
-import { Clients as Dependents } from "@/features/client/table/list-clients";
-
-import Personal, { loadClientData } from "@/features/client/forms/personal";
+import { Dependents } from "@/features/client/table/list-dependents";
 import useClient from "@/hooks/useClient";
 import useDiscount from "@/hooks/useDiscount";
 import useSignature from "@/hooks/useSignature";
 
 export default function ClientDetails() {
   const { clientId } = useParams();
-  const { getClientByid, currentClient } = useClient();
+  const { getClientByid } = useClient();
   const { discountList, setDiscountList, getDiscountsByClient } = useDiscount();
   const { signatureList, setSignatureList, getSignatureByClient } = useSignature();
 
-  useMemo(async () => await getClientByid(clientId), []);
   useMemo(async () => await getDiscountsByClient(Number(clientId)), []);
   useMemo(async () => await getSignatureByClient(Number(clientId)), []);
+  getClientByid(Number(clientId));
 
   return (
-    <div className="p-6 pt-1 h-screen space-y-4">
+    <div className="sx:p-0 md:p-6 pt-1 h-screen space-y-4">
       <div className="flex items-center justify-between">
         <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="grid grid-cols-6 h-16 xl:pl-96 xl:pr-96">
+          <TabsList className="grid grid-cols-8 h-16 xl:pl-96 xl:pr-96">
             <div className="text-center">
               <TabsTrigger value="personal" className="rounded w-12 h-12">
                 <User className="w-6 h-6" />
@@ -80,7 +79,7 @@ export default function ClientDetails() {
                   <CardTitle>Dados Pessoais</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Personal {...loadClientData(currentClient)} />
+                  <Personal />
                 </CardContent>
               </div>
             </Card>
@@ -92,7 +91,7 @@ export default function ClientDetails() {
                 <CardTitle>Contatos</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Contacts {...currentClient} />
+                <Contacts />
               </CardContent>
             </Card>
           </TabsContent>
@@ -103,10 +102,7 @@ export default function ClientDetails() {
                 <CardTitle>Dependentes</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Dependents
-                  clients={currentClient?.dependents}
-                  showAddBtn={!currentClient?.holderId}
-                />
+                <Dependents />
               </CardContent>
             </Card>
           </TabsContent>
@@ -117,7 +113,7 @@ export default function ClientDetails() {
                 <CardTitle>Endereços</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Address {...currentClient} />
+                <Address />
               </CardContent>
             </Card>
           </TabsContent>
@@ -128,7 +124,10 @@ export default function ClientDetails() {
                 <CardTitle>Assinaturas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Signatures data={signatureList} setSignatureList={setSignatureList} />
+                <Signatures
+                  data={signatureList}
+                  setSignatureList={setSignatureList}
+                />
               </CardContent>
             </Card>
 
@@ -139,7 +138,10 @@ export default function ClientDetails() {
                 <CardTitle>Descontos</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Discounts data={discountList} setDiscountList={setDiscountList} />
+                <Discounts
+                  data={discountList}
+                  setDiscountList={setDiscountList}
+                />
               </CardContent>
             </Card>
           </TabsContent>
@@ -150,10 +152,11 @@ export default function ClientDetails() {
                 <CardTitle>Boletos</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Invoices {...currentClient} />
+                <Invoices />
               </CardContent>
             </Card>
           </TabsContent>
+
         </Tabs>
       </div>
     </div>

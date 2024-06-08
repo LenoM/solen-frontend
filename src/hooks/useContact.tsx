@@ -2,8 +2,10 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 import { ContactType } from "@/features/client/forms/contact";
+import { ClientType } from "@/features/client/forms/personal";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { getHeader } from "@/utils/headers-utils";
+import { queryClient } from "@/lib/react-query";
 
 const BASE_URL = import.meta.env.VITE_API_URL + "/contact";
 
@@ -36,7 +38,19 @@ export default function useContact() {
       const res = await response.json();
 
       if (response.ok && res) {
-        setContactsList((prev: ContactType[]) => [...prev, res]);
+        queryClient.setQueryData(
+          ["getClientById", { clientId }],
+          (prev: ClientType) => {
+            if (prev && prev.contacts) {
+              return { ...prev, contacts: [...prev.contacts, res] };
+            }
+          }
+        );
+
+        toast.success("Contato salvo", {
+          description: `O contato #${res.id} foi salvo`,
+        });
+
         return;
       }
 
@@ -82,8 +96,14 @@ export default function useContact() {
       const res = await response.json();
 
       if (response.ok && res) {
-        setContactsList((prev: ContactType[]) =>
-          prev.filter((d) => d.id !== res.id).concat(res)
+        queryClient.setQueryData(
+          ["getClientById", { clientId }],
+          (prev: ClientType) => {
+            prev.contacts = prev?.contacts
+              ?.filter((d) => d.id !== res.id)
+              .concat(res);
+            return prev;
+          }
         );
 
         toast.success("Contato salvo", {
@@ -105,10 +125,10 @@ export default function useContact() {
     }
   };
 
-  const deleteContact = async (id: number) => {
+  const deleteContact = async (clientId: number, contactId: number) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${id}`;
+    const url = `${BASE_URL}/${contactId}`;
 
     const params: RequestInit = {
       method: "DELETE",
@@ -120,11 +140,18 @@ export default function useContact() {
       const res = await response.json();
 
       if (response.ok && res) {
-        setContactsList((prev: ContactType[]) => prev.filter((d) => d.id !== res.id));
+        queryClient.setQueryData(
+          ["getClientById", { clientId }],
+          (prev: ClientType) => {
+            prev.contacts = prev?.contacts?.filter((d) => d.id !== res.id);
+            return prev;
+          }
+        );
 
         toast.success("Contato deletado", {
-          description: `O contato #${id} foi removido com sucesso!`,
+          description: `O contato #${contactId} foi removido com sucesso!`,
         });
+
         return;
       }
 
@@ -141,9 +168,9 @@ export default function useContact() {
   };
 
   return {
+    loading,
     contactsList,
     setContactsList,
-    loading,
     deleteContact,
     createContact,
     updateContact,
