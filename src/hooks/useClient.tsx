@@ -125,6 +125,55 @@ export default function useClient() {
     }
   };
 
+  const updateHolderStatus = (holderId: number) => {
+    queryClient.setQueryData(["getClient"], (prev: ClientType[]) => {
+      if (prev) {
+        const clientIndex = prev.findIndex(
+          (cli) => Number(cli.id) === holderId
+        );
+
+        const newClient = {
+          ...prev[clientIndex],
+          isActive: !prev[clientIndex].isActive,
+        };
+
+        const clients = [
+          ...prev.slice(0, clientIndex),
+          newClient,
+          ...prev.slice(clientIndex + 1),
+        ];
+
+        return clients;
+      }
+    });
+  };
+
+  const updateClientStatus = (holderId: number, clientId: number) => {
+    queryClient.setQueryData(
+      ["getClientById", { clientId: holderId }],
+      (prev: ClientType) => {
+        if (prev?.dependents) {
+          const clientIndex = prev.dependents.findIndex(
+            (cli) => Number(cli.id) === clientId
+          );
+
+          const newClient = {
+            ...prev.dependents[clientIndex],
+            isActive: !prev.dependents[clientIndex].isActive,
+          };
+
+          const deps = [
+            ...prev.dependents.slice(0, clientIndex),
+            newClient,
+            ...prev.dependents.slice(clientIndex + 1),
+          ];
+
+          return { ...prev, dependents: deps };
+        }
+      }
+    );
+  };
+
   const cancelClient = async (
     holderId: number,
     clientId: number,
@@ -151,29 +200,11 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
-        queryClient.setQueryData(
-          ["getClientById", { clientId: holderId }],
-          (prev: ClientType) => {
-            if (prev?.dependents) {
-              const clientIndex = prev.dependents.findIndex(
-                (cli) => Number(cli.id) === clientId
-              );
-
-              const newClient = {
-                ...prev.dependents[clientIndex],
-                isActive: false,
-              };
-
-              const deps = [
-                ...prev.dependents.slice(0, clientIndex),
-                newClient,
-                ...prev.dependents.slice(clientIndex + 1),
-              ];
-
-              return { ...prev, dependents: deps };
-            }
-          }
-        );
+        if (holderId === clientId) {
+          updateHolderStatus(clientId);
+        } else {
+          updateClientStatus(holderId, clientId);
+        }
 
         toast.success("Cancelamento registrado", {
           description: "O cancelamento foi registrado",
@@ -220,29 +251,11 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
-        queryClient.setQueryData(
-          ["getClientById", { clientId: holderId }],
-          (prev: ClientType) => {
-            if (prev?.dependents) {
-              const clientIndex = prev.dependents.findIndex(
-                (cli) => Number(cli.id) === clientId
-              );
-
-              const newClient = {
-                ...prev.dependents[clientIndex],
-                isActive: true,
-              };
-
-              const deps = [
-                ...prev.dependents.slice(0, clientIndex),
-                newClient,
-                ...prev.dependents.slice(clientIndex + 1),
-              ];
-
-              return { ...prev, dependents: deps };
-            }
-          }
-        );
+        if (holderId === clientId) {
+          updateHolderStatus(clientId);
+        } else {
+          updateClientStatus(holderId, clientId);
+        }
 
         toast.success("Reativação registrada", {
           description: "A reativação foi registrada",

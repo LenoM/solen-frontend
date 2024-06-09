@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 
 import {
@@ -43,7 +43,6 @@ import useClient from "@/hooks/useClient";
 const pathNewClient = `${window.origin}/client/add`;
 
 export function Clients() {
-  const { clientId: holderId } = useParams();
   const { cancelClient, reactivateClient } = useClient();
 
   const data = queryClient.getQueryData<ClientType[]>(["getClient"]) ?? [];
@@ -54,7 +53,7 @@ export function Clients() {
     referenceDate,
   }: CancelType) => {
     await cancelClient(
-      Number(holderId),
+      Number(clientId),
       Number(clientId),
       referenceDate,
       reason
@@ -67,7 +66,7 @@ export function Clients() {
     referenceDate,
   }: ReativateType) => {
     await reactivateClient(
-      Number(holderId),
+      Number(clientId),
       Number(clientId),
       referenceDate,
       dependents

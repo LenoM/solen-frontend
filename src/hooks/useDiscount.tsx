@@ -101,7 +101,6 @@ export default function useDiscount() {
         description: res.message,
       });
     } catch (err) {
-      console.log(err);
       toast.error("Falha na atualização do desconto", {
         description: SERVER_ERROR_MESSAGE,
       });
