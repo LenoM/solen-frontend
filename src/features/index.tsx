@@ -1,19 +1,20 @@
+import { lazy } from "react";
 import { Users, User as UserIcon } from "lucide-react";
 import { LogOut } from "lucide-react";
 import { Receipt } from "lucide-react";
 import { BarChartBig } from "lucide-react";
 import { ShoppingBasket } from "lucide-react";
 
-import Dashboard from "@/features/dashboard";
-import Invoice from "@/features/invoice";
-import Product from "@/features/product";
-import ProductDetails from "@/features/product/details";
-import Logoff from "@/features/logoff";
-import Client from "@/features/client";
-import ClientAdd from "@/features/client/add";
-import ClientDetails from "@/features/client/details";
-import User from "@/features/user";
-import UserDetail from "@/features/user/details";
+const Dashboard = lazy(() => import("@/features/dashboard"));
+const Invoice = lazy(() => import("@/features/invoice"));
+const Product = lazy(() => import("@/features/product"));
+const ProductDetails = lazy(() => import("@/features/product/details"));
+const Logoff = lazy(() => import("@/features/logoff"));
+const Client = lazy(() => import("@/features/client"));
+const ClientAdd = lazy(() => import("@/features/client/add"));
+const ClientDetails = lazy(() => import("@/features/client/details"));
+const User = lazy(() => import("@/features/user"));
+const UserDetail = lazy(() => import("@/features/user/details"));
 
 export const features = [
   {
