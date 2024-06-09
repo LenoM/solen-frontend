@@ -37,6 +37,7 @@ import {
 import { KinshipBadge, StatusBadge } from "@/features/client/status";
 import { contactBaseSchema } from "@/features/client/forms/contact";
 import { addressBaseSchema } from "@/features/client/forms/address";
+import { clientHistoryBaseSchema } from "@/features/client/table/list-history";
 import { invoiceBaseSchema } from "@/features/invoice";
 import { ErrorMessage } from "@/utils/error.enum";
 import { Entity } from "@/utils/utils";
@@ -199,6 +200,11 @@ const clientSchema = yup.object().shape({
   invoices: yup.array(
     yup.object().shape({
       ...invoiceBaseSchema,
+    })
+  ),
+  clientHistory: yup.array(
+    yup.object().shape({
+      ...clientHistoryBaseSchema,
     })
   ),
 });

@@ -11,6 +11,7 @@ import {
   Home,
   ShoppingBasket,
   PhoneCall,
+  BookOpenText,
 } from "lucide-react";
 
 import Personal from "@/features/client/forms/personal";
@@ -20,6 +21,7 @@ import { Contacts } from "@/features/client/table/list-contacts";
 import { Discounts } from "@/features/client/table/list-discount";
 import { Signatures } from "@/features/client/table/list-signatures";
 import { Dependents } from "@/features/client/table/list-dependents";
+import { ClientHistory } from "@/features/client/table/list-history";
 import useClient from "@/hooks/useClient";
 import useDiscount from "@/hooks/useDiscount";
 import useSignature from "@/hooks/useSignature";
@@ -67,6 +69,12 @@ export default function ClientDetails() {
             <div className="text-center">
               <TabsTrigger value="invoices" className="rounded w-12 h-12">
                 <Receipt className="w-6 h-6" />
+              </TabsTrigger>
+            </div>
+
+            <div className="text-center">
+              <TabsTrigger value="history" className="rounded w-12 h-12">
+                <BookOpenText className="w-6 h-6" />
               </TabsTrigger>
             </div>
           </TabsList>
@@ -150,6 +158,16 @@ export default function ClientDetails() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="history">
+            <Card>
+              <CardHeader className="text-center">
+                <CardTitle>Histórico</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <ClientHistory />
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
