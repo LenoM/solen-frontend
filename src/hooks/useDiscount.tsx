@@ -1,6 +1,8 @@
 import { toast } from "sonner";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
+import { queryClient } from "@/lib/react-query";
 import { getHeader } from "@/utils/headers-utils";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { DiscountType } from "@/features/client/forms/discount";
@@ -10,7 +12,6 @@ const BASE_URL = import.meta.env.VITE_API_URL + "/discount";
 export default function useDiscount() {
   const headers = getHeader();
   const [loading, setLoading] = useState(true);
-  const [discountList, setDiscountList] = useState<DiscountType[]>([]);
 
   const createDiscount = async (
     clientId: number,
@@ -42,11 +43,13 @@ export default function useDiscount() {
       const res = await response.json();
 
       if (response.ok && res) {
+        queryClient.setQueryData(["getDiscountsByClient", { clientId }], res);
+
         toast.success("Desconto adicionado", {
           description: "O desconto foi adicionado com sucesso!",
         });
 
-        return res;
+        return;
       }
 
       toast.error("Erro na inclusão do desconto", {
@@ -61,7 +64,11 @@ export default function useDiscount() {
     }
   };
 
-  const deleteDiscount = async (id: number, finalDate: Date) => {
+  const deleteDiscount = async (
+    id: number,
+    clientId: number,
+    finalDate: Date
+  ) => {
     setLoading(true);
 
     const url = `${BASE_URL}/${id}`;
@@ -81,6 +88,8 @@ export default function useDiscount() {
       const res = await response.json();
 
       if (response.ok && res) {
+        queryClient.setQueryData(["getDiscountsByClient", { clientId }], res);
+
         toast.success("Desconto cancelado", {
           description: "O desconto foi cancelado com sucesso!",
         });
@@ -92,6 +101,7 @@ export default function useDiscount() {
         description: res.message,
       });
     } catch (err) {
+      console.log(err);
       toast.error("Falha na atualização do desconto", {
         description: SERVER_ERROR_MESSAGE,
       });
@@ -100,7 +110,15 @@ export default function useDiscount() {
     }
   };
 
-  const getDiscountsByClient = async (clientId: number) => {
+  const getDiscountsByClient = (clientId: number) => {
+    return useQuery<DiscountType[]>({
+      queryKey: ["getDiscountsByClient", { clientId }],
+      queryFn: () => retrieveDiscountsByClient(clientId),
+      refetchOnMount: false,
+    });
+  };
+
+  const retrieveDiscountsByClient = async (clientId: number) => {
     setLoading(true);
     const url = `${BASE_URL}/client/${clientId}`;
 
@@ -115,8 +133,7 @@ export default function useDiscount() {
         const res = await response.json();
 
         if (response.ok && res) {
-          setDiscountList(res);
-          return;
+          return res;
         }
 
         toast.error("Erro na lista de descontos", {
@@ -134,8 +151,6 @@ export default function useDiscount() {
 
   return {
     loading,
-    discountList,
-    setDiscountList,
     getDiscountsByClient,
     createDiscount,
     deleteDiscount,

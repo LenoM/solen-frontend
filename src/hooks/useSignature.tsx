@@ -1,16 +1,17 @@
 import { toast } from "sonner";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { SignatureType } from "@/features/client/forms/signature";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { getHeader } from "@/utils/headers-utils";
+import { queryClient } from "@/lib/react-query";
 
 const BASE_URL = import.meta.env.VITE_API_URL + "/signature";
 
 export default function useSignature() {
   const headers = getHeader();
   const [loading, setLoading] = useState(true);
-  const [signatureList, setSignatureList] = useState<SignatureType[]>([]);
 
   const createSignature = async (
     clientId: number,
@@ -36,11 +37,13 @@ export default function useSignature() {
       const res = await response.json();
 
       if (response.ok && res) {
+        queryClient.setQueryData(["getSignatureByClient", { clientId }], res);
+
         toast.success("Assinatura adicionada", {
           description: "A assinatura foi adicionada com sucesso!",
         });
 
-        return res;
+        return;
       }
 
       toast.error("Erro na inclusão do assinatura", {
@@ -55,7 +58,11 @@ export default function useSignature() {
     }
   };
 
-  const deleteSignature = async (signatureId: number, finalDate: Date) => {
+  const deleteSignature = async (
+    signatureId: number,
+    clientId: number,
+    finalDate: Date
+  ) => {
     setLoading(true);
 
     const url = `${BASE_URL}/${signatureId}`;
@@ -75,6 +82,8 @@ export default function useSignature() {
       const res = await response.json();
 
       if (response.ok && res) {
+        queryClient.setQueryData(["getSignatureByClient", { clientId }], res);
+
         toast.success("Assinatura cancelada", {
           description: "A assinatura foi cancelada com sucesso!",
         });
@@ -94,7 +103,15 @@ export default function useSignature() {
     }
   };
 
-  const getSignatureByClient = async (clientId: number) => {
+  const getSignatureByClient = (clientId: number) => {
+    return useQuery<SignatureType[]>({
+      queryKey: ["getSignatureByClient", { clientId }],
+      queryFn: () => retriveSignatureByClient(clientId),
+      refetchOnMount: false,
+    });
+  };
+
+  const retriveSignatureByClient = async (clientId: number) => {
     setLoading(true);
     const url = `${BASE_URL}/client/${clientId}`;
 
@@ -109,8 +126,7 @@ export default function useSignature() {
         const res = await response.json();
 
         if (response.ok && res) {
-          setSignatureList(res);
-          return;
+          return res;
         }
 
         toast.error("Erro na lista de assinaturas", {
@@ -127,8 +143,6 @@ export default function useSignature() {
   };
 
   return {
-    signatureList,
-    setSignatureList,
     loading,
     createSignature,
     getSignatureByClient,

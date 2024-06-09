@@ -1,7 +1,7 @@
-import { useParams } from "react-router-dom";
 import { Info, PlusCircle, Trash } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "@/components/dataTable";
+import { useParams } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 
 import {
@@ -18,22 +18,19 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
+import { DataTable } from "@/components/dataTable";
 import HiringForm from "@/features/client/forms/hiring";
-import type { HaringType } from "@/features/client/forms/hiring";
 import DiscountForm from "@/features/client/forms/discount";
+import type { HaringType } from "@/features/client/forms/hiring";
 import type { DiscountType } from "@/features/client/forms/discount";
 import { toDateString, toMoneyString } from "@/utils/format-utils";
 import useDiscount from "@/hooks/useDiscount";
-import { Dispatch, SetStateAction } from "react";
 
-type DiscountProps = {
-  data: DiscountType[];
-  setDiscountList?: Dispatch<SetStateAction<DiscountType[]>>;
-};
-
-export function Discounts({ data, setDiscountList }: DiscountProps) {
+export function Discounts() {
   const { clientId } = useParams();
-  const { createDiscount, deleteDiscount } = useDiscount();
+  const { getDiscountsByClient, createDiscount, deleteDiscount } =
+    useDiscount();
+  const { data: discount } = getDiscountsByClient(Number(clientId));
 
   const handlerSubmit = async ({
     productId,
@@ -42,7 +39,7 @@ export function Discounts({ data, setDiscountList }: DiscountProps) {
     initialDate,
     finalDate,
   }: DiscountType) => {
-    const newData = await createDiscount(
+    await createDiscount(
       Number(clientId),
       productId,
       Number(price),
@@ -50,16 +47,10 @@ export function Discounts({ data, setDiscountList }: DiscountProps) {
       initialDate,
       finalDate
     );
-
-    setDiscountList && setDiscountList(newData);
   };
 
   const handlerDelete = async ({ referenceDate, referenceId }: HaringType) => {
-    await deleteDiscount(Number(referenceId), referenceDate);
-    setDiscountList &&
-      setDiscountList((prev: DiscountType[]) =>
-        prev.filter((d) => d.id !== referenceId)
-      );
+    await deleteDiscount(Number(referenceId), Number(clientId), referenceDate);
   };
 
   const columns: ColumnDef<DiscountType>[] = [
@@ -155,7 +146,8 @@ export function Discounts({ data, setDiscountList }: DiscountProps) {
           </DialogContent>
         </Dialog>
       </div>
-      <DataTable columns={columns} data={data} />
+
+      {discount && <DataTable columns={columns} data={discount} />}
     </>
   );
 }

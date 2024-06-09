@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { Separator } from "@/components/ui/separator";
@@ -28,11 +27,11 @@ import useSignature from "@/hooks/useSignature";
 export default function ClientDetails() {
   const { clientId } = useParams();
   const { getClientByid } = useClient();
-  const { discountList, setDiscountList, getDiscountsByClient } = useDiscount();
-  const { signatureList, setSignatureList, getSignatureByClient } = useSignature();
+  const { getDiscountsByClient } = useDiscount();
+  const { getSignatureByClient } = useSignature();
 
-  useMemo(async () => await getDiscountsByClient(Number(clientId)), []);
-  useMemo(async () => await getSignatureByClient(Number(clientId)), []);
+  getDiscountsByClient(Number(clientId));
+  getSignatureByClient(Number(clientId));
   getClientByid(Number(clientId));
 
   return (
@@ -124,10 +123,7 @@ export default function ClientDetails() {
                 <CardTitle>Assinaturas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Signatures
-                  data={signatureList}
-                  setSignatureList={setSignatureList}
-                />
+                <Signatures />
               </CardContent>
             </Card>
 
@@ -138,10 +134,7 @@ export default function ClientDetails() {
                 <CardTitle>Descontos</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Discounts
-                  data={discountList}
-                  setDiscountList={setDiscountList}
-                />
+                <Discounts />
               </CardContent>
             </Card>
           </TabsContent>

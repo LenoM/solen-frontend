@@ -1,7 +1,7 @@
 import { DollarSign, PlusCircle, Trash } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
-import { useParams } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
+import { useParams } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 
 import {
@@ -19,20 +19,16 @@ import ProductPrice from "@/features/client/forms/product-price";
 import type { HaringType } from "@/features/client/forms/hiring";
 import type { SignatureType } from "@/features/client/forms/signature";
 import type { ProductPriceType } from "@/features/client/forms/product-price";
-
 import { toDateString, toMoneyString } from "@/utils/format-utils";
 import useProductPrice from "@/hooks/useProductPrice";
 import useSignature from "@/hooks/useSignature";
 
-type SignatureProps = {
-  data: SignatureType[];
-  setSignatureList?: Dispatch<SetStateAction<SignatureType[]>>;
-};
-
-export function Signatures({ data, setSignatureList }: SignatureProps) {
+export function Signatures() {
   const { clientId } = useParams();
-  const { createSignature, deleteSignature } = useSignature();
+  const { getSignatureByClient, createSignature, deleteSignature } =
+    useSignature();
   const { createProductPrice } = useProductPrice();
+  const { data: signatures } = getSignatureByClient(Number(clientId));
 
   const handlerAddPrice = async ({
     productId,
@@ -40,27 +36,13 @@ export function Signatures({ data, setSignatureList }: SignatureProps) {
     finalDate,
     price,
   }: ProductPriceType) => {
-    const result = await createProductPrice(
+    await createProductPrice(
       Number(productId),
       Number(clientId),
       Number(price),
       initialDate,
       finalDate
     );
-
-    if (result) {
-      const prodIndex = data.findIndex(
-        (prod) => Number(prod.productId) === productId
-      );
-      const newProd = { ...data[prodIndex], price: price };
-
-      const newClients = [
-        ...data.slice(0, prodIndex),
-        newProd,
-        ...data.slice(prodIndex + 1),
-      ];
-      setSignatureList && setSignatureList(newClients);
-    }
   };
 
   const handlerSubmit = async ({
@@ -68,21 +50,11 @@ export function Signatures({ data, setSignatureList }: SignatureProps) {
     initialDate,
     finalDate,
   }: SignatureType) => {
-    const newData = await createSignature(
-      Number(clientId),
-      productId,
-      initialDate,
-      finalDate
-    );
-    setSignatureList && setSignatureList(newData);
+    await createSignature(Number(clientId), productId, initialDate, finalDate);
   };
 
   const handlerDelete = async ({ referenceDate, referenceId }: HaringType) => {
-    await deleteSignature(Number(referenceId), referenceDate);
-    setSignatureList &&
-      setSignatureList((prev: SignatureType[]) =>
-        prev.filter((d) => d.id !== referenceId)
-      );
+    await deleteSignature(Number(referenceId), Number(clientId), referenceDate);
   };
 
   const columns: ColumnDef<SignatureType>[] = [
@@ -167,7 +139,8 @@ export function Signatures({ data, setSignatureList }: SignatureProps) {
           </DialogContent>
         </Dialog>
       </div>
-      <DataTable columns={columns} data={data} />
+
+      {signatures && <DataTable columns={columns} data={signatures} />}
     </>
   );
 }

@@ -1,8 +1,10 @@
 import { toast } from "sonner";
 import { useState } from "react";
 
+import { SignatureType } from "@/features/client/forms/signature";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { getHeader } from "@/utils/headers-utils";
+import { queryClient } from "@/lib/react-query";
 
 const BASE_URL = import.meta.env.VITE_API_URL + "/product-price";
 
@@ -36,7 +38,29 @@ export default function useProductPrice() {
       const res = await response.json();
 
       if (response.ok && res) {
-        return res;
+        queryClient.setQueryData(
+          ["getSignatureByClient", { clientId: clientId }],
+          (prev: SignatureType[]) => {
+            const signatureIndex = prev.findIndex(
+              (sig) => Number(sig.productId) === productId
+            );
+
+            const newSig = {
+              ...prev[signatureIndex],
+              price: res.price,
+            };
+
+            const sigArray = [
+              ...prev.slice(0, signatureIndex),
+              newSig,
+              ...prev.slice(signatureIndex + 1),
+            ];
+
+            return sigArray;
+          }
+        );
+
+        return;
       }
 
       toast.error("Erro na inclusão da tabela de preço", {
