@@ -1,7 +1,13 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 
-import { Ban, EllipsisVertical, ShieldCheck, Eye } from "lucide-react";
+import {
+  Ban,
+  EllipsisVertical,
+  ShieldCheck,
+  PlusCircle,
+  Eye,
+} from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 
 import {
@@ -31,6 +37,8 @@ import type { CancelType } from "@/features/client/forms/cancel";
 import type { ClientType } from "@/features/client/forms/personal";
 import type { ReativateType } from "@/features/client/forms/reactivate";
 import useClient from "@/hooks/useClient";
+
+const pathNewClient = `${window.origin}/client/add`;
 
 export function Dependents() {
   const { cancelClient, reactivateClient, getClientByid } = useClient();
@@ -90,7 +98,8 @@ export function Dependents() {
       id: "actions",
       cell: ({ row }) => {
         const [isOpenModalCancel, setIsOpenModalCancel] = useState(false);
-        const [isOpenModalReactivate, setIsOpenModalReactivate] = useState(false);
+        const [isOpenModalReactivate, setIsOpenModalReactivate] =
+          useState(false);
         const newPath = `${window.origin}/client/${row.original.id}`;
 
         return (
@@ -172,6 +181,17 @@ export function Dependents() {
 
   return (
     <>
+      {client?.kinship == "Titular" && (
+        <div className="text-right">
+          <Button asChild>
+            <Link to={pathNewClient}>
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Novo
+            </Link>
+          </Button>
+        </div>
+      )}
+
       {client?.dependents && (
         <DataTable columns={columns} data={client.dependents} />
       )}
