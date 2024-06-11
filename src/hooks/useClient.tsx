@@ -280,6 +280,7 @@ export default function useClient() {
       queryKey: ["getClientById", { clientId }],
       queryFn: () => retrieveClientByid(clientId),
       refetchOnMount: false,
+      enabled: !!clientId
     });
   };
 

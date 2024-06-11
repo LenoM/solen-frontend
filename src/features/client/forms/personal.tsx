@@ -339,10 +339,10 @@ export default function Personal() {
 
   const onSubmit = async () => {
     const newData: ClientType = form.getValues();
-    if (data?.id == 0) {
-      await createClient({ ...newData });
-    } else {
+    if (Number(data?.id) > 0) {
       await updateClient({ ...newData });
+    } else {
+      await createClient({ ...newData });
     }
   };
 
@@ -350,12 +350,10 @@ export default function Personal() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
         <div className="grid w-full items-center gap-4 xl:px-196">
-          {data?.id !== 0 && (
-            <div className="flex flex-row-reverse gap-4">
-              <StatusBadge isActive={data?.isActive} />
-              <KinshipBadge kinship={data?.kinship} />
-            </div>
-          )}
+          <div className="flex flex-row-reverse gap-4">
+            {data?.isActive && <StatusBadge isActive={data.isActive} />}
+            {data?.kinship && <KinshipBadge kinship={data.kinship} />}
+          </div>
 
           <div className="flex flex-col space-y-2">
             <FormField
@@ -702,7 +700,7 @@ export default function Personal() {
             </>
           )}
 
-          {data?.id === 0 && (
+          {!data?.id && (
             <div className="flex flex-col space-y-2">
               <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
                 <div>
