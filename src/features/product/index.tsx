@@ -25,7 +25,7 @@ export default function Product() {
   }, []);
 
   return (
-    <div className="p-6 pt-1 h-screen space-y-4">
+    <div className="sx:p-0 md:p-6 pt-1 h-screen space-y-4">
       <h1 className="text-3xl font-bold text-center">Produtos</h1>
 
       <div className="flex place-content-end">

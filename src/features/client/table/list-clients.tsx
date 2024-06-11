@@ -5,7 +5,6 @@ import {
   Ban,
   EllipsisVertical,
   ShieldCheck,
-  PlusCircle,
   Eye,
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
@@ -39,8 +38,6 @@ import type { ReativateType } from "@/features/client/forms/reactivate";
 import type { ClientType } from "@/features/client/forms/personal";
 import { queryClient } from "@/lib/react-query";
 import useClient from "@/hooks/useClient";
-
-const pathNewClient = `${window.origin}/client/add`;
 
 export function Clients() {
   const { cancelClient, reactivateClient } = useClient();
@@ -181,17 +178,5 @@ export function Clients() {
     },
   ];
 
-  return (
-    <>
-      <div className="text-right">
-        <Link to={pathNewClient}>
-          <Button>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Novo
-          </Button>
-        </Link>
-      </div>
-      <DataTable columns={columns} data={data} />
-    </>
-  );
+  return <DataTable columns={columns} data={data} />;
 }

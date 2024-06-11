@@ -1,5 +1,6 @@
 import * as yup from "yup";
-import { Search } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Search, PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -9,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Clients } from "@/features/client/table/list-clients";
 import useClient from "@/hooks/useClient";
+
+const pathNewClient = `${window.origin}/client/add`;
 
 const filterSchema = yup.object({
   filter: yup.string(),
@@ -24,8 +27,8 @@ export default function Client() {
   });
 
   const filter = form.watch("filter");
-  const { getFilterClient } = useClient();
-  const onSubmit = (e: Event) => e.preventDefault();
+  const { getFilterClient, getClient } = useClient();
+  const onSubmit = () => getClient(filter)
 
   getFilterClient(filter);
 
@@ -33,28 +36,37 @@ export default function Client() {
     <div className="sx:p-0 md:p-6 pt-1 h-screen space-y-4">
       <h1 className="text-3xl font-bold text-center">Clientes</h1>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(() => onSubmit)}>
-          <div className="flex flex-row content-center float-left">
-            <FormField
-              control={form.control}
-              name="filter"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Nome" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+      <div className="flex flex-col md:flex-row place-content-between">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="flex gap-2 w-4/4 sm:w-full mb-2">
+              <FormField
+                control={form.control}
+                name="filter"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Input placeholder="Nome" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-            <Button variant="default" className="ml-1" type="submit">
-              <Search className="h-4 w-4  md:mr-2" />
-              <span className="sr-only md:not-sr-only">Procurar</span>
-            </Button>
-          </div>
-        </form>
-      </Form>
+              <Button variant="default" type="submit">
+                <Search className="h-4 w-4 md:mr-2" />
+                <span className="sr-only md:not-sr-only">Procurar</span>
+              </Button>
+            </div>
+          </form>
+        </Form>
+
+        <Button asChild>
+          <Link to={pathNewClient}>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            Novo
+          </Link>
+        </Button>
+      </div>
 
       <Clients />
     </div>

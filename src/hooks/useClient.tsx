@@ -482,6 +482,7 @@ export default function useClient() {
     loading,
     getClientByid,
     getFamily,
+    getClient,
     getClients,
     createClient,
     deleteClient,
