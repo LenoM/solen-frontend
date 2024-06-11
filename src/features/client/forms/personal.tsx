@@ -45,7 +45,7 @@ import useCompany from "@/hooks/useCompany";
 import useCategory from "@/hooks/useCategory";
 import useClient from "@/hooks/useClient";
 
-export const loadClientData = (data?: any): ClientType => {
+const loadClientData = (data?: any): ClientType => {
   return {
     id: data?.id || 0,
     holderId: data?.holderId || "",

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { ClientType, loadClientData } from "@/features/client/forms/personal";
+import { ClientType } from "@/features/client/forms/personal";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { toDateValue } from "@/utils/format-utils";
 import { getHeader } from "@/utils/headers-utils";
@@ -17,7 +17,6 @@ export default function useClient() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [clientsList, setClientsList] = useState<ClientType[]>([]);
-  const [currentClient, setCurrentClient] = useState<any>();
 
   const getClients = async () => {
     setLoading(true);
@@ -305,8 +304,6 @@ export default function useClient() {
         toast.error("Erro na lista de clientes", {
           description: res.message,
         });
-      } else {
-        setCurrentClient(loadClientData());
       }
     } catch (err) {
       toast.error("Falha na lista de clientes", {
@@ -366,6 +363,10 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
+        queryClient.invalidateQueries({
+          queryKey: ["getClientById", { clientId: id }],
+        });
+
         toast.success("Cadastro salvo", {
           description: `O cliente #${res.id} foi salvo`,
         });
@@ -460,7 +461,6 @@ export default function useClient() {
       const res = await response.json();
 
       if (response.ok && res) {
-        setCurrentClient(res);
         return;
       }
 
@@ -478,7 +478,6 @@ export default function useClient() {
 
   return {
     clientsList,
-    currentClient,
     loading,
     getClientByid,
     getFamily,
