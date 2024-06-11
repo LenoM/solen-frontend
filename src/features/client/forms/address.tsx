@@ -42,7 +42,7 @@ export const loadAddressData = (data?: AddressDataType) => {
   };
 };
 
-const addressSchema = yup.object({
+export const addressBaseSchema = {
   id: yup.number(),
   cep: yup.string().required(ErrorMessage.required),
   city: yup.string().nullable().required(ErrorMessage.required),
@@ -53,6 +53,10 @@ const addressSchema = yup.object({
   complement: yup.string(),
   addressType: yup.string().nullable().required(ErrorMessage.required),
   addressCategory: yup.string().nullable().required(ErrorMessage.required),
+};
+
+const addressSchema = yup.object().shape({
+  ...addressBaseSchema,
 });
 
 export type AddressDataType = yup.InferType<typeof addressSchema>;

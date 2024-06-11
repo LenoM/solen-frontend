@@ -4,7 +4,8 @@ import { useState } from "react";
 import { AddressDataType } from "@/features/client/forms/address";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { getHeader } from "@/utils/headers-utils";
-import { Address } from "@/features/client/table/list-address";
+import { queryClient } from "@/lib/react-query";
+import { ClientType } from "@/features/client/forms/personal";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -20,7 +21,7 @@ export default function useAddress() {
   const headers = getHeader();
   const [loading, setLoading] = useState(true);
 
-  const [addressList, setAddresssList] = useState<Address[]>([]);
+  /* TODO: usar react-query */
   const [cityList, setCityList] = useState<AddressAttr[]>([]);
   const [stateList, setStateList] = useState<AddressAttr[]>([]);
   const [districtList, setDistrictList] = useState<AddressAttr[]>([]);
@@ -244,6 +245,15 @@ export default function useAddress() {
       const res = await response.json();
 
       if (response.ok && res) {
+        queryClient.setQueryData(
+          ["getClientById", { clientId }],
+          (prev: ClientType) => {
+            if (prev && prev.address) {
+              return { ...prev, address: [...prev.address, res] };
+            }
+          }
+        );
+
         toast.success("Endereço salvo", {
           description: `O endereço #${res.id} foi salvo`,
         });
@@ -300,6 +310,16 @@ export default function useAddress() {
       const res = await response.json();
 
       if (response.ok && res) {
+        queryClient.setQueryData(
+          ["getClientById", { clientId }],
+          (prev: ClientType) => {
+            prev.address = prev?.address
+              ?.filter((d) => d.id !== res.id)
+              .concat(res);
+            return prev;
+          }
+        );
+
         toast.success("Endereço salvo", {
           description: `O endereço #${res.id} foi salvo`,
         });
@@ -331,8 +351,12 @@ export default function useAddress() {
       const res = await response.json();
 
       if (response.ok && res) {
-        setAddresssList((prev: Address[]) =>
-          prev.filter((d) => d.id !== res.id)
+        queryClient.setQueryData(
+          ["getClientById", { clientId }],
+          (prev: ClientType) => {
+            prev.address = prev?.address?.filter((d) => d.id !== res.id);
+            return prev;
+          }
         );
 
         toast.success("Endereço deletado", {
@@ -374,7 +398,5 @@ export default function useAddress() {
     createAddress,
     updateAddress,
     deleteAddress,
-    addressList,
-    setAddresssList,
   };
 }

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Pencil, PlusCircle, Trash } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
@@ -22,6 +21,7 @@ import type { AddressDataType } from "@/features/client/forms/address";
 import { normalizeCepNumber } from "@/utils/format-utils";
 import { DataTable } from "@/components/dataTable";
 import useAddress from "@/hooks/useAddress";
+import useClient from "@/hooks/useClient";
 
 type AddressType = {
   id: string;
@@ -45,7 +45,7 @@ type City = {
   state: State;
 };
 
-type Address = {
+type AddressCustomType = {
   id: number;
   address: string;
   addressType: AddressType;
@@ -58,7 +58,7 @@ type Address = {
   complement: string;
 };
 
-const formatAddress = (data: Address) => {
+const formatAddress = (data: AddressCustomType) => {
   return (
     data.addressType.abbreviation +
     `. ${data.address}` +
@@ -67,7 +67,7 @@ const formatAddress = (data: Address) => {
   );
 };
 
-const editAddress = (data: Address): AddressDataType => {
+const editAddress = (data: AddressCustomType): AddressDataType => {
   return {
     id: data.id,
     cep: data.cep,
@@ -88,82 +88,80 @@ export interface AddressFormProps {
   formData: AddressDataType;
 }
 
-export function Address(data: any) {
-  const {
-    addressList,
-    setAddresssList,
-    createAddress,
-    deleteAddress,
-    updateAddress,
-  } = useAddress();
-
-  useEffect(() => {
-    setAddresssList(data?.address);
-  }, []);
-
+const AddressDialog = ({ title, children, formData }: AddressFormProps) => {
   const { clientId } = useParams();
-
-  const AddressDialog = ({ title, children, formData }: AddressFormProps) => {
-    return (
-      <Dialog>
-        <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-          </DialogHeader>
-          <AddressForm
-            data={formData}
-            onSubmit={(newData: AddressDataType) => handlerSubmit(newData)}
-          />
-        </DialogContent>
-      </Dialog>
-    );
-  };
+  const { createAddress, updateAddress } = useAddress();
 
   const handlerSubmit = async (newData: any) => {
     const isUpdate = newData.id! > 0;
 
     if (isUpdate) {
-      newData = await updateAddress(Number(clientId), newData);
+      await updateAddress(Number(clientId), newData);
     } else {
-      newData = await createAddress(Number(clientId), newData);
+      await createAddress(Number(clientId), newData);
     }
-
-    setAddresssList((prev) =>
-      prev.filter((end) => end.id !== newData.id).concat(newData)
-    );
   };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <AddressForm
+          data={formData}
+          onSubmit={(newData: AddressDataType) => handlerSubmit(newData)}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export function Address() {
+  const { clientId } = useParams();
+  const { getClientByid } = useClient();
+  const { data: client } = getClientByid(Number(clientId));
+  const { deleteAddress } = useAddress();
+
+  // TODO: refactore
+  const clientAddress = client?.address
+    ? (client.address as unknown as AddressCustomType[])
+    : [];
 
   const handlerDelete = async (clientId: number, addressId: number) => {
     await deleteAddress(clientId, addressId);
   };
 
-  const columns: ColumnDef<Address>[] = [
+  const columns: ColumnDef<AddressCustomType>[] = [
     {
       accessorKey: "address",
       header: "Endereço",
-      accessorFn: (data: Address) => formatAddress(data).toUpperCase(),
+      accessorFn: (data: AddressCustomType) =>
+        formatAddress(data).toUpperCase(),
     },
     {
       accessorKey: "district",
       header: "Bairro",
-      accessorFn: (data: Address) => data.district.abbreviation.toUpperCase(),
+      accessorFn: (data: AddressCustomType) =>
+        data.district.abbreviation.toUpperCase(),
     },
     {
       accessorKey: "city",
       header: "Cidade",
-      accessorFn: (data: Address) =>
+      accessorFn: (data: AddressCustomType) =>
         data.district.city.abbreviation.toUpperCase(),
     },
     {
       accessorKey: "state",
       header: "UF",
-      accessorFn: (data: Address) => data.district.city.state.abbreviation,
+      accessorFn: (data: AddressCustomType) =>
+        data.district.city.state.abbreviation,
     },
     {
       accessorKey: "cep",
       header: "CEP",
-      accessorFn: (data: Address) => normalizeCepNumber(data.cep),
+      accessorFn: (data: AddressCustomType) => normalizeCepNumber(data.cep),
     },
     {
       id: "actions",
@@ -230,7 +228,7 @@ export function Address(data: any) {
         </AddressDialog>
       </div>
 
-      <DataTable columns={columns} data={addressList} />
+      {client?.address && <DataTable columns={columns} data={clientAddress} />}
     </>
   );
 }

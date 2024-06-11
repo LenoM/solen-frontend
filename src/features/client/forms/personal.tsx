@@ -66,6 +66,7 @@ export const loadClientData = (data?: any): ClientType => {
     kinship: data?.kinship || "",
     contacts: data?.contacts || [],
     dependents: data?.dependents || [],
+    address: data?.address || [],
   };
 };
 
@@ -190,6 +191,11 @@ const clientSchema = yup.object().shape({
   dependents: yup.array(
     yup.object().shape({
       ...clientBaseSchema,
+    })
+  ),
+  address: yup.array(
+    yup.object().shape({
+      ...addressBaseSchema,
     })
   ),
   contacts: yup.array(
