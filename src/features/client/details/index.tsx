@@ -42,38 +42,68 @@ export default function ClientDetails() {
         <Tabs defaultValue="personal" className="w-full">
           <TabsList className="grid grid-cols-8 h-16 xl:pl-96 xl:pr-96">
             <div className="text-center">
-              <TabsTrigger value="personal" className="rounded w-12 h-12">
+              <TabsTrigger
+                value="personal"
+                className="rounded w-12 h-12"
+                aria-label="Dados do cliente"
+              >
                 <User className="w-6 h-6" />
               </TabsTrigger>
             </div>
             <div className="text-center">
-              <TabsTrigger value="contacts" className="rounded w-12 h-12">
+              <TabsTrigger
+                value="contacts"
+                className="rounded w-12 h-12"
+                aria-label="Lista dos dados de contato"
+              >
                 <PhoneCall className="w-6 h-6" />
               </TabsTrigger>
             </div>
             <div className="text-center">
-              <TabsTrigger value="dependents" className="rounded w-12 h-12">
+              <TabsTrigger
+                value="dependents"
+                className="rounded w-12 h-12"
+                aria-label="Lista de dependentes"
+              >
                 <Users className="w-6 h-6" />
               </TabsTrigger>
             </div>
             <div className="text-center">
-              <TabsTrigger value="address" className="rounded w-12 h-12">
+              <TabsTrigger
+                value="address"
+                className="rounded w-12 h-12"
+                aria-label="Lista de endereços"
+              >
                 <Home className="w-6 h-6" />
               </TabsTrigger>
             </div>
             <div className="text-center">
-              <TabsTrigger value="products" className="rounded w-12 h-12">
+              <TabsTrigger
+                value="products"
+                className="rounded w-12 h-12"
+                aria-label="Lista de assinaturas e descontos"
+              >
                 <ShoppingBasket className="w-6 h-6" />
               </TabsTrigger>
             </div>
             <div className="text-center">
-              <TabsTrigger value="invoices" className="rounded w-12 h-12">
+              <TabsTrigger
+                value="invoices"
+                className="rounded w-12 h-12"
+                aria-label="Lista de boletos"
+              >
                 <Receipt className="w-6 h-6" />
               </TabsTrigger>
             </div>
 
             <div className="text-center">
-              <TabsTrigger value="history" className="rounded w-12 h-12">
+
+            <div className="text-center">
+              <TabsTrigger
+                value="history"
+                className="rounded w-12 h-12"
+                aria-label="Histórico de movimentação cadastral"
+              >
                 <BookOpenText className="w-6 h-6" />
               </TabsTrigger>
             </div>
