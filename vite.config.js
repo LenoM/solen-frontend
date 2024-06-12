@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { compression } from "vite-plugin-compression2";
 import react from "@vitejs/plugin-react";
 
 import path from "path";
@@ -19,7 +20,7 @@ export default defineConfig({
       },
     },
   },
-  plugins: [react()],
+  plugins: [react(), compression()],
   resolve: {
     alias: [{ find: "@", replacement: pathConfig }],
   },
