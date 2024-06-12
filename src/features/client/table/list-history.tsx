@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, number, date, InferType, ref } from "yup";
 import { useParams } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
 
@@ -7,18 +7,18 @@ import { DataTable } from "@/components/dataTable";
 import useClient from "@/hooks/useClient";
 
 export const clientHistoryBaseSchema = {
-  id: yup.number().nullable(),
-  registrationDate: yup.date(),
-  referenceDate: yup.date(),
-  action: yup.string(),
-  reason: yup.string(),
+  id: number().nullable(),
+  registrationDate: date(),
+  referenceDate: date(),
+  action: string(),
+  reason: string(),
 };
 
-const clientHistorySchema = yup.object().shape({
+const clientHistorySchema = object().shape({
   ...clientHistoryBaseSchema,
 });
 
-export type ClientHistoryType = yup.InferType<typeof clientHistorySchema>;
+export type ClientHistoryType = InferType<typeof clientHistorySchema>;
 
 export function ClientHistory() {
   const { clientId } = useParams();

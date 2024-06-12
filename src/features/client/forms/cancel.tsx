@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, number, date, InferType } from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CalendarIcon } from "lucide-react";
@@ -31,26 +31,22 @@ import {
 } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
-import {
-  toDateString,
-  isOutOfRange,
-} from "@/utils/format-utils";
+import { toDateString, isOutOfRange } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
 
 const reasonTypeArray = ["Debito", "Pedido", "Obito"];
 
-const cancelSchema = yup.object().shape({
-  id: yup.number().nullable(),
-  clientId: yup.number().optional(),
-  referenceDate: yup.date().required(ErrorMessage.required),
-  reason: yup
-    .string()
+const cancelSchema = object().shape({
+  id: number().nullable(),
+  clientId: number().optional(),
+  referenceDate: date().required(ErrorMessage.required),
+  reason: string()
     .nullable()
     .required(ErrorMessage.required)
     .equals(reasonTypeArray, ErrorMessage.equals),
 });
 
-export type CancelType = yup.InferType<typeof cancelSchema>;
+export type CancelType = InferType<typeof cancelSchema>;
 
 type CancelInput = {
   referenceId: number;

@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, number, date, InferType, ref } from "yup";
 import { useForm } from "react-hook-form";
 import { useMemo } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -37,19 +37,18 @@ import { ErrorMessage } from "@/utils/error.enum";
 import type { ProductType } from "@/features/product/form";
 import useProduct from "@/hooks/useProducts";
 
-const signatureSchema = yup.object().shape({
-  id: yup.number().nullable(),
-  price: yup.string().optional(),
-  productId: yup.number().required(ErrorMessage.required),
-  clientId: yup.number().optional(),
-  initialDate: yup.date().required(ErrorMessage.required),
-  finalDate: yup
-    .date()
+const signatureSchema = object().shape({
+  id: number().nullable(),
+  price: string().optional(),
+  productId: number().required(ErrorMessage.required),
+  clientId: number().optional(),
+  initialDate: date().required(ErrorMessage.required),
+  finalDate: date()
     .nullable()
-    .min(yup.ref("initialDate"), ErrorMessage.invalidMinDate),
+    .min(ref("initialDate"), ErrorMessage.invalidMinDate),
 });
 
-export type SignatureType = yup.InferType<typeof signatureSchema>;
+export type SignatureType = InferType<typeof signatureSchema>;
 
 type CancelInput = {
   onSubmit: (param: SignatureType) => void;

@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, InferType } from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -18,18 +18,16 @@ import {
 import useLogin from "@/hooks/useLogin";
 import { ErrorMessage } from "@/utils/error.enum";
 
-const loginSchema = yup.object({
-  email: yup
-    .string()
+const loginSchema = object({
+  email: string()
     .required(ErrorMessage.required)
     .email(ErrorMessage.invalidEmail),
-  password: yup
-    .string()
+  password: string()
     .required(ErrorMessage.required)
     .min(5, ErrorMessage.invalidPassword),
 });
 
-export type LoginType = yup.InferType<typeof loginSchema>;
+export type LoginType = InferType<typeof loginSchema>;
 
 export default function Login() {
   const login = useLogin();

@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, number, InferType } from "yup";
 import { FormEvent, useEffect, useMemo } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -43,23 +43,23 @@ export const loadAddressData = (data?: AddressDataType) => {
 };
 
 export const addressBaseSchema = {
-  id: yup.number(),
-  cep: yup.string().required(ErrorMessage.required),
-  city: yup.string().nullable().required(ErrorMessage.required),
-  state: yup.string().nullable().required(ErrorMessage.required),
-  district: yup.string().nullable().required(ErrorMessage.required),
-  address: yup.string().required(ErrorMessage.required),
-  number: yup.number().min(0, ErrorMessage.min).required(ErrorMessage.required),
-  complement: yup.string(),
-  addressType: yup.string().nullable().required(ErrorMessage.required),
-  addressCategory: yup.string().nullable().required(ErrorMessage.required),
+  id: number(),
+  cep: string().required(ErrorMessage.required),
+  city: string().nullable().required(ErrorMessage.required),
+  state: string().nullable().required(ErrorMessage.required),
+  district: string().nullable().required(ErrorMessage.required),
+  address: string().required(ErrorMessage.required),
+  number: number().min(0, ErrorMessage.min).required(ErrorMessage.required),
+  complement: string(),
+  addressType: string().nullable().required(ErrorMessage.required),
+  addressCategory: string().nullable().required(ErrorMessage.required),
 };
 
-const addressSchema = yup.object().shape({
+const addressSchema = object().shape({
   ...addressBaseSchema,
 });
 
-export type AddressDataType = yup.InferType<typeof addressSchema>;
+export type AddressDataType = InferType<typeof addressSchema>;
 
 type AddressFormProps = {
   data: AddressDataType;

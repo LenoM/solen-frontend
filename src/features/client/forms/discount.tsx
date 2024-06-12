@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, number, date, InferType, ref } from "yup";
 import { useForm } from "react-hook-form";
 import { useMemo } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -39,20 +39,19 @@ import { ErrorMessage } from "@/utils/error.enum";
 import type { ProductType } from "@/features/product/form";
 import useProduct from "@/hooks/useProducts";
 
-const discountSchema = yup.object().shape({
-  id: yup.number().nullable(),
-  price: yup.string().required(ErrorMessage.required),
-  productId: yup.number().required(ErrorMessage.required),
-  clientId: yup.number().optional(),
-  initialDate: yup.date().required(ErrorMessage.required),
-  finalDate: yup
-    .date()
+const discountSchema = object().shape({
+  id: number().nullable(),
+  price: string().required(ErrorMessage.required),
+  productId: number().required(ErrorMessage.required),
+  clientId: number().optional(),
+  initialDate: date().required(ErrorMessage.required),
+  finalDate: date()
     .nullable()
-    .min(yup.ref("initialDate"), ErrorMessage.invalidMinDate),
-  description: yup.string(),
+    .min(ref("initialDate"), ErrorMessage.invalidMinDate),
+  description: string(),
 });
 
-export type DiscountType = yup.InferType<typeof discountSchema>;
+export type DiscountType = InferType<typeof discountSchema>;
 
 type CancelInput = {
   onSubmit: (param: DiscountType) => void;

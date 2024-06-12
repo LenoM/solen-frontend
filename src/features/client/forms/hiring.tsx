@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, number, date, InferType } from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CalendarIcon } from "lucide-react";
@@ -26,13 +26,13 @@ import { cn } from "@/lib/utils";
 import { isOutOfRange, toDateString } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
 
-const hiringSchema = yup.object().shape({
-  id: yup.number().nullable(),
-  referenceId: yup.number().optional(),
-  referenceDate: yup.date().required(ErrorMessage.required),
+const hiringSchema = object().shape({
+  id: number().nullable(),
+  referenceId: number().optional(),
+  referenceDate: date().required(ErrorMessage.required),
 });
 
-export type HaringType = yup.InferType<typeof hiringSchema>;
+export type HaringType = InferType<typeof hiringSchema>;
 
 type HiringInput = {
   referenceId: number;

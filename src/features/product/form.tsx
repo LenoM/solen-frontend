@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, number, boolean, InferType } from "yup";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -41,24 +41,22 @@ export const loadProductData = (data?: ProductType): ProductType => {
   };
 };
 
-const productSchema = yup.object({
-  id: yup.number().nullable(),
-  name: yup.string().required(ErrorMessage.required),
-  description: yup.string().required(ErrorMessage.required),
-  isActive: yup.boolean(),
-  supplierId: yup
-    .string()
+const productSchema = object({
+  id: number().nullable(),
+  name: string().required(ErrorMessage.required),
+  description: string().required(ErrorMessage.required),
+  isActive: boolean(),
+  supplierId: string()
     .transform((value) => (Number.isNaN(value) ? null : value))
     .required(ErrorMessage.required)
     .min(1, ErrorMessage.equals),
-  billingMethod: yup
-    .string()
+  billingMethod: string()
     .nullable()
     .required(ErrorMessage.required)
     .equals(["Fix", "Age"], ErrorMessage.equals),
 });
 
-export type ProductType = yup.InferType<typeof productSchema>;
+export type ProductType = InferType<typeof productSchema>;
 
 type ProductFormProps = {
   setProductsList?: Dispatch<SetStateAction<ProductType[]>>;

@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, number, array, boolean, InferType } from "yup";
 import validator from "validator";
 import { useParams } from "react-router-dom";
 import { FormEvent, useEffect, useMemo } from "react";
@@ -79,143 +79,126 @@ const kinshipArray = [
 ];
 
 const clientBaseSchema = {
-  id: yup.number().nullable(),
-  name: yup.string().required(ErrorMessage.required),
-  socialName: yup.string().required(ErrorMessage.required),
-  isHolder: yup.boolean().default(true),
-  isActive: yup.boolean().default(true),
-  gender: yup
-    .string()
+  id: number().nullable(),
+  name: string().required(ErrorMessage.required),
+  socialName: string().required(ErrorMessage.required),
+  isHolder: boolean().default(true),
+  isActive: boolean().default(true),
+  gender: string()
     .required(ErrorMessage.required)
     .equals(["Masculino", "Feminino"], ErrorMessage.equals),
-  cpf: yup
-    .string()
-    .transform(formatCPF)
-    .required(ErrorMessage.required)
-    .length(14),
-  rg: yup
-    .string()
+  cpf: string().transform(formatCPF).required(ErrorMessage.required).length(14),
+  rg: string()
     .required(ErrorMessage.required)
     .min(5, ErrorMessage.invalidRG)
     .max(12, ErrorMessage.invalidRG),
-  birthday: yup
-    .string()
+  birthday: string()
     .transform((value) => formatDate(toDateString(value)))
     .required(ErrorMessage.invalidDate)
     .length(10, ErrorMessage.invalidDate),
-  referenceDate: yup
-    .string()
+  referenceDate: string()
     .transform((value) => formatDate(toDateString(value)))
     .required(ErrorMessage.invalidDate)
     .length(10, ErrorMessage.invalidDate),
-  motherName: yup.string().required(ErrorMessage.required),
-  fatherName: yup.string().required(ErrorMessage.required),
+  motherName: string().required(ErrorMessage.required),
+  fatherName: string().required(ErrorMessage.required),
 };
 
 const holderBaseSchema = {
-  categoryId: yup
-    .string()
+  categoryId: string()
     .when("isHolder", {
       is: (value: boolean) => value === false,
-      then: () => yup.string().nullable(),
+      then: () => string().nullable(),
     })
     .when("isHolder", {
       is: (value: boolean) => value === true,
       then: () =>
-        yup
-          .number()
+        number()
           .transform((value) => (Number.isNaN(value) ? null : value))
           .required(ErrorMessage.required)
           .min(1, ErrorMessage.equals),
     }),
-  companyId: yup
-    .string()
+  companyId: string()
     .when("isHolder", {
       is: (value: boolean) => value === false,
-      then: () => yup.string().nullable(),
+      then: () => string().nullable(),
     })
     .when("isHolder", {
       is: (value: boolean) => value === true,
       then: () =>
-        yup
-          .number()
+        number()
           .transform((value) => (Number.isNaN(value) ? null : value))
           .required(ErrorMessage.required)
           .min(1, ErrorMessage.equals),
     }),
-  holderId: yup
-    .string()
+  holderId: string()
     .when("isHolder", {
       is: (value: boolean) => value === true,
-      then: () => yup.string().nullable(),
+      then: () => string().nullable(),
     })
     .when("isHolder", {
       is: (value: boolean) => value === false,
       then: () =>
-        yup
-          .string()
+        string()
           .transform((value) => (Number.isNaN(value) ? null : value))
           .required(ErrorMessage.required)
           .min(1, ErrorMessage.equals),
     }),
-  kinship: yup
-    .string()
+  kinship: string()
     .when("isHolder", {
       is: (value: boolean) => value === true,
-      then: () => yup.string().nullable(),
+      then: () => string().nullable(),
     })
     .when("isHolder", {
       is: (value: boolean) => value === false,
-      then: () => yup.string().required(ErrorMessage.required),
+      then: () => string().required(ErrorMessage.required),
     }),
-  bondDate: yup
-    .string()
+  bondDate: string()
     .when("isHolder", {
       is: (value: boolean) => value === true,
-      then: () => yup.string().nullable(),
+      then: () => string().nullable(),
     })
     .when("isHolder", {
       is: (value: boolean) => value === false,
       then: () =>
-        yup
-          .string()
+        string()
           .transform((value) => formatDate(toDateString(value)))
           .required(ErrorMessage.invalidDate)
           .length(10, ErrorMessage.invalidDate),
     }),
 };
 
-const clientSchema = yup.object().shape({
+const clientSchema = object().shape({
   ...clientBaseSchema,
   ...holderBaseSchema,
-  dependents: yup.array(
-    yup.object().shape({
+  dependents: array(
+    object().shape({
       ...clientBaseSchema,
     })
   ),
-  address: yup.array(
-    yup.object().shape({
+  address: array(
+    object().shape({
       ...addressBaseSchema,
     })
   ),
-  contacts: yup.array(
-    yup.object().shape({
+  contacts: array(
+    object().shape({
       ...contactBaseSchema,
     })
   ),
-  invoices: yup.array(
-    yup.object().shape({
+  invoices: array(
+    object().shape({
       ...invoiceBaseSchema,
     })
   ),
-  clientHistory: yup.array(
-    yup.object().shape({
+  clientHistory: array(
+    object().shape({
       ...clientHistoryBaseSchema,
     })
   ),
 });
 
-export type ClientType = yup.InferType<typeof clientSchema>;
+export type ClientType = InferType<typeof clientSchema>;
 
 export default function Personal() {
   const { companyList, getCompany } = useCompany();

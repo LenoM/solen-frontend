@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, number, boolean, InferType } from "yup";
 import validator from "validator";
 import { FormEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -58,16 +58,14 @@ const formatValue = (value: string, currentType: string) => {
 };
 
 export const contactBaseSchema = {
-  id: yup.number().nullable(),
-  clientId: yup.number().required(ErrorMessage.required),
-  contactType: yup
-    .string()
+  id: number().nullable(),
+  clientId: number().required(ErrorMessage.required),
+  contactType: string()
     .nullable()
     .required(ErrorMessage.required)
     .equals(contactTypeArray, ErrorMessage.equals),
-  isWhatsapp: yup.boolean().default(false),
-  value: yup
-    .string()
+  isWhatsapp: boolean().default(false),
+  value: string()
     .required(ErrorMessage.required)
     .test({
       message: ErrorMessage.invalidContact,
@@ -81,11 +79,11 @@ export const contactBaseSchema = {
     }),
 };
 
-const contactSchema = yup.object().shape({
-  ...contactBaseSchema
-})
+const contactSchema = object().shape({
+  ...contactBaseSchema,
+});
 
-export type ContactType = yup.InferType<typeof contactSchema>;
+export type ContactType = InferType<typeof contactSchema>;
 
 type ContactFormProps = {
   data: ContactType;

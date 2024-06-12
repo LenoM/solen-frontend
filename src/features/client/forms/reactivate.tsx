@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, number, array, date, InferType } from "yup";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { CalendarIcon } from "lucide-react";
@@ -29,14 +29,14 @@ import { isOutOfRange, toDateString } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
 import useClient from "@/hooks/useClient";
 
-const reactivateSchema = yup.object().shape({
-  referenceDate: yup.date().required(ErrorMessage.required),
-  id: yup.number().nullable(),
-  clientId: yup.number().optional(),
-  dependents: yup.array(),
+const reactivateSchema = object().shape({
+  referenceDate: date().required(ErrorMessage.required),
+  id: number().nullable(),
+  clientId: number().optional(),
+  dependents: array(),
 });
 
-export type ReativateType = yup.InferType<typeof reactivateSchema>;
+export type ReativateType = InferType<typeof reactivateSchema>;
 
 type ReactivateInput = {
   referenceId: number;

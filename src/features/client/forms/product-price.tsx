@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, number, date, InferType, ref } from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CalendarIcon } from "lucide-react";
@@ -27,18 +27,17 @@ import MoneyInput from "@/components/input/money";
 import { ErrorMessage } from "@/utils/error.enum";
 import { isOutOfRange, toDateString } from "@/utils/format-utils";
 
-const productPriceSchema = yup.object().shape({
-  price: yup.string().required(ErrorMessage.required),
-  productId: yup.number().optional(),
-  clientId: yup.number().optional(),
-  initialDate: yup.date().required(ErrorMessage.required),
-  finalDate: yup
-    .date()
+const productPriceSchema = object().shape({
+  price: string().required(ErrorMessage.required),
+  productId: number().optional(),
+  clientId: number().optional(),
+  initialDate: date().required(ErrorMessage.required),
+  finalDate: date()
     .nullable()
-    .min(yup.ref("initialDate"), ErrorMessage.invalidMinDate),
+    .min(ref("initialDate"), ErrorMessage.invalidMinDate),
 });
 
-export type ProductPriceType = yup.InferType<typeof productPriceSchema>;
+export type ProductPriceType = InferType<typeof productPriceSchema>;
 
 type ProductPricelInput = {
   productId: number | undefined;

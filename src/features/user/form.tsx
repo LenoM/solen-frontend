@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string, boolean, InferType, ref } from "yup";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
@@ -33,35 +33,32 @@ export const loadUserData = (data?: UserType): UserType => {
   };
 };
 
-const userSchema = yup.object({
-  id: yup.string(),
-  name: yup.string().required(ErrorMessage.required),
-  isActive: yup.boolean().default(false),
-  isChangePassword: yup.boolean().default(true),
-  email: yup
-    .string()
+const userSchema = object({
+  id: string(),
+  name: string().required(ErrorMessage.required),
+  isActive: boolean().default(false),
+  isChangePassword: boolean().default(true),
+  email: string()
     .email(ErrorMessage.invalidEmail)
     .required(ErrorMessage.required),
-  password: yup.string().when("isChangePassword", {
+  password: string().when("isChangePassword", {
     is: (value: number) => value,
     then: () =>
-      yup
-        .string()
+      string()
         .required(ErrorMessage.required)
         .min(7, ErrorMessage.invalidLength),
   }),
-  passwordConfirmation: yup.string().when("password", {
+  passwordConfirmation: string().when("password", {
     is: (value: number) => value,
     then: () =>
-      yup
-        .string()
+      string()
         .required(ErrorMessage.required)
         .min(7, ErrorMessage.invalidLength)
-        .oneOf([yup.ref("password")], ErrorMessage.notEquals),
+        .oneOf([ref("password")], ErrorMessage.notEquals),
   }),
 });
 
-export type UserType = yup.InferType<typeof userSchema>;
+export type UserType = InferType<typeof userSchema>;
 
 type UserFormProps = {
   setUsersList?: Dispatch<SetStateAction<UserType[]>>;

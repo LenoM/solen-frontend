@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { object, string } from "yup";
 import { Link } from "react-router-dom";
 import { Search, PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -13,8 +13,8 @@ import useClient from "@/hooks/useClient";
 
 const pathNewClient = `${window.origin}/client/add`;
 
-const filterSchema = yup.object({
-  filter: yup.string(),
+const filterSchema = object({
+  filter: string(),
 });
 
 export default function Client() {
@@ -28,7 +28,7 @@ export default function Client() {
 
   const filter = form.watch("filter");
   const { getFilterClient, getClient } = useClient();
-  const onSubmit = () => getClient(filter)
+  const onSubmit = () => getClient(filter);
 
   getFilterClient(filter);
 
