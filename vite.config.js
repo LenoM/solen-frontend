@@ -7,6 +7,8 @@ const pathConfig = path.resolve(path.resolve(), "src");
 
 export default defineConfig({
   build: {
+    cssMinify: true,
+    minify: true,
     rollupOptions: {
       output: {
         manualChunks: (id) => {
