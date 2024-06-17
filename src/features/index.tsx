@@ -8,6 +8,7 @@ import { ShoppingBasket } from "lucide-react";
 const Dashboard = lazy(() => import("@/features/dashboard"));
 const Invoice = lazy(() => import("@/features/invoice"));
 const InvoiceDetail = lazy(() => import("@/features/invoice/detail"));
+const BatchGenerator = lazy(() => import("@/features/batch-generator"));
 const Product = lazy(() => import("@/features/product"));
 const ProductDetails = lazy(() => import("@/features/product/details"));
 const Logoff = lazy(() => import("@/features/logoff"));
@@ -62,6 +63,12 @@ export const features = [
     path: "/invoice/:invoiceId",
     isMenuItem: false,
     element: <InvoiceDetail />,
+  },
+  {
+    label: "Processamento de boletos",
+    path: "/batch",
+    isMenuItem: false,
+    element: <BatchGenerator />,
   },
   {
     label: "Produtos",
