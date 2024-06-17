@@ -15,6 +15,7 @@ import {
   CirclePlus,
   CircleMinus,
   FileX,
+  Eye,
 } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -43,13 +44,14 @@ import {
 
 import { DataTable } from "@/components/dataTable";
 import InvoiceFilter from "@/features/invoice/forms/filter";
-import type { InvoiceType } from "@/features/invoice/forms/form";
+import type { InvoiceType } from "@/features/invoice/forms/invoice";
 import { toDateString, toMoneyString } from "@/utils/format-utils";
 import { queryClient } from "@/lib/react-query";
 import useInvoice from "@/hooks/useInvoice";
 
 const BATCH_PATH = `${window.origin}/batch`;
-const DETAIL_PATH = `${window.origin}/invoice/detail`;
+const DETAIL_PATH = `${window.origin}/invoice`;
+const NEW_PATH = `${DETAIL_PATH}/detail`;
 
 export default function Invoices() {
   const { sendInvoice, printInvoice, getInvoices } = useInvoice();
@@ -95,6 +97,13 @@ export default function Invoices() {
       cell: ({ row }) => {
         return (
           <>
+            <Link to={`${DETAIL_PATH}/${row.original.id}`}>
+              <Button variant="outline" className="h-8 w-8 p-0">
+                <span className="sr-only">Vizualizar cadastro</span>
+                <Eye className="h-4 w-4" />
+              </Button>
+            </Link>
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -174,7 +183,7 @@ export default function Invoices() {
 
       <div className="flex flex-col md:flex-row place-content-end gap-2">
         <Button asChild>
-          <Link to={DETAIL_PATH}>
+          <Link to={NEW_PATH}>
             <PlusCircle className="h-4 w-4 mr-2" />
             Novo
           </Link>

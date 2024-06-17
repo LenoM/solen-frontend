@@ -7,6 +7,7 @@ import { ShoppingBasket } from "lucide-react";
 
 const Dashboard = lazy(() => import("@/features/dashboard"));
 const Invoice = lazy(() => import("@/features/invoice"));
+const InvoiceDetail = lazy(() => import("@/features/invoice/detail"));
 const Product = lazy(() => import("@/features/product"));
 const ProductDetails = lazy(() => import("@/features/product/details"));
 const Logoff = lazy(() => import("@/features/logoff"));
@@ -49,6 +50,12 @@ export const features = [
     isMenuItem: true,
     element: <Invoice />,
     icon: <Receipt />,
+  },
+  {
+    label: "Boletos",
+    path: "/invoice/:invoiceId",
+    isMenuItem: false,
+    element: <InvoiceDetail />,
   },
   {
     label: "Produtos",
