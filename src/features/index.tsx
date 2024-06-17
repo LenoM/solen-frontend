@@ -53,6 +53,12 @@ export const features = [
   },
   {
     label: "Boletos",
+    path: "/invoice/add",
+    isMenuItem: false,
+    element: <InvoiceDetail />,
+  },
+  {
+    label: "Boletos",
     path: "/invoice/:invoiceId",
     isMenuItem: false,
     element: <InvoiceDetail />,

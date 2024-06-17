@@ -1,14 +1,121 @@
 import { toast } from "sonner";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
+import type { InvoiceType } from "@/features/invoice/forms/invoice";
+import type { InvoiceFilterType } from "@/features/invoice/forms/filter";
+import { loadInvoiceData } from "@/features/invoice/forms/invoice";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
+import { toDateString } from "@/utils/format-utils";
 import { getHeader } from "@/utils/headers-utils";
+import { queryClient } from "@/lib/react-query";
 
 const BASE_URL = import.meta.env.VITE_API_URL + "/invoice";
 
 export default function useInvoice() {
   const headers = getHeader();
   const [loading, setLoading] = useState(true);
+  const [currentData, setCurrentData] = useState<InvoiceType>();
+
+  const getInvoices = async (filter: InvoiceFilterType) => {
+    return useQuery<InvoiceType[]>({
+      queryKey: ["getInvoices"],
+      queryFn: () => retrieveInvoices(filter),
+      enabled: false,
+    });
+  };
+
+  const retrieveInvoices = async (filter: InvoiceFilterType) => {
+    setLoading(true);
+
+    const query = new URLSearchParams();
+
+    if (filter.invoiceId) {
+      query.append("invoiceId", filter.invoiceId.toString());
+    }
+
+    if (filter.initialDueDate) {
+      query.append("initialDueDate", toDateString(filter.initialDueDate) ?? "");
+    }
+
+    if (filter.finalDueDate) {
+      query.append("finalDueDate", toDateString(filter.finalDueDate) ?? "");
+    }
+
+    if (filter.initialReferenceDate) {
+      query.append(
+        "initialReferenceDate",
+        toDateString(filter.initialReferenceDate) ?? ""
+      );
+    }
+
+    if (filter.finalReferenceDate) {
+      query.append(
+        "finalReferenceDate",
+        toDateString(filter.finalReferenceDate) ?? ""
+      );
+    }
+
+    const url = `${BASE_URL}?${query}`;
+    const params: RequestInit = {
+      method: "GET",
+      headers,
+    };
+
+    try {
+      const response = await fetch(url, params);
+      const res = await response.json();
+
+      if (response.ok && res) {
+        queryClient.setQueryData(["getInvoices"], res);
+        return res;
+      }
+
+      toast.error("Erro na lista de boletos", {
+        description: res.message,
+      });
+    } catch (err) {
+      toast.error("Falha na lista de boletos", {
+        description: SERVER_ERROR_MESSAGE,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getInvoice = async (invoiceId: number) => {
+    setLoading(true);
+    const url = `${BASE_URL}/${invoiceId}`;
+
+    const params: RequestInit = {
+      method: "GET",
+      headers,
+    };
+
+    try {
+      if (!isNaN(invoiceId)) {
+        const response = await fetch(url, params);
+        const res = await response.json();
+
+        if (response.ok && res) {
+          setCurrentData(res);
+          return;
+        }
+
+        toast.error("Erro na lista de boletos", {
+          description: res.message,
+        });
+      } else {
+        setCurrentData(loadInvoiceData());
+      }
+    } catch (err) {
+      toast.error("Falha na lista de boletos", {
+        description: SERVER_ERROR_MESSAGE,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const printInvoice = async (data: number[]) => {
     const url = `${BASE_URL}/print`;
@@ -86,7 +193,11 @@ export default function useInvoice() {
 
   return {
     loading,
+    currentData,
+    getInvoice,
     sendInvoice,
     printInvoice,
+    getInvoices,
+    retrieveInvoices,
   };
 }

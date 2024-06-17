@@ -51,7 +51,7 @@ import useInvoice from "@/hooks/useInvoice";
 
 const BATCH_PATH = `${window.origin}/batch`;
 const DETAIL_PATH = `${window.origin}/invoice`;
-const NEW_PATH = `${DETAIL_PATH}/detail`;
+const NEW_PATH = `${DETAIL_PATH}/add`;
 
 export default function Invoices() {
   const { sendInvoice, printInvoice, getInvoices } = useInvoice();
