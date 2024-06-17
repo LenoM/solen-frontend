@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/react-query";
 import { getHeader } from "@/utils/headers-utils";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
-import { DiscountType } from "@/features/client/forms/discount";
+import type { DiscountType } from "@/features/client/forms/discount";
 
 const BASE_URL = import.meta.env.VITE_API_URL + "/discount";
 

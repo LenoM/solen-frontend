@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import { useState } from "react";
 
-import { SignatureType } from "@/features/client/forms/signature";
+import type { SignatureType } from "@/features/client/forms/signature";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { getHeader } from "@/utils/headers-utils";
 import { queryClient } from "@/lib/react-query";

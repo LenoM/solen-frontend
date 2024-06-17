@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { ClientType } from "@/features/client/forms/personal";
+import type { ClientType } from "@/features/client/forms/personal";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { toDateValue } from "@/utils/format-utils";
 import { getHeader } from "@/utils/headers-utils";

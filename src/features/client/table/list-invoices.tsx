@@ -13,9 +13,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+import type { InvoiceType } from "@/features/invoice/forms/invoice";
 import { toDateString, toMoneyString } from "@/utils/format-utils";
 import { DataTable } from "@/components/dataTable";
-import { InvoiceType } from "@/features/invoice";
 import useInvoice from "@/hooks/useInvoice";
 import useClient from "@/hooks/useClient";
 

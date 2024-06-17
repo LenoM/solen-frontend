@@ -1,8 +1,8 @@
 import { toast } from "sonner";
 import { useState } from "react";
 
-import { ContactType } from "@/features/client/forms/contact";
-import { ClientType } from "@/features/client/forms/personal";
+import type { ContactType } from "@/features/client/forms/contact";
+import type { ClientType } from "@/features/client/forms/personal";
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { getHeader } from "@/utils/headers-utils";
 import { queryClient } from "@/lib/react-query";
