@@ -38,7 +38,7 @@ import { KinshipBadge, StatusBadge } from "@/features/client/status";
 import { contactBaseSchema } from "@/features/client/forms/contact";
 import { addressBaseSchema } from "@/features/client/forms/address";
 import { clientHistoryBaseSchema } from "@/features/client/table/list-history";
-import { invoiceBaseSchema } from "@/features/invoice";
+import { invoiceBaseSchema } from "@/features/invoice/forms/invoice";
 import { ErrorMessage } from "@/utils/error.enum";
 import { Entity } from "@/utils/utils";
 import useCompany from "@/hooks/useCompany";
@@ -66,6 +66,7 @@ const loadClientData = (data?: any): ClientType => {
     kinship: data?.kinship || "",
     contacts: data?.contacts || [],
     dependents: data?.dependents || [],
+    invoices: data?.invoices || [],
     address: data?.address || [],
   };
 };
