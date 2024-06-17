@@ -140,6 +140,7 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
                 <FormItem>
                   <FormLabel>Tipo cobrança</FormLabel>
                   <Select
+                    name="billingMethod"
                     value={value.toString()}
                     defaultValue={value}
                     onValueChange={onChange}
@@ -173,6 +174,7 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
                   <FormItem>
                     <FormLabel>Fornecedor</FormLabel>
                     <Select
+                      name="supplierId"
                       value={value?.toString()}
                       defaultValue={value?.toString()}
                       onValueChange={onChange}
@@ -212,7 +214,7 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Switch onCheckedChange={onChange} checked={value} />
+                    <Switch name="isActive" onCheckedChange={onChange} checked={value} />
                   </FormControl>
                 </FormItem>
               )}
