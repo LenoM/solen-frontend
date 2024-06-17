@@ -12,6 +12,7 @@ const BASE_URL = import.meta.env.VITE_API_URL + "/discount";
 export default function useDiscount() {
   const headers = getHeader();
   const [loading, setLoading] = useState(true);
+  const [discountTypeList, setDiscountTypeList] = useState([]);
 
   const createDiscount = async (
     clientId: number,
@@ -127,7 +128,7 @@ export default function useDiscount() {
     };
 
     try {
-      if (!isNaN(clientId)) {
+      if (!isNaN(clientId) && clientId > 0) {
         const response = await fetch(url, params);
         const res = await response.json();
 
@@ -148,9 +149,41 @@ export default function useDiscount() {
     }
   };
 
+  const getDiscountsTypes = async () => {
+    setLoading(true);
+    const url = `${BASE_URL}/types`;
+
+    const params: RequestInit = {
+      method: "GET",
+      headers,
+    };
+
+    try {
+      const response = await fetch(url, params);
+      const res = await response.json();
+
+      if (response.ok && res) {
+        setDiscountTypeList(res)
+        return res;
+      }
+
+      toast.error("Erro na lista de tipos de descontos", {
+        description: res.message,
+      });
+    } catch (err) {
+      toast.error("Falha na lista de tipos de descontos", {
+        description: SERVER_ERROR_MESSAGE,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     getDiscountsByClient,
+    getDiscountsTypes,
+    discountTypeList,
     createDiscount,
     deleteDiscount,
   };
