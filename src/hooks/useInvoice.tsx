@@ -156,6 +156,46 @@ export default function useInvoice() {
     }
   };
 
+  const createInvoice = async (data: InvoiceType) => {
+    const { invoiceDetail, ...rest } = data;
+
+    const invoiceitem = {
+      invoice: rest,
+      items: invoiceDetail,
+    };
+
+    const body: BodyInit = JSON.stringify(invoiceitem);
+
+    const params: RequestInit = {
+      method: "POST",
+      headers,
+      body,
+    };
+
+    try {
+      const response = await fetch(BASE_URL, params);
+      const res = await response.json();
+
+      if (response.ok && res) {
+        toast.success("Boleto adicionado com sucesso", {
+          description: `O boleto foi adicionado`,
+        });
+
+        return;
+      }
+
+      toast.error("Erro no cadastro do boleto", {
+        description: res.message,
+      });
+    } catch (err) {
+      toast.error("Falha no cadastro do boleto", {
+        description: SERVER_ERROR_MESSAGE,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const sendInvoice = async (data: number[]) => {
     const url = `${BASE_URL}/send`;
 
@@ -198,6 +238,7 @@ export default function useInvoice() {
     sendInvoice,
     printInvoice,
     getInvoices,
+    createInvoice,
     retrieveInvoices,
   };
 }
