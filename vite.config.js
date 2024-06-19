@@ -10,15 +10,6 @@ export default defineConfig({
   build: {
     cssMinify: true,
     minify: true,
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          if (id.includes("components/ui")) {
-            return "@ui";
-          }
-        },
-      },
-    },
   },
   plugins: [react(), compression()],
   resolve: {
