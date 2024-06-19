@@ -1,5 +1,5 @@
 import { object, number, InferType, string } from "yup";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -37,34 +37,36 @@ export const entityBaseSchema = {
   description: string().nullable(),
 };
 
-export const invoiceProductBaseSchema = {
+export const invoiceItemBaseSchema = {
   id: number().default(0),
   invoiceId: number().nullable(),
   discountId: number().nullable(),
   signatureId: number().nullable(),
   productPriceId: number().nullable(),
-  discountTypeId: number().test(function test() {
-    const ctx = this.options.context;
-
-    if (ctx === undefined) {
-      return true;
-    } else {
-      return !!ctx;
-    }
-  }),
+  discountTypeId: number()
+    .nullable()
+    .test({
+      name: "discountTypeId",
+      message: ErrorMessage.required,
+      test: (value, ctx) =>
+        (ctx.options.context?.isDiscount == true && Number(value) > 0) ||
+        ctx.options.context?.isDiscount != true,
+    }),
   productId: number().required(ErrorMessage.required),
   clientId: number().required(ErrorMessage.required),
-  price: number().default(0),
-  discountType: object().shape({ ...entityBaseSchema }),
+  price: number().required(ErrorMessage.required),
+  discountType: object()
+    .nullable()
+    .shape({ ...entityBaseSchema }),
   product: object().shape({ ...entityBaseSchema }),
   client: object().shape({ ...entityBaseSchema }),
 };
 
-const invoiceProductSchema = object().shape({
-  ...invoiceProductBaseSchema,
+const invoiceItemSchema = object().shape({
+  ...invoiceItemBaseSchema,
 });
 
-export type InvoiceItemType = InferType<typeof invoiceProductSchema>;
+export type InvoiceItemType = InferType<typeof invoiceItemSchema>;
 
 type InvoiceProductsProps = {
   isDiscount?: boolean;
@@ -89,7 +91,7 @@ export default function InvoiceItemForm({
   );
 
   const form = useForm({
-    resolver: yupResolver(invoiceProductSchema),
+    resolver: yupResolver(invoiceItemSchema),
     context: { isDiscount: isDiscount },
   });
 

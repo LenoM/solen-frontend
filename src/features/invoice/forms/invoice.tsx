@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { CalendarIcon, MinusCircle, PlusCircle } from "lucide-react";
+import { CalendarIcon, MinusCircle, PlusCircle, Trash } from "lucide-react";
 import { object, string, number, date, boolean, InferType, array } from "yup";
 
 import { Calendar } from "@/components/ui/calendar";
@@ -11,7 +11,10 @@ import { Button } from "@/components/ui/button";
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -45,18 +48,18 @@ import {
   isOutOfRange,
   toMoneyString,
 } from "@/utils/format-utils";
+import { ErrorMessage } from "@/utils/error.enum";
 import { cn } from "@/lib/utils";
-import useClient from "@/hooks/useClient";
 
 import { DataTable } from "@/components/dataTable";
 import type { ClientType } from "@/features/client/forms/personal";
 import type { InvoiceItemType } from "@/features/invoice/forms/invoice-item";
 import InvoiceItemForm, {
-  invoiceProductBaseSchema,
+  invoiceItemBaseSchema,
 } from "@/features/invoice/forms/invoice-item";
 
+import useClient from "@/hooks/useClient";
 import useInvoice from "@/hooks/useInvoice";
-import { ErrorMessage } from "@/utils/error.enum";
 
 export const loadInvoiceData = (data?: InvoiceType): InvoiceType => {
   return {
@@ -99,7 +102,7 @@ const invoiceSchema = object().shape({
   ...invoiceBaseSchema,
   invoiceDetail: array(
     object().shape({
-      ...invoiceProductBaseSchema,
+      ...invoiceItemBaseSchema,
     })
   ),
 });
@@ -109,7 +112,8 @@ export type InvoiceType = InferType<typeof invoiceSchema>;
 export default function InvoiceForm() {
   const { invoiceId } = useParams();
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const { createInvoice, getInvoice, currentData } = useInvoice();
+  const { createInvoice, updateInvoice, getInvoice, currentData } =
+    useInvoice();
 
   const [data, setData] = useState<InvoiceItemType[]>([]);
   const { clientsList, getClients } = useClient();
@@ -142,13 +146,24 @@ export default function InvoiceForm() {
   const onSubmit = async () => {
     form.setValue("invoiceDetail", data);
     const newData: InvoiceType = form.getValues();
-    await createInvoice(newData);
+
+    if (newData.id) {
+      await updateInvoice(newData.id, newData);
+    } else {
+      await createInvoice(newData);
+    }
   };
 
   const addItem = (product: InvoiceItemType) => {
     setTotalPrice((prev: number) => Number(prev) + Number(product.price));
     setData((prev: InvoiceItemType[]) => {
       return [...prev, product];
+    });
+  };
+
+  const handlerDelete = (index: number) => {
+    setData((prev: InvoiceItemType[]) => {
+      return [...prev.slice(0, index), ...prev.slice(index + 1)];
     });
   };
 
@@ -236,6 +251,46 @@ export default function InvoiceForm() {
       accessorKey: "price",
       header: "Valor",
       accessorFn: (data: InvoiceItemType) => toMoneyString(data.price),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        return (
+          <>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Remover item do boleto</span>
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Remover item</DialogTitle>
+                  <DialogDescription>
+                    Tem certeza que deseja remover este item?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button" variant="secondary" className="mb-2">
+                      Cancelar
+                    </Button>
+                  </DialogClose>
+                  <Button
+                    onClick={() => handlerDelete(Number(row.id))}
+                    type="submit"
+                    variant="destructive"
+                    className="mb-2"
+                  >
+                    Remover
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
+        );
+      },
     },
   ];
 

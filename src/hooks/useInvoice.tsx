@@ -196,6 +196,48 @@ export default function useInvoice() {
     }
   };
 
+  const updateInvoice = async (invoiceId: number, data: InvoiceType) => {
+    const url = `${BASE_URL}/${invoiceId}`;
+
+    const { invoiceDetail, ...rest } = data;
+
+    const invoiceitem = {
+      invoice: rest,
+      items: invoiceDetail,
+    };
+
+    const body: BodyInit = JSON.stringify(invoiceitem);
+
+    const params: RequestInit = {
+      method: "PUT",
+      headers,
+      body,
+    };
+
+    try {
+      const response = await fetch(url, params);
+      const res = await response.json();
+
+      if (response.ok && res) {
+        toast.success("Boleto atualizado com sucesso", {
+          description: `O boleto foi atualizado`,
+        });
+
+        return;
+      }
+
+      toast.error("Erro na atualização do boleto", {
+        description: res.message,
+      });
+    } catch (err) {
+      toast.error("Falha na atualização do boleto", {
+        description: SERVER_ERROR_MESSAGE,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const sendInvoice = async (data: number[]) => {
     const url = `${BASE_URL}/send`;
 
@@ -239,6 +281,7 @@ export default function useInvoice() {
     printInvoice,
     getInvoices,
     createInvoice,
+    updateInvoice,
     retrieveInvoices,
   };
 }
