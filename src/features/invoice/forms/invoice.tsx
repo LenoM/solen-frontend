@@ -138,13 +138,20 @@ export default function InvoiceForm() {
 
   useEffect(() => {
     if (currentData?.price && totalPrice == 0) {
-      setTotalPrice(currentData?.price);
       setData(currentData.invoiceDetail ?? []);
     }
   }, [currentData]);
 
+  useEffect(() => {
+    if (data.length > 0) {
+      const total = data.reduce((total, ite) => total + Number(ite.price), 0);
+      setTotalPrice(total);
+    }
+  }, [data]);
+
   const onSubmit = async () => {
     form.setValue("invoiceDetail", data);
+    form.setValue("price", totalPrice);
     const newData: InvoiceType = form.getValues();
 
     if (newData.id) {
@@ -155,7 +162,6 @@ export default function InvoiceForm() {
   };
 
   const addItem = (product: InvoiceItemType) => {
-    setTotalPrice((prev: number) => Number(prev) + Number(product.price));
     setData((prev: InvoiceItemType[]) => {
       return [...prev, product];
     });
