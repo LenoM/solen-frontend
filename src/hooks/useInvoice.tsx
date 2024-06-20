@@ -4,7 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 
 import type { InvoiceType } from "@/features/invoice/forms/invoice";
 import type { InvoiceFilterType } from "@/features/invoice/forms/filter";
+import type { BatchFilterType } from "@/features/batch-generator/form";
 import { loadInvoiceData } from "@/features/invoice/forms/invoice";
+
 import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { toDateString } from "@/utils/format-utils";
 import { getHeader } from "@/utils/headers-utils";
@@ -16,6 +18,7 @@ export default function useInvoice() {
   const headers = getHeader();
   const [loading, setLoading] = useState(true);
   const [currentData, setCurrentData] = useState<InvoiceType>();
+  const [batchList, setBatchList] = useState([]);
 
   const getInvoices = async (filter: InvoiceFilterType) => {
     return useQuery<InvoiceType[]>({
@@ -117,6 +120,36 @@ export default function useInvoice() {
     }
   };
 
+  const getBatchs = async () => {
+    setLoading(true);
+    const url = `${BASE_URL}/batch`;
+
+    const params: RequestInit = {
+      method: "GET",
+      headers,
+    };
+
+    try {
+      const response = await fetch(url, params);
+      const res = await response.json();
+
+      if (response.ok && res) {
+        setBatchList(res);
+        return;
+      }
+
+      toast.error("Erro na lista de geração em lotes", {
+        description: res.message,
+      });
+    } catch (err) {
+      toast.error("Falha na lista de geração em lotes", {
+        description: SERVER_ERROR_MESSAGE,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const printInvoice = async (data: number[]) => {
     const url = `${BASE_URL}/print`;
 
@@ -149,6 +182,61 @@ export default function useInvoice() {
       });
     } catch (err) {
       toast.error("Falha na impressão do boleto", {
+        description: SERVER_ERROR_MESSAGE,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createManyInvoice = async (data: BatchFilterType) => {
+    const url = `${BASE_URL}/all`;
+
+    if (!data.categoryId ||data.categoryId < 1) {
+      data.categoryId = null
+    }
+
+    if (!data.productId ||data.productId < 1) {
+      data.productId = null
+    }
+
+    if (!data.clientId ||data.clientId < 1) {
+      data.clientId = null
+    }
+
+    if (!data.companyId ||data.companyId < 1) {
+      data.companyId = null
+    }
+
+    if (!data.bankAccountId ||data.bankAccountId < 1) {
+      data.bankAccountId = null
+    }
+
+    const body: BodyInit = JSON.stringify(data);
+
+    const params: RequestInit = {
+      method: "POST",
+      headers,
+      body,
+    };
+
+    try {
+      const response = await fetch(url, params);
+      const res = await response.json();
+
+      if (response.ok && res) {
+        toast.success("Lote adicionado com sucesso", {
+          description: `O lote foi adicionado`,
+        });
+
+        return;
+      }
+
+      toast.error("Erro no cadastro do lote", {
+        description: res.message,
+      });
+    } catch (err) {
+      toast.error("Falha no cadastro do lote", {
         description: SERVER_ERROR_MESSAGE,
       });
     } finally {
@@ -276,11 +364,14 @@ export default function useInvoice() {
   return {
     loading,
     currentData,
+    getBatchs,
+    batchList,
     getInvoice,
     sendInvoice,
     printInvoice,
     getInvoices,
     createInvoice,
+    createManyInvoice,
     updateInvoice,
     retrieveInvoices,
   };
