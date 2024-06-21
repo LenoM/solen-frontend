@@ -15,7 +15,7 @@ const BASE_URL = import.meta.env.VITE_API_URL + "/client";
 export default function useClient() {
   const headers = getHeader();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [clientsList, setClientsList] = useState<ClientType[]>([]);
 
   const getClients = async () => {

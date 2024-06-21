@@ -1,6 +1,6 @@
 import { object, string } from "yup";
 import { Link } from "react-router-dom";
-import { Search, PlusCircle } from "lucide-react";
+import { Search, PlusCircle, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -27,7 +27,7 @@ export default function Client() {
   });
 
   const filter = form.watch("filter");
-  const { getFilterClient, getClient } = useClient();
+  const { getFilterClient, getClient, loading } = useClient();
   const onSubmit = () => getClient(filter);
 
   getFilterClient(filter);
@@ -53,7 +53,11 @@ export default function Client() {
               />
 
               <Button variant="default" type="submit">
-                <Search className="h-4 w-4 md:mr-2" />
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4 md:mr-2" />
+                )}
                 <span className="sr-only md:not-sr-only">Procurar</span>
               </Button>
             </div>
