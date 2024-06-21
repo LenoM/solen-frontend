@@ -1,5 +1,3 @@
-import { useParams } from "react-router-dom";
-
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,20 +20,8 @@ import { Discounts } from "@/features/client/table/list-discount";
 import { Signatures } from "@/features/client/table/list-signatures";
 import { Dependents } from "@/features/client/table/list-dependents";
 import { ClientHistory } from "@/features/client/table/list-history";
-import useClient from "@/hooks/useClient";
-import useDiscount from "@/hooks/useDiscount";
-import useSignature from "@/hooks/useSignature";
 
 export default function ClientDetails() {
-  const { clientId } = useParams();
-  const { getClientByid } = useClient();
-  const { getDiscountsByClient } = useDiscount();
-  const { getSignatureByClient } = useSignature();
-
-  getDiscountsByClient(Number(clientId));
-  getSignatureByClient(Number(clientId));
-  getClientByid(Number(clientId));
-
   return (
     <div className="sx:p-0 md:p-6 pt-1 h-screen space-y-4">
       <div className="flex items-center justify-between">

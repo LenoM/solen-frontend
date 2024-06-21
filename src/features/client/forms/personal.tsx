@@ -34,6 +34,7 @@ import {
   toDateString,
 } from "@/utils/format-utils";
 
+import { LoadingSpinner } from "@/components/spinner";
 import { KinshipBadge, StatusBadge } from "@/features/client/status";
 import { contactBaseSchema } from "@/features/client/forms/contact";
 import { addressBaseSchema } from "@/features/client/forms/address";
@@ -204,8 +205,14 @@ export type ClientType = InferType<typeof clientSchema>;
 export default function Personal() {
   const { companyList, getCompany } = useCompany();
   const { categoryList, getCategories } = useCategory();
-  const { clientsList, getClientByid, getClients, createClient, updateClient } =
-    useClient();
+  const {
+    loading,
+    clientsList,
+    getClientByid,
+    getClients,
+    createClient,
+    updateClient,
+  } = useClient();
 
   const { clientId } = useParams();
   const { data } = getClientByid(Number(clientId));
@@ -217,6 +224,12 @@ export default function Personal() {
   });
 
   const isClientHolder = form.watch("isHolder");
+
+  const isLoading =
+    loading ||
+    companyList.length == 0 ||
+    categoryList.length == 0 ||
+    clientsList.length == 0;
 
   useMemo(async () => await getCompany(), []);
   useMemo(async () => await getCategories(), []);
@@ -334,288 +347,41 @@ export default function Personal() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
         <div className="grid w-full items-center gap-4 xl:px-196">
-          <div className="flex flex-row-reverse gap-4">
-            {data?.isActive && <StatusBadge isActive={data.isActive} />}
-            {data?.kinship && <KinshipBadge kinship={data.kinship} />}
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome Completo</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <FormField
-              control={form.control}
-              name="socialName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome Social</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
-              <FormField
-                control={form.control}
-                name="cpf"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CPF</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        onChange={onChangeCPF}
-                        onBlur={onBlurCPF}
-                        maxLength={14}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="rg"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>RG</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
-              <div>
-                <FormField
-                  control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Gênero</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value.toString()}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Escolha o gênero" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Masculino">Masculino</SelectItem>
-                          <SelectItem value="Feminino">Feminino</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <div className="flex flex-row-reverse gap-4">
+                {data?.isActive && <StatusBadge isActive={data.isActive} />}
+                {data?.kinship && <KinshipBadge kinship={data.kinship} />}
               </div>
 
-              <div>
+              <div className="flex flex-col space-y-2">
                 <FormField
                   control={form.control}
-                  name="birthday"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nascimento</FormLabel>
+                      <FormLabel>Nome Completo</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          onChange={onChangeBirthdate}
-                          onBlur={onBlurBirthdate}
-                          maxLength={10}
-                        />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-            </div>
-          </div>
 
-          <div className="flex flex-col space-y-2">
-            <FormField
-              control={form.control}
-              name="fatherName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome do Pai</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="flex flex-col space-y-2">
-            <FormField
-              control={form.control}
-              name="motherName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome da Mãe</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <Controller
-              control={form.control}
-              name="isHolder"
-              render={({ field: { onChange, value } }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Titular?</FormLabel>
-                    <FormDescription>
-                      Boletos são gerados apenas para titulares
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch onCheckedChange={onChange} checked={value} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {isClientHolder && categoryList && companyList && (
-            <>
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-2">
                 <FormField
-                  name="categoryId"
                   control={form.control}
-                  render={({ field: { onChange, value } }) => (
+                  name="socialName"
+                  render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Categoria</FormLabel>
-                      <Select
-                        value={value?.toString()}
-                        onValueChange={onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Escolha a categoria" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categoryList.map((cat: Entity) => {
-                            return (
-                              <SelectItem
-                                key={`cat-${cat.id}`}
-                                value={cat.id.toString()}
-                              >
-                                {cat.description}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <FormField
-                  name="companyId"
-                  control={form.control}
-                  render={({ field: { onChange, value } }) => (
-                    <FormItem>
-                      <FormLabel>Empresa</FormLabel>
-                      <Select
-                        value={value?.toString()}
-                        onValueChange={onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Escolha a empresa" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {companyList.map((comp: Entity) => {
-                            return (
-                              <SelectItem
-                                key={`comp-${comp.id}`}
-                                value={comp.id.toString()}
-                              >
-                                {comp.name}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </>
-          )}
-
-          {!isClientHolder && clientsList && (
-            <>
-              <div className="flex flex-col">
-                <FormField
-                  name="holderId"
-                  control={form.control}
-                  render={({ field: { onChange, value } }) => (
-                    <FormItem>
-                      <FormLabel>Nome do titular</FormLabel>
-                      <Select
-                        value={value?.toString()}
-                        defaultValue={value?.toString()}
-                        onValueChange={onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Escolha o titular" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {clientsList.map((ctt: ClientType) => {
-                            return (
-                              <SelectItem
-                                key={`state-${ctt.id}`}
-                                value={ctt.id!.toString()}
-                              >
-                                {ctt.name}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Nome Social</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -624,33 +390,63 @@ export default function Personal() {
 
               <div className="flex flex-col space-y-2">
                 <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="cpf"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>CPF</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            onChange={onChangeCPF}
+                            onBlur={onBlurCPF}
+                            maxLength={14}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="rg"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>RG</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
                   <div>
                     <FormField
-                      name="kinship"
                       control={form.control}
+                      name="gender"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Parentesco</FormLabel>
+                          <FormLabel>Gênero</FormLabel>
                           <Select
-                            value={field.value?.toString()}
                             onValueChange={field.onChange}
+                            value={field.value.toString()}
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Escolha o parentesco" />
+                                <SelectValue placeholder="Escolha o gênero" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {kinshipArray.map((ks) => {
-                                return (
-                                  <SelectItem
-                                    key={`kinship-${ks.id}`}
-                                    value={ks.id}
-                                  >
-                                    {ks.name}
-                                  </SelectItem>
-                                );
-                              })}
+                              <SelectItem value="Masculino">
+                                Masculino
+                              </SelectItem>
+                              <SelectItem value="Feminino">Feminino</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -662,15 +458,15 @@ export default function Personal() {
                   <div>
                     <FormField
                       control={form.control}
-                      name="bondDate"
+                      name="birthday"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Data de vínculo</FormLabel>
+                          <FormLabel>Nascimento</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              onChange={onChangeBondDate}
-                              onBlur={onBlurBondDate}
+                              onChange={onChangeBirthdate}
+                              onBlur={onBlurBirthdate}
                               maxLength={10}
                             />
                           </FormControl>
@@ -681,39 +477,265 @@ export default function Personal() {
                   </div>
                 </div>
               </div>
+
+              <div className="flex flex-col space-y-2">
+                <FormField
+                  control={form.control}
+                  name="fatherName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome do Pai</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <FormField
+                  control={form.control}
+                  name="motherName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome da Mãe</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <Controller
+                  control={form.control}
+                  name="isHolder"
+                  render={({ field: { onChange, value } }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Titular?</FormLabel>
+                        <FormDescription>
+                          Boletos são gerados apenas para titulares
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch onCheckedChange={onChange} checked={value} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {isClientHolder && categoryList && companyList && (
+                <>
+                  <div className="flex flex-col">
+                    <FormField
+                      name="categoryId"
+                      control={form.control}
+                      render={({ field: { onChange, value } }) => (
+                        <FormItem>
+                          <FormLabel>Categoria</FormLabel>
+                          <Select
+                            value={value?.toString()}
+                            onValueChange={onChange}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Escolha a categoria" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {categoryList.map((cat: Entity) => {
+                                return (
+                                  <SelectItem
+                                    key={`cat-${cat.id}`}
+                                    value={cat.id.toString()}
+                                  >
+                                    {cat.description}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <FormField
+                      name="companyId"
+                      control={form.control}
+                      render={({ field: { onChange, value } }) => (
+                        <FormItem>
+                          <FormLabel>Empresa</FormLabel>
+                          <Select
+                            value={value?.toString()}
+                            onValueChange={onChange}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Escolha a empresa" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {companyList.map((comp: Entity) => {
+                                return (
+                                  <SelectItem
+                                    key={`comp-${comp.id}`}
+                                    value={comp.id.toString()}
+                                  >
+                                    {comp.name}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </>
+              )}
+
+              {!isClientHolder && clientsList && (
+                <>
+                  <div className="flex flex-col">
+                    <FormField
+                      name="holderId"
+                      control={form.control}
+                      render={({ field: { onChange, value } }) => (
+                        <FormItem>
+                          <FormLabel>Nome do titular</FormLabel>
+                          <Select
+                            value={value?.toString()}
+                            defaultValue={value?.toString()}
+                            onValueChange={onChange}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Escolha o titular" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {clientsList.map((ctt: ClientType) => {
+                                return (
+                                  <SelectItem
+                                    key={`state-${ctt.id}`}
+                                    value={ctt.id!.toString()}
+                                  >
+                                    {ctt.name}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="flex flex-col space-y-2">
+                    <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
+                      <div>
+                        <FormField
+                          name="kinship"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Parentesco</FormLabel>
+                              <Select
+                                value={field.value?.toString()}
+                                onValueChange={field.onChange}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Escolha o parentesco" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {kinshipArray.map((ks) => {
+                                    return (
+                                      <SelectItem
+                                        key={`kinship-${ks.id}`}
+                                        value={ks.id}
+                                      >
+                                        {ks.name}
+                                      </SelectItem>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div>
+                        <FormField
+                          control={form.control}
+                          name="bondDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Data de vínculo</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  onChange={onChangeBondDate}
+                                  onBlur={onBlurBondDate}
+                                  maxLength={10}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {!data?.id && (
+                <div className="flex flex-col space-y-2">
+                  <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
+                    <div>
+                      <FormField
+                        control={form.control}
+                        name="referenceDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Data de referência</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                onChange={onChangeReferenceDate}
+                                onBlur={onBlurReferenceDate}
+                                maxLength={10}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col mt-8">
+                <Button type="submit">Salvar</Button>
+              </div>
             </>
           )}
-
-          {!data?.id && (
-            <div className="flex flex-col space-y-2">
-              <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="referenceDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Data de referência</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            onChange={onChangeReferenceDate}
-                            onBlur={onBlurReferenceDate}
-                            maxLength={10}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="flex flex-col mt-8">
-            <Button type="submit">Salvar</Button>
-          </div>
         </div>
       </form>
     </Form>
