@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { DataTable } from "@/components/dataTable";
+import { LoadingSpinner } from "@/components/spinner";
 import InvoiceFilter from "@/features/invoice/forms/filter";
 import type { InvoiceType } from "@/features/invoice/forms/invoice";
 import { toDateString, toMoneyString } from "@/utils/format-utils";
@@ -54,7 +55,7 @@ const DETAIL_PATH = `${window.origin}/invoice`;
 const NEW_PATH = `${DETAIL_PATH}/add`;
 
 export default function Invoices() {
-  const { sendInvoice, printInvoice, getInvoices } = useInvoice();
+  const { loading, sendInvoice, printInvoice, getInvoices } = useInvoice();
 
   getInvoices({});
   const data = queryClient.getQueryData<InvoiceType[]>(["getInvoices"]) ?? [];
@@ -181,40 +182,46 @@ export default function Invoices() {
     <div className="sx:p-0 md:p-6 pt-1 h-screen space-y-4">
       <h1 className="text-3xl font-bold text-center">Boletos</h1>
 
-      <div className="flex flex-col md:flex-row place-content-end gap-2">
-        <Button asChild>
-          <Link to={NEW_PATH}>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Novo
-          </Link>
-        </Button>
-
-        <Button variant="outline" asChild>
-          <Link to={BATCH_PATH}>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Ver lotes
-          </Link>
-        </Button>
-
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">
-              <Search className="h-4 w-4 mr-2" />
-              Filtrar
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <div className="flex flex-col md:flex-row place-content-end gap-2">
+            <Button asChild>
+              <Link to={NEW_PATH}>
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Novo
+              </Link>
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Parâmetros de busca</DialogTitle>
-            </DialogHeader>
 
-            <InvoiceFilter />
-          </DialogContent>
-        </Dialog>
-      </div>
+            <Button variant="outline" asChild>
+              <Link to={BATCH_PATH}>
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Ver lotes
+              </Link>
+            </Button>
 
-      <DataTable columns={columns} data={data} />
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Search className="h-4 w-4 mr-2" />
+                  Filtrar
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Parâmetros de busca</DialogTitle>
+                </DialogHeader>
+
+                <InvoiceFilter />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <DataTable columns={columns} data={data} />
+        </>
+      )}
     </div>
   );
 }

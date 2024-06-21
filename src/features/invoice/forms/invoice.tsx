@@ -43,15 +43,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import { LoadingSpinner } from "@/components/spinner";
+import { DataTable } from "@/components/dataTable";
+import { ErrorMessage } from "@/utils/error.enum";
+import { cn } from "@/lib/utils";
 import {
   toDateString,
   isOutOfRange,
   toMoneyString,
 } from "@/utils/format-utils";
-import { ErrorMessage } from "@/utils/error.enum";
-import { cn } from "@/lib/utils";
 
-import { DataTable } from "@/components/dataTable";
 import type { ClientType } from "@/features/client/forms/personal";
 import type { InvoiceItemType } from "@/features/invoice/forms/invoice-item";
 import InvoiceItemForm, {
@@ -112,7 +113,7 @@ export type InvoiceType = InferType<typeof invoiceSchema>;
 export default function InvoiceForm() {
   const { invoiceId } = useParams();
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const { createInvoice, updateInvoice, getInvoice, currentData } =
+  const { createInvoice, updateInvoice, getInvoice, currentData, loading } =
     useInvoice();
 
   const [data, setData] = useState<InvoiceItemType[]>([]);
@@ -128,6 +129,8 @@ export default function InvoiceForm() {
   });
 
   const selectedClientId = form.watch("clientId");
+
+  const isLoading = loading || clientsList.length == 0;
 
   useEffect(() => {
     if (currentData?.clientId !== selectedClientId) {
@@ -309,125 +312,131 @@ export default function InvoiceForm() {
           id="invoice-form"
         >
           <div className="grid w-full items-center gap-4 xl:px-196">
-            <div className="flex flex-col">
-              <FormField
-                name="clientId"
-                control={form.control}
-                render={({ field: { onChange, value } }) => (
-                  <FormItem>
-                    <FormLabel>Cliente</FormLabel>
-                    <Select
-                      value={value?.toString()}
-                      defaultValue={value?.toString()}
-                      onValueChange={onChange}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Escolha o titular" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {clientsList.map((ctt: ClientType) => {
-                          return (
-                            <SelectItem
-                              key={`state-${ctt.id}`}
-                              value={ctt.id!.toString()}
-                            >
-                              {ctt.name}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                <div className="flex flex-col">
+                  <FormField
+                    name="clientId"
+                    control={form.control}
+                    render={({ field: { onChange, value } }) => (
+                      <FormItem>
+                        <FormLabel>Cliente</FormLabel>
+                        <Select
+                          value={value?.toString()}
+                          defaultValue={value?.toString()}
+                          onValueChange={onChange}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Escolha o titular" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {clientsList.map((ctt: ClientType) => {
+                              return (
+                                <SelectItem
+                                  key={`state-${ctt.id}`}
+                                  value={ctt.id!.toString()}
+                                >
+                                  {ctt.name}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-            <div className="flex flex-col">
-              <FormField
-                control={form.control}
-                name="referenceDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Data de referência</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              toDateString(field.value)
-                            ) : (
-                              <span>Escolha a data</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => isOutOfRange(date)}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                <div className="flex flex-col">
+                  <FormField
+                    control={form.control}
+                    name="referenceDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Data de referência</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  toDateString(field.value)
+                                ) : (
+                                  <span>Escolha a data</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) => isOutOfRange(date)}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-            <div className="flex flex-col">
-              <FormField
-                control={form.control}
-                name="dueDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Data de vencimento</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              toDateString(field.value)
-                            ) : (
-                              <span>Escolha a data</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => isOutOfRange(date)}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                <div className="flex flex-col">
+                  <FormField
+                    control={form.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Data de vencimento</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  toDateString(field.value)
+                                ) : (
+                                  <span>Escolha a data</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) => isOutOfRange(date)}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </form>
       </Form>
