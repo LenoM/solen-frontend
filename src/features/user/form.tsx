@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import { LoadingSpinner } from "@/components/spinner";
 import { ErrorMessage } from "@/utils/error.enum";
 import useUser from "@/hooks/useUser";
 
@@ -67,7 +68,7 @@ type UserFormProps = {
 export default function UserForm({ setUsersList }: UserFormProps) {
   const { userId } = useParams();
 
-  const { currentData, getUser, createUser, updateUser } = useUser();
+  const { loading, currentData, getUser, createUser, updateUser } = useUser();
 
   useMemo(async () => await getUser(userId), [userId]);
 
@@ -89,7 +90,9 @@ export default function UserForm({ setUsersList }: UserFormProps) {
     }
   };
 
-  return (
+  return loading ? (
+    <LoadingSpinner />
+  ) : (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
         <div className="grid w-full items-center gap-4 xl:px-196">

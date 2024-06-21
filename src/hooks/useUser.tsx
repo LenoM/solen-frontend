@@ -1,61 +1,21 @@
-import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { UserType, loadUserData } from "@/features/user/form";
-import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
-import { getHeader } from "@/utils/headers-utils";
-
-const BASE_URL = import.meta.env.VITE_API_URL + "/user";
+import useFetcher from "@/lib/request";
 
 export default function useUser() {
-  const headers = getHeader();
+  const fetcher = useFetcher();
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [usersList, setUsersList] = useState<UserType[]>([]);
   const [currentData, setCurrentData] = useState<UserType>();
 
-  const createUser = async ({ name, email, password, isActive }: UserType) => {
-    const body: BodyInit = JSON.stringify({
-      name,
-      email,
-      password,
-      isActive,
-    });
-
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
-
-    try {
-      const response = await fetch(BASE_URL, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        return res;
-      }
-
-      toast.error("Erro na inclusão do usuário", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na inclusão do usuário", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateUser = async (
-    id: string,
-    { name, email, password, isActive }: UserType
-  ) => {
+  const createUser = async (data: UserType) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${id}`;
+    const { name, email, password, isActive } = data;
 
     const body: BodyInit = JSON.stringify({
       name,
@@ -64,94 +24,64 @@ export default function useUser() {
       isActive,
     });
 
-    const params: RequestInit = {
-      method: "PUT",
-      headers,
-      body,
-    };
+    const response = await fetcher.post("user", body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        navigate(`/user`);
-        return;
-      }
-
-      toast.error("Erro na atualização do usuário", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na atualização do usuário", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
+    if (response) {
       setLoading(false);
+      return response;
     }
+
+    setLoading(false);
+  };
+
+  const updateUser = async (userId: string, data: UserType) => {
+    setLoading(true);
+
+    const { name, email, password, isActive } = data;
+
+    const body: BodyInit = JSON.stringify({
+      name,
+      email,
+      password,
+      isActive,
+    });
+
+    const url = `user/${userId}`;
+    const response = await fetcher.put(url, body);
+
+    if (response) {
+      navigate(`/user`);
+    }
+
+    setLoading(false);
   };
 
   const getUser = async (userId: string | undefined) => {
     setLoading(true);
-    const url = `${BASE_URL}/${userId}`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    if (userId) {
+      const response = await fetcher.get(`user/${userId}`);
 
-    try {
-      if (userId) {
-        const response = await fetch(url, params);
-        const res = await response.json();
-
-        if (response.ok && res) {
-          setCurrentData(res);
-          return;
-        }
-
-        toast.error("Erro na lista de usuários", {
-          description: res.message,
-        });
-      } else {
-        setCurrentData(loadUserData());
+      if (response) {
+        setCurrentData(response);
       }
-    } catch (err) {
-      toast.error("Falha na lista de usuários", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+    } else {
+      setCurrentData(loadUserData());
     }
+
+    setLoading(false);
   };
 
   const getUsers = async () => {
     setLoading(true);
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const response = await fetcher.get("user");
 
-    try {
-      const response = await fetch(BASE_URL, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        setUsersList(res);
-        return;
-      }
-
-      toast.error("Erro na lista de usuários", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na lista de usuários", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+    if (response) {
+      setUsersList(response);
     }
+
+    setLoading(false);
   };
 
   return {
