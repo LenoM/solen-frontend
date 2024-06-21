@@ -1,7 +1,7 @@
-import { object, string, number, boolean, InferType } from "yup";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { object, string, number, boolean, InferType } from "yup";
 import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import { LoadingSpinner } from "@/components/spinner";
 import { ErrorMessage } from "@/utils/error.enum";
 import useSupplier from "@/hooks/useSupplier";
 import useProduct from "@/hooks/useProducts";
@@ -64,7 +65,7 @@ type ProductFormProps = {
 
 export default function ProductForm({ setProductsList }: ProductFormProps) {
   const { productId } = useParams();
-  const { currentData, getProduct, createProduct, updateProduct } =
+  const { loading, currentData, getProduct, createProduct, updateProduct } =
     useProduct();
   const { suppliersList, getSuppliers } = useSupplier();
   useMemo(async () => await getProduct(Number(productId)), [productId]);
@@ -96,7 +97,9 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
     }
   };
 
-  return (
+  return loading ? (
+    <LoadingSpinner />
+  ) : (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
         <div className="grid w-full items-center gap-4 xl:px-196">
@@ -214,7 +217,11 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
                     </FormDescription>
                   </div>
                   <FormControl>
-                    <Switch name="isActive" onCheckedChange={onChange} checked={value} />
+                    <Switch
+                      name="isActive"
+                      onCheckedChange={onChange}
+                      checked={value}
+                    />
                   </FormControl>
                 </FormItem>
               )}

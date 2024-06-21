@@ -1,97 +1,20 @@
-import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ProductType, loadProductData } from "@/features/product/form";
-import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
-import { getHeader } from "@/utils/headers-utils";
-
-const BASE_URL = import.meta.env.VITE_API_URL + "/product";
+import useFetcher from "@/lib/request";
 
 export default function useProduct() {
-  const headers = getHeader();
+  const fetcher = useFetcher();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [productsList, setProductsList] = useState<ProductType[]>([]);
   const [currentData, setCurrentData] = useState<ProductType>();
 
-  const createProduct = async ({
-    name,
-    description,
-    isActive,
-    billingMethod,
-    supplierId,
-  }: ProductType) => {
-    const body: BodyInit = JSON.stringify({
-      name,
-      description,
-      billingMethod,
-      supplierId: Number(supplierId),
-      isActive: Boolean(isActive),
-    });
-
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
-
-    try {
-      const response = await fetch(BASE_URL, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        return res;
-      }
-
-      toast.error("Erro na inclusão do produto", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na inclusão do produto", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteProduct = async (id: number) => {
-    const url = `${BASE_URL}/${id}`;
-
-    const params: RequestInit = {
-      method: "DELETE",
-      headers,
-    };
-
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        setCurrentData(res);
-        return;
-      }
-
-      toast.error("Erro na exclusão do produto", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na exclusão do produto", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateProduct = async (
-    id: number,
-    { name, description, isActive, billingMethod, supplierId }: ProductType
-  ) => {
+  const createProduct = async (data: ProductType) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${id}`;
+    const { name, description, isActive, billingMethod, supplierId } = data;
 
     const body: BodyInit = JSON.stringify({
       name,
@@ -101,94 +24,81 @@ export default function useProduct() {
       isActive: Boolean(isActive),
     });
 
-    const params: RequestInit = {
-      method: "PUT",
-      headers,
-      body,
-    };
+    const response = await fetcher.post("product", body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        navigate(`/product`);
-        return;
-      }
-
-      toast.error("Erro na atualização do produto", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na atualização do produto", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
+    if (response) {
       setLoading(false);
+      return response;
     }
+
+    setLoading(false);
+  };
+
+  const deleteProduct = async (productId: number) => {
+    setLoading(true);
+
+    const url = `product/${productId}`;
+
+    const response = await fetcher.del(url);
+
+    if (response) {
+      setCurrentData(response);
+    }
+
+    setLoading(false);
+  };
+
+  const updateProduct = async (productId: number, data: ProductType) => {
+    setLoading(true);
+
+    const { name, description, isActive, billingMethod, supplierId } = data;
+    const url = `product/${productId}`;
+
+    const body: BodyInit = JSON.stringify({
+      name,
+      description,
+      billingMethod,
+      supplierId: Number(supplierId),
+      isActive: Boolean(isActive),
+    });
+
+    const response = await fetcher.put(url, body);
+
+    if (response) {
+      navigate(`/product`);
+    }
+
+    setLoading(false);
   };
 
   const getProduct = async (productId: number) => {
     setLoading(true);
-    const url = `${BASE_URL}/${productId}`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const url = `product/${productId}`;
 
-    try {
-      if (!isNaN(productId)) {
-        const response = await fetch(url, params);
-        const res = await response.json();
+    if (!isNaN(productId)) {
+      const response = await fetcher.get(url);
 
-        if (response.ok && res) {
-          setCurrentData(res);
-          return;
-        }
-
-        toast.error("Erro na lista de produtos", {
-          description: res.message,
-        });
-      } else {
-        setCurrentData(loadProductData());
+      if (response) {
+        setCurrentData(response);
       }
-    } catch (err) {
-      toast.error("Falha na lista de produtos", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+    } else {
+      setCurrentData(loadProductData());
     }
+
+    setLoading(false);
   };
 
   const getProducts = async () => {
     setLoading(true);
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const response = await fetcher.get("product");
 
-    try {
-      const response = await fetch(BASE_URL, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        setProductsList(res);
-        return;
-      }
-
-      toast.error("Erro na lista de produtos", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na lista de produtos", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+    if (response) {
+      setProductsList(response);
     }
+
+    setLoading(false);
   };
 
   return {
