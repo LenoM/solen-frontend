@@ -16,7 +16,7 @@ const BASE_URL = import.meta.env.VITE_API_URL + "/invoice";
 
 export default function useInvoice() {
   const headers = getHeader();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [currentData, setCurrentData] = useState<InvoiceType>();
   const [batchList, setBatchList] = useState([]);
 

@@ -13,6 +13,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/dataTable";
+import { LoadingSpinner } from "@/components/spinner";
 
 import InvoiceParam from "@/features/batch-generator/form";
 import { toDateString } from "@/utils/format-utils";
@@ -49,7 +50,7 @@ type BatchType = InferType<typeof batchSchema>;
 export type BatchGeneratorType = InferType<typeof invoiceFilterSchema>;
 
 export default function BatchGenerator() {
-  const { batchList, getBatchs } = useInvoice();
+  const { loading, batchList, getBatchs } = useInvoice();
 
   useMemo(async () => await getBatchs(), []);
 
@@ -84,25 +85,31 @@ export default function BatchGenerator() {
     <div className="sx:p-0 md:p-6 pt-1 h-screen space-y-4">
       <h1 className="text-3xl font-bold text-center">Gerações</h1>
 
-      <div className="flex flex-col md:flex-row place-content-end gap-2">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Novo
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Parâmetros para geração</DialogTitle>
-            </DialogHeader>
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <div className="flex flex-col md:flex-row place-content-end gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Novo
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Parâmetros para geração</DialogTitle>
+                </DialogHeader>
 
-            <InvoiceParam />
-          </DialogContent>
-        </Dialog>
-      </div>
+                <InvoiceParam />
+              </DialogContent>
+            </Dialog>
+          </div>
 
-      <DataTable columns={columns} data={batchList} />
+          <DataTable columns={columns} data={batchList} />
+        </>
+      )}
     </div>
   );
 }
