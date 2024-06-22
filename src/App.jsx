@@ -4,11 +4,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "@/features/login";
 import RequireAuth from "@/utils/required-auth";
 import { features } from "@/features/index";
+import { LoadingSpinner } from "@/components/spinner";
 
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading..</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           <Route element={<RequireAuth />}>
             {features.map((el, idx) => {
