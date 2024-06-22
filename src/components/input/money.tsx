@@ -1,13 +1,13 @@
 import { useReducer } from "react";
+import { UseFormReturn } from "react-hook-form";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import { UseFormReturn } from "react-hook-form";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 type TextInputProps = {
   form: UseFormReturn<any>;

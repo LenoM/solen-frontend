@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import Login from "./features/login";
-import RequireAuth from "./utils/required-auth";
-import { features } from "./features/index";
+import Login from "@/features/login";
+import RequireAuth from "@/utils/required-auth";
+import { features } from "@/features/index";
 
 function App() {
   return (

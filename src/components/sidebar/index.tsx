@@ -1,3 +1,5 @@
+import { Menu } from "lucide-react";
+
 import {
   Sheet,
   SheetContent,
@@ -8,10 +10,9 @@ import {
 } from "@/components/ui/sheet";
 
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
 
-import { features } from "../../features";
-import SidebarItem from "./sidebar-item";
+import { features } from "@/features";
+import SidebarItem from "@/components/sidebar/sidebar-item";
 
 export default function Sidebar() {
   return (
