@@ -2,14 +2,11 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 import type { SignatureType } from "@/features/client/forms/signature";
-import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
-import { getHeader } from "@/utils/headers-utils";
 import { queryClient } from "@/lib/react-query";
-
-const BASE_URL = import.meta.env.VITE_API_URL + "/product-price";
+import useFetcher from "@/lib/request";
 
 export default function useProductPrice() {
-  const headers = getHeader();
+  const fetcher = useFetcher();
   const [loading, setLoading] = useState(true);
 
   const createProductPrice = async (
@@ -19,6 +16,8 @@ export default function useProductPrice() {
     initialDate: Date,
     finalDate: Date | null | undefined
   ) => {
+    setLoading(true);
+
     const body: BodyInit = JSON.stringify({
       productId,
       clientId,
@@ -26,53 +25,37 @@ export default function useProductPrice() {
       initialDate,
       finalDate,
     });
+    const response = await fetcher.post("product-price", body);
 
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
+    if (response) {
+      queryClient.setQueryData(
+        ["getSignatureByClient", { clientId: clientId }],
+        (prev: SignatureType[]) => {
+          const signatureIndex = prev.findIndex(
+            (sig) => Number(sig.productId) === productId
+          );
 
-    try {
-      const response = await fetch(BASE_URL, params);
-      const res = await response.json();
+          const newSig = {
+            ...prev[signatureIndex],
+            price: response.price,
+          };
 
-      if (response.ok && res) {
-        queryClient.setQueryData(
-          ["getSignatureByClient", { clientId: clientId }],
-          (prev: SignatureType[]) => {
-            const signatureIndex = prev.findIndex(
-              (sig) => Number(sig.productId) === productId
-            );
+          const sigArray = [
+            ...prev.slice(0, signatureIndex),
+            newSig,
+            ...prev.slice(signatureIndex + 1),
+          ];
 
-            const newSig = {
-              ...prev[signatureIndex],
-              price: res.price,
-            };
+          toast.success("Preço configurado", {
+            description: "O preço foi configurado com sucesso",
+          });
 
-            const sigArray = [
-              ...prev.slice(0, signatureIndex),
-              newSig,
-              ...prev.slice(signatureIndex + 1),
-            ];
-
-            return sigArray;
-          }
-        );
-
-        return;
-      }
-
-      toast.error("Erro na inclusão da tabela de preço", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na inclusão da tabela de preço", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+          return sigArray;
+        }
+      );
     }
+
+    setLoading(false);
   };
 
   return {

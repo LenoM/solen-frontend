@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -28,6 +29,11 @@ export default function useProduct() {
 
     if (response) {
       setLoading(false);
+
+      toast.success("Produto adicionado", {
+        description: "O produto foi adicionado com sucesso",
+      });
+
       return response;
     }
 
@@ -65,6 +71,10 @@ export default function useProduct() {
     const response = await fetcher.put(url, body);
 
     if (response) {
+      toast.success("Produto salvo", {
+        description: "O produto foi salvo com sucesso",
+      });
+
       navigate(`/product`);
     }
 
@@ -74,9 +84,8 @@ export default function useProduct() {
   const getProduct = async (productId: number) => {
     setLoading(true);
 
-    const url = `product/${productId}`;
-
     if (!isNaN(productId)) {
+      const url = `product/${productId}`;
       const response = await fetcher.get(url);
 
       if (response) {

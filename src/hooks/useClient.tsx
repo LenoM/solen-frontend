@@ -4,16 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import type { ClientType } from "@/features/client/forms/personal";
-import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { toDateValue } from "@/utils/format-utils";
-import { getHeader } from "@/utils/headers-utils";
 import { queryClient } from "@/lib/react-query";
+import useFetcher from "@/lib/request";
 
 const MIN_INPUT_LENGTH = 5;
-const BASE_URL = import.meta.env.VITE_API_URL + "/client";
 
 export default function useClient() {
-  const headers = getHeader();
+  const fetcher = useFetcher();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [clientsList, setClientsList] = useState<ClientType[]>([]);
@@ -21,30 +19,13 @@ export default function useClient() {
   const getClients = async () => {
     setLoading(true);
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const response = await fetcher.get("client");
 
-    try {
-      const response = await fetch(BASE_URL, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        setClientsList(res);
-        return;
-      }
-
-      toast.error("Erro na lista de clientes", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na lista de clientes", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+    if (response) {
+      setClientsList(response);
     }
+
+    setLoading(false);
   };
 
   const getFilterClient = async (input: string | undefined) => {
@@ -65,63 +46,31 @@ export default function useClient() {
 
     setLoading(true);
 
-    const url = `${BASE_URL}/filter/${input}`;
+    const url = `client/filter/${input}`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const response = await fetcher.get(url);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        queryClient.setQueryData(["getClient"], res);
-        return res;
-      }
-
-      toast.error("Erro na lista de clientes", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na lista de clientes", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
+    if (response) {
+      queryClient.setQueryData(["getClient"], response);
       setLoading(false);
+      return response;
     }
+
+    setLoading(false);
   };
 
   const getFamily = async (id: number) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/family/${id}`;
+    const url = `client/family/${id}`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const response = await fetcher.get(url);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        setClientsList(res);
-        return;
-      }
-
-      toast.error("Erro na lista de dependentes", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na lista de dependentes", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+    if (response) {
+      setClientsList(response);
     }
+
+    setLoading(false);
   };
 
   const updateHolderStatus = (holderId: number) => {
@@ -181,47 +130,28 @@ export default function useClient() {
   ) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${clientId}/cancel`;
+    const url = `client/${clientId}/cancel`;
 
     const body: BodyInit = JSON.stringify({
       cancelDate,
       reason,
     });
 
-    const params: RequestInit = {
-      method: "PATCH",
-      headers,
-      body,
-    };
+    const response = await fetcher.patch(url, body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        if (holderId === clientId) {
-          updateHolderStatus(clientId);
-        } else {
-          updateClientStatus(holderId, clientId);
-        }
-
-        toast.success("Cancelamento registrado", {
-          description: "O cancelamento foi registrado",
-        });
-
-        return;
+    if (response) {
+      if (holderId === clientId) {
+        updateHolderStatus(clientId);
+      } else {
+        updateClientStatus(holderId, clientId);
       }
 
-      toast.error("Erro no cancelamento de clientes", {
-        description: res.message,
+      toast.success("Cancelamento registrado", {
+        description: "O cancelamento foi registrado",
       });
-    } catch (err) {
-      toast.error("Falha no cancelamento de clientes", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const reactivateClient = async (
@@ -232,47 +162,28 @@ export default function useClient() {
   ) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${clientId}/reactivate`;
+    const url = `client/${clientId}/reactivate`;
 
     const body: BodyInit = JSON.stringify({
       reactivatedDate,
       dependents,
     });
 
-    const params: RequestInit = {
-      method: "PATCH",
-      headers,
-      body,
-    };
+    const response = await fetcher.patch(url, body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        if (holderId === clientId) {
-          updateHolderStatus(clientId);
-        } else {
-          updateClientStatus(holderId, clientId);
-        }
-
-        toast.success("Reativação registrada", {
-          description: "A reativação foi registrada",
-        });
-
-        return;
+    if (response) {
+      if (holderId === clientId) {
+        updateHolderStatus(clientId);
+      } else {
+        updateClientStatus(holderId, clientId);
       }
 
-      toast.error("Erro na reativação de clientes", {
-        description: res.message,
+      toast.success("Reativação registrada", {
+        description: "A reativação foi registrada",
       });
-    } catch (err) {
-      toast.error("Falha na reativação de clientes", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const getClientByid = (clientId: number) => {
@@ -280,61 +191,47 @@ export default function useClient() {
       queryKey: ["getClientById", { clientId }],
       queryFn: () => retrieveClientByid(clientId),
       refetchOnMount: false,
-      enabled: !!clientId
+      enabled: !!clientId,
     });
   };
 
   const retrieveClientByid = async (clientId: number) => {
     setLoading(true);
-    const url = `${BASE_URL}/${clientId}`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    if (clientId) {
+      const url = `client/${clientId}`;
+      const response = await fetcher.get(url);
 
-    try {
-      if (clientId) {
-        const response = await fetch(url, params);
-        const res = await response.json();
-
-        if (response.ok && res) {
-          return res;
-        }
-
-        toast.error("Erro na lista de clientes", {
-          description: res.message,
-        });
+      if (response) {
+        return response;
       }
-    } catch (err) {
-      toast.error("Falha na lista de clientes", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
-  const updateClient = async ({
-    id,
-    name,
-    socialName,
-    gender,
-    cpf,
-    rg,
-    birthday,
-    bondDate,
-    referenceDate,
-    fatherName,
-    motherName,
-    categoryId,
-    companyId,
-    holderId,
-    kinship = "Titular",
-  }: ClientType) => {
+  const updateClient = async (data: ClientType) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${id}`;
+    const {
+      id,
+      name,
+      socialName,
+      gender,
+      cpf,
+      rg,
+      birthday,
+      bondDate,
+      referenceDate,
+      fatherName,
+      motherName,
+      categoryId,
+      companyId,
+      holderId,
+      kinship = "Titular",
+    } = data;
+
+    const url = `client/${id}`;
 
     const body: BodyInit = JSON.stringify({
       name,
@@ -353,55 +250,41 @@ export default function useClient() {
       kinship,
     });
 
-    const params: RequestInit = {
-      method: "PUT",
-      headers,
-      body,
-    };
+    const response = await fetcher.put(url, body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        queryClient.invalidateQueries({
-          queryKey: ["getClientById", { clientId: id }],
-        });
-
-        toast.success("Cadastro salvo", {
-          description: `O cliente #${res.id} foi salvo`,
-        });
-        return;
-      }
-
-      toast.error("Erro na atualização do cliente", {
-        description: res.message,
+    if (response) {
+      queryClient.invalidateQueries({
+        queryKey: ["getClientById", { clientId: id }],
       });
-    } catch (err) {
-      toast.error("Falha na atualização do cliente", {
-        description: SERVER_ERROR_MESSAGE,
+
+      toast.success("Cadastro salvo", {
+        description: `O cliente #${response.id} foi salvo`,
       });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
-  const createClient = async ({
-    name,
-    socialName,
-    gender,
-    cpf,
-    rg,
-    birthday,
-    bondDate,
-    referenceDate,
-    fatherName,
-    motherName,
-    categoryId,
-    companyId,
-    holderId,
-    kinship = "Titular",
-  }: ClientType) => {
+  const createClient = async (data: ClientType) => {
+    setLoading(true);
+
+    const {
+      name,
+      socialName,
+      gender,
+      cpf,
+      rg,
+      birthday,
+      bondDate,
+      referenceDate,
+      fatherName,
+      motherName,
+      categoryId,
+      companyId,
+      holderId,
+      kinship = "Titular",
+    } = data;
+
     const body: BodyInit = JSON.stringify({
       name,
       socialName,
@@ -419,62 +302,23 @@ export default function useClient() {
       kinship,
     });
 
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
+    const response = await fetcher.post("client", body);
 
-    try {
-      const response = await fetch(BASE_URL, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        toast.success("Cadastro salvo", {
-          description: `O cliente #${res.id} foi salvo`,
-        });
-        navigate(`/client/${res.id}`);
-        return;
-      }
-
-      toast.error("Erro na inclusão do cliente", {
-        description: res.message,
+    if (response) {
+      toast.success("Cadastro salvo", {
+        description: `O cliente #${response.id} foi salvo`,
       });
-    } catch (err) {
-      toast.error("Falha na inclusão do cliente", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+      navigate(`/client/${response.id}`);
     }
+
+    setLoading(false);
   };
 
-  const deleteClient = async (id: number) => {
-    const url = `${BASE_URL}/${id}`;
-
-    const params: RequestInit = {
-      method: "DELETE",
-      headers,
-    };
-
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        return;
-      }
-
-      toast.error("Erro na exclusão do cliente", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na exclusão do cliente", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
-    }
+  const deleteClient = async (clientId: number) => {
+    setLoading(true);
+    const url = `client/${clientId}`;
+    await fetcher.del(url);
+    setLoading(false);
   };
 
   return {

@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -28,6 +29,11 @@ export default function useUser() {
 
     if (response) {
       setLoading(false);
+
+      toast.success("Usuário adicionado", {
+        description: "O usuário foi adicionado com sucesso",
+      });
+
       return response;
     }
 
@@ -50,6 +56,10 @@ export default function useUser() {
     const response = await fetcher.put(url, body);
 
     if (response) {
+      toast.success("Usuário salvo", {
+        description: "O usuário foi salvo com sucesso",
+      });
+
       navigate(`/user`);
     }
 

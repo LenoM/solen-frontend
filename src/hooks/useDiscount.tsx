@@ -2,112 +2,81 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { queryClient } from "@/lib/react-query";
-import { getHeader } from "@/utils/headers-utils";
-import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import type { DiscountType } from "@/features/client/forms/discount";
-
-const BASE_URL = import.meta.env.VITE_API_URL + "/discount";
+import { queryClient } from "@/lib/react-query";
+import useFetcher from "@/lib/request";
 
 export default function useDiscount() {
-  const headers = getHeader();
+  const fetcher = useFetcher();
   const [loading, setLoading] = useState(true);
   const [discountTypeList, setDiscountTypeList] = useState([]);
 
   const createDiscount = async (
     clientId: number,
     productId: number,
+    discountTypeId: number,
     price: number,
     description: string | undefined,
     initialDate: Date,
     finalDate: Date | null | undefined
   ) => {
-    const url = `${BASE_URL}/client/${clientId}`;
+    setLoading(false);
+
+    const url = `discount/client/${clientId}`;
 
     const body: BodyInit = JSON.stringify({
       clientId,
       productId,
+      discountTypeId,
       price,
       description,
       initialDate,
       finalDate,
     });
 
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
+    const response = await fetcher.post(url, body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
+    if (response) {
+      queryClient.setQueryData(
+        ["getDiscountsByClient", { clientId }],
+        response
+      );
 
-      if (response.ok && res) {
-        queryClient.setQueryData(["getDiscountsByClient", { clientId }], res);
-
-        toast.success("Desconto adicionado", {
-          description: "O desconto foi adicionado com sucesso!",
-        });
-
-        return;
-      }
-
-      toast.error("Erro na inclusão do desconto", {
-        description: res.message,
+      toast.success("Desconto adicionado", {
+        description: "O desconto foi adicionado com sucesso!",
       });
-    } catch (err) {
-      toast.error("Falha na inclusão do desconto", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const deleteDiscount = async (
-    id: number,
+    discountId: number,
     clientId: number,
     finalDate: Date
   ) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${id}`;
+    const url = `discount/${discountId}`;
 
     const body: BodyInit = JSON.stringify({
       finalDate,
     });
 
-    const params: RequestInit = {
-      method: "DELETE",
-      headers,
-      body,
-    };
+    const response = await fetcher.del(url, body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
+    if (response) {
+      queryClient.setQueryData(
+        ["getDiscountsByClient", { clientId }],
+        response
+      );
 
-      if (response.ok && res) {
-        queryClient.setQueryData(["getDiscountsByClient", { clientId }], res);
-
-        toast.success("Desconto cancelado", {
-          description: "O desconto foi cancelado com sucesso!",
-        });
-
-        return;
-      }
-
-      toast.error("Erro na atualização do desconto", {
-        description: res.message,
+      toast.success("Desconto cancelado", {
+        description: "O desconto foi cancelado com sucesso!",
       });
-    } catch (err) {
-      toast.error("Falha na atualização do desconto", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const getDiscountsByClient = (clientId: number) => {
@@ -120,63 +89,33 @@ export default function useDiscount() {
 
   const retrieveDiscountsByClient = async (clientId: number) => {
     setLoading(true);
-    const url = `${BASE_URL}/client/${clientId}`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const url = `discount/client/${clientId}`;
 
-    try {
-      if (!isNaN(clientId) && clientId > 0) {
-        const response = await fetch(url, params);
-        const res = await response.json();
+    if (!isNaN(clientId) && clientId > 0) {
+      const response = await fetcher.get(url);
 
-        if (response.ok && res) {
-          return res;
-        }
-
-        toast.error("Erro na lista de descontos", {
-          description: res.message,
-        });
+      if (response) {
+        return response;
       }
-    } catch (err) {
-      toast.error("Falha na lista de descontos", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const getDiscountsTypes = async () => {
     setLoading(true);
-    const url = `${BASE_URL}/types`;
+    const url = `discount/types`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const response = await fetcher.get(url);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        setDiscountTypeList(res)
-        return res;
-      }
-
-      toast.error("Erro na lista de tipos de descontos", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na lista de tipos de descontos", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
+    if (response) {
+      setDiscountTypeList(response);
       setLoading(false);
+      return response;
     }
+
+    setLoading(false);
   };
 
   return {

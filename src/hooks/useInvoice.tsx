@@ -6,16 +6,12 @@ import type { InvoiceType } from "@/features/invoice/forms/invoice";
 import type { InvoiceFilterType } from "@/features/invoice/forms/filter";
 import type { BatchFilterType } from "@/features/batch-generator/form";
 import { loadInvoiceData } from "@/features/invoice/forms/invoice";
-
-import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
 import { toDateString } from "@/utils/format-utils";
-import { getHeader } from "@/utils/headers-utils";
 import { queryClient } from "@/lib/react-query";
-
-const BASE_URL = import.meta.env.VITE_API_URL + "/invoice";
+import useFetcher, { ResponseFormat } from "@/lib/request";
 
 export default function useInvoice() {
-  const headers = getHeader();
+  const fetcher = useFetcher();
   const [loading, setLoading] = useState(false);
   const [currentData, setCurrentData] = useState<InvoiceType>();
   const [batchList, setBatchList] = useState([]);
@@ -59,192 +55,110 @@ export default function useInvoice() {
       );
     }
 
-    const url = `${BASE_URL}?${query}`;
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const url = `invoice?${query}`;
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
+    const response = await fetcher.get(url);
 
-      if (response.ok && res) {
-        queryClient.setQueryData(["getInvoices"], res);
-        return res;
-      }
-
-      toast.error("Erro na lista de boletos", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na lista de boletos", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
+    if (response) {
       setLoading(false);
+      queryClient.setQueryData(["getInvoices"], response);
+      return response;
     }
+
+    setLoading(false);
   };
 
   const getInvoice = async (invoiceId: number) => {
     setLoading(true);
-    const url = `${BASE_URL}/${invoiceId}`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    if (!isNaN(invoiceId)) {
+      const url = `invoice/${invoiceId}`;
+      const response = await fetcher.get(url);
 
-    try {
-      if (!isNaN(invoiceId)) {
-        const response = await fetch(url, params);
-        const res = await response.json();
-
-        if (response.ok && res) {
-          setCurrentData(res);
-          return;
-        }
-
-        toast.error("Erro na lista de boletos", {
-          description: res.message,
-        });
-      } else {
-        setCurrentData(loadInvoiceData());
+      if (response) {
+        setCurrentData(response);
       }
-    } catch (err) {
-      toast.error("Falha na lista de boletos", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+    } else {
+      setCurrentData(loadInvoiceData());
     }
+
+    setLoading(false);
   };
 
   const getBatchs = async () => {
     setLoading(true);
-    const url = `${BASE_URL}/batch`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    const url = `invoice/batch`;
+    const response = await fetcher.get(url);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        setBatchList(res);
-        return;
-      }
-
-      toast.error("Erro na lista de geração em lotes", {
-        description: res.message,
-      });
-    } catch (err) {
-      toast.error("Falha na lista de geração em lotes", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
+    if (response) {
+      setBatchList(response);
     }
+
+    setLoading(false);
   };
 
   const printInvoice = async (data: number[]) => {
-    const url = `${BASE_URL}/print`;
+    setLoading(true);
 
     const body: BodyInit = JSON.stringify(data);
-
-    const params: RequestInit = {
-      method: "POST",
-      headers,
+    const response = await fetcher.post(
+      "invoice/print",
       body,
-    };
+      ResponseFormat.TEXT
+    );
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.text();
-
-      if (response.ok && res) {
-        toast.success("Impressão de boleto", {
-          description: `O boleto está disponível`,
-          action: {
-            label: "Baixar",
-            onClick: () => window.open(res),
-          },
-        });
-
-        return;
-      }
-
-      toast.error("Impressão de boleto", {
-        description: `O boleto não está disponível`,
+    if (response) {
+      toast.success("Impressão de boleto", {
+        description: `O boleto está disponível`,
+        action: {
+          label: "Baixar",
+          onClick: () => window.open(response),
+        },
       });
-    } catch (err) {
-      toast.error("Falha na impressão do boleto", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const createManyInvoice = async (data: BatchFilterType) => {
-    const url = `${BASE_URL}/all`;
-
-    if (!data.categoryId ||data.categoryId < 1) {
-      data.categoryId = null
+    setLoading(true);
+    if (!data.categoryId || data.categoryId < 1) {
+      data.categoryId = null;
     }
 
-    if (!data.productId ||data.productId < 1) {
-      data.productId = null
+    if (!data.productId || data.productId < 1) {
+      data.productId = null;
     }
 
-    if (!data.clientId ||data.clientId < 1) {
-      data.clientId = null
+    if (!data.clientId || data.clientId < 1) {
+      data.clientId = null;
     }
 
-    if (!data.companyId ||data.companyId < 1) {
-      data.companyId = null
+    if (!data.companyId || data.companyId < 1) {
+      data.companyId = null;
     }
 
-    if (!data.bankAccountId ||data.bankAccountId < 1) {
-      data.bankAccountId = null
+    if (!data.bankAccountId || data.bankAccountId < 1) {
+      data.bankAccountId = null;
     }
 
     const body: BodyInit = JSON.stringify(data);
 
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
+    const response = await fetcher.post("invoice/all", body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        toast.success("Lote adicionado com sucesso", {
-          description: `O lote foi adicionado`,
-        });
-
-        return;
-      }
-
-      toast.error("Erro no cadastro do lote", {
-        description: res.message,
+    if (response) {
+      toast.success("Lote adicionado com sucesso", {
+        description: `O lote foi adicionado`,
       });
-    } catch (err) {
-      toast.error("Falha no cadastro do lote", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const createInvoice = async (data: InvoiceType) => {
+    setLoading(true);
+
     const { invoiceDetail, ...rest } = data;
 
     const invoiceitem = {
@@ -253,39 +167,19 @@ export default function useInvoice() {
     };
 
     const body: BodyInit = JSON.stringify(invoiceitem);
+    const response = await fetcher.post("invoice", body);
 
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
-
-    try {
-      const response = await fetch(BASE_URL, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        toast.success("Boleto adicionado com sucesso", {
-          description: `O boleto foi adicionado`,
-        });
-
-        return;
-      }
-
-      toast.error("Erro no cadastro do boleto", {
-        description: res.message,
+    if (response) {
+      toast.success("Boleto adicionado com sucesso", {
+        description: `O boleto foi adicionado`,
       });
-    } catch (err) {
-      toast.error("Falha no cadastro do boleto", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const updateInvoice = async (invoiceId: number, data: InvoiceType) => {
-    const url = `${BASE_URL}/${invoiceId}`;
+    setLoading(true);
 
     const { invoiceDetail, ...rest } = data;
 
@@ -294,71 +188,33 @@ export default function useInvoice() {
       items: invoiceDetail,
     };
 
+    const url = `invoice/${invoiceId}`;
     const body: BodyInit = JSON.stringify(invoiceitem);
+    const response = await fetcher.put(url, body);
 
-    const params: RequestInit = {
-      method: "PUT",
-      headers,
-      body,
-    };
-
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        toast.success("Boleto atualizado com sucesso", {
-          description: `O boleto foi atualizado`,
-        });
-
-        return;
-      }
-
-      toast.error("Erro na atualização do boleto", {
-        description: res.message,
+    if (response) {
+      toast.success("Boleto atualizado com sucesso", {
+        description: `O boleto foi atualizado`,
       });
-    } catch (err) {
-      toast.error("Falha na atualização do boleto", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const sendInvoice = async (data: number[]) => {
-    const url = `${BASE_URL}/send`;
+    setLoading(true);
 
+    const url = `invoice/send`;
     const body: BodyInit = JSON.stringify(data);
+    const response = await fetcher.post(url, body);
 
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
-
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        toast.success("Boleto enviado com sucesso", {
-          description: `O boleto foi adicionado a fila para envio`,
-        });
-
-        return;
-      }
-
-      toast.error("Erro no envio do boleto", {
-        description: res.message,
+    if (response) {
+      toast.success("Boleto enviado com sucesso", {
+        description: `O boleto foi adicionado a fila para envio`,
       });
-    } catch (err) {
-      toast.error("Falha no envio do boleto", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return {

@@ -3,23 +3,19 @@ import { useState } from "react";
 
 import type { ContactType } from "@/features/client/forms/contact";
 import type { ClientType } from "@/features/client/forms/personal";
-import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
-import { getHeader } from "@/utils/headers-utils";
 import { queryClient } from "@/lib/react-query";
-
-const BASE_URL = import.meta.env.VITE_API_URL + "/contact";
+import useFetcher from "@/lib/request";
 
 export default function useContact() {
-  const headers = getHeader();
+  const fetcher = useFetcher();
   const [loading, setLoading] = useState(true);
   const [contactsList, setContactsList] = useState<ContactType[]>([]);
 
-  const createContact = async ({
-    value,
-    clientId,
-    contactType,
-    isWhatsapp,
-  }: ContactType) => {
+  const createContact = async (data: ContactType) => {
+    setLoading(true);
+
+    const { value, clientId, contactType, isWhatsapp } = data;
+
     const body: BodyInit = JSON.stringify({
       value,
       clientId,
@@ -27,55 +23,32 @@ export default function useContact() {
       isWhatsapp,
     });
 
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
+    const response = await fetcher.post("contact", body);
 
-    try {
-      const response = await fetch(BASE_URL, params);
-      const res = await response.json();
-
-      if (response.ok && res) {
-        queryClient.setQueryData(
-          ["getClientById", { clientId }],
-          (prev: ClientType) => {
-            if (prev && prev.contacts) {
-              return { ...prev, contacts: [...prev.contacts, res] };
-            }
+    if (response) {
+      queryClient.setQueryData(
+        ["getClientById", { clientId }],
+        (prev: ClientType) => {
+          if (prev && prev.contacts) {
+            return { ...prev, contacts: [...prev.contacts, response] };
           }
-        );
+        }
+      );
 
-        toast.success("Contato salvo", {
-          description: `O contato #${res.id} foi salvo`,
-        });
-
-        return;
-      }
-
-      toast.error("Erro na inclusão do contato", {
-        description: res.message,
+      toast.success("Contato salvo", {
+        description: `O contato #${response.id} foi salvo`,
       });
-    } catch (err) {
-      toast.error("Falha na inclusão do contato", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
-  const updateContact = async ({
-    id,
-    clientId,
-    value,
-    contactType,
-    isWhatsapp,
-  }: ContactType) => {
+  const updateContact = async (data: ContactType) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${id}`;
+    const { id, clientId, value, contactType, isWhatsapp } = data;
+
+    const url = `contact/${id}`;
 
     const body: BodyInit = JSON.stringify({
       id,
@@ -85,86 +58,48 @@ export default function useContact() {
       isWhatsapp,
     });
 
-    const params: RequestInit = {
-      method: "PUT",
-      headers,
-      body,
-    };
+    const response = await fetcher.put(url, body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
+    if (response) {
+      queryClient.setQueryData(
+        ["getClientById", { clientId }],
+        (prev: ClientType) => {
+          prev.contacts = prev?.contacts
+            ?.filter((d) => d.id !== response.id)
+            .concat(response);
+          return prev;
+        }
+      );
 
-      if (response.ok && res) {
-        queryClient.setQueryData(
-          ["getClientById", { clientId }],
-          (prev: ClientType) => {
-            prev.contacts = prev?.contacts
-              ?.filter((d) => d.id !== res.id)
-              .concat(res);
-            return prev;
-          }
-        );
-
-        toast.success("Contato salvo", {
-          description: `O contato #${res.id} foi salvo`,
-        });
-
-        return;
-      }
-
-      toast.error("Erro na atualização do contato", {
-        description: res.message,
+      toast.success("Contato salvo", {
+        description: `O contato #${response.id} foi salvo`,
       });
-    } catch (err) {
-      toast.error("Falha na atualização do contato", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const deleteContact = async (clientId: number, contactId: number) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${contactId}`;
+    const url = `contact/${contactId}`;
 
-    const params: RequestInit = {
-      method: "DELETE",
-      headers,
-    };
+    const response = await fetcher.del(url);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
+    if (response) {
+      queryClient.setQueryData(
+        ["getClientById", { clientId }],
+        (prev: ClientType) => {
+          prev.contacts = prev?.contacts?.filter((d) => d.id !== response.id);
+          return prev;
+        }
+      );
 
-      if (response.ok && res) {
-        queryClient.setQueryData(
-          ["getClientById", { clientId }],
-          (prev: ClientType) => {
-            prev.contacts = prev?.contacts?.filter((d) => d.id !== res.id);
-            return prev;
-          }
-        );
-
-        toast.success("Contato deletado", {
-          description: `O contato #${contactId} foi removido com sucesso!`,
-        });
-
-        return;
-      }
-
-      toast.error("Erro na atualização do contato", {
-        description: res.message,
+      toast.success("Contato deletado", {
+        description: `O contato #${contactId} foi removido com sucesso!`,
       });
-    } catch (err) {
-      toast.error("Falha na atualização do contato", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return {

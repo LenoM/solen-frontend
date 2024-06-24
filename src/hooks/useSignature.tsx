@@ -3,14 +3,11 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import type { SignatureType } from "@/features/client/forms/signature";
-import { SERVER_ERROR_MESSAGE } from "@/utils/error.enum";
-import { getHeader } from "@/utils/headers-utils";
 import { queryClient } from "@/lib/react-query";
-
-const BASE_URL = import.meta.env.VITE_API_URL + "/signature";
+import useFetcher from "@/lib/request";
 
 export default function useSignature() {
-  const headers = getHeader();
+  const fetcher = useFetcher();
   const [loading, setLoading] = useState(true);
 
   const createSignature = async (
@@ -19,43 +16,29 @@ export default function useSignature() {
     initialDate: Date,
     finalDate: Date | null | undefined
   ) => {
-    const url = `${BASE_URL}/client/${clientId}/product/${productId}`;
+    setLoading(true);
+
+    const url = `signature/client/${clientId}/product/${productId}`;
 
     const body: BodyInit = JSON.stringify({
       initialDate,
       finalDate,
     });
 
-    const params: RequestInit = {
-      method: "POST",
-      headers,
-      body,
-    };
+    const response = await fetcher.post(url, body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
+    if (response) {
+      queryClient.setQueryData(
+        ["getSignatureByClient", { clientId }],
+        response
+      );
 
-      if (response.ok && res) {
-        queryClient.setQueryData(["getSignatureByClient", { clientId }], res);
-
-        toast.success("Assinatura adicionada", {
-          description: "A assinatura foi adicionada com sucesso!",
-        });
-
-        return;
-      }
-
-      toast.error("Erro na inclusão do assinatura", {
-        description: res.message,
+      toast.success("Assinatura adicionada", {
+        description: "A assinatura foi adicionada com sucesso!",
       });
-    } catch (err) {
-      toast.error("Falha na inclusão do assinatura", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const deleteSignature = async (
@@ -65,42 +48,26 @@ export default function useSignature() {
   ) => {
     setLoading(true);
 
-    const url = `${BASE_URL}/${signatureId}`;
+    const url = `signature/${signatureId}`;
 
     const body: BodyInit = JSON.stringify({
       finalDate,
     });
 
-    const params: RequestInit = {
-      method: "DELETE",
-      headers,
-      body,
-    };
+    const response = await fetcher.del(url, body);
 
-    try {
-      const response = await fetch(url, params);
-      const res = await response.json();
+    if (response) {
+      queryClient.setQueryData(
+        ["getSignatureByClient", { clientId }],
+        response
+      );
 
-      if (response.ok && res) {
-        queryClient.setQueryData(["getSignatureByClient", { clientId }], res);
-
-        toast.success("Assinatura cancelada", {
-          description: "A assinatura foi cancelada com sucesso!",
-        });
-
-        return;
-      }
-
-      toast.error("Erro no cancelamento do assinatura", {
-        description: res.message,
+      toast.success("Assinatura cancelada", {
+        description: "A assinatura foi cancelada com sucesso!",
       });
-    } catch (err) {
-      toast.error("Falha no cancelamento do assinatura", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const getSignatureByClient = (clientId: number) => {
@@ -113,33 +80,18 @@ export default function useSignature() {
 
   const retriveSignatureByClient = async (clientId: number) => {
     setLoading(true);
-    const url = `${BASE_URL}/client/${clientId}`;
 
-    const params: RequestInit = {
-      method: "GET",
-      headers,
-    };
+    if (!isNaN(clientId)) {
+      const url = `signature/client/${clientId}`;
+      const response = await fetcher.get(url);
 
-    try {
-      if (!isNaN(clientId)) {
-        const response = await fetch(url, params);
-        const res = await response.json();
-
-        if (response.ok && res) {
-          return res;
-        }
-
-        toast.error("Erro na lista de assinaturas", {
-          description: res.message,
-        });
+      if (response) {
+        setLoading(false);
+        return response;
       }
-    } catch (err) {
-      toast.error("Falha na lista de assinaturas", {
-        description: SERVER_ERROR_MESSAGE,
-      });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return {
