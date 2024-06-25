@@ -42,7 +42,23 @@ export const loadAddressData = (data?: AddressDataType) => {
   };
 };
 
-export const addressBaseSchema = {
+const addressEntitySchema = {
+  id: string(),
+  abbreviation: string().required(ErrorMessage.required),
+};
+
+export const addressOutputSchema = {
+  id: number(),
+  cep: string().required(ErrorMessage.required),
+  district: object().shape({ ...addressEntitySchema }),
+  address: string().required(ErrorMessage.required),
+  number: number().min(0, ErrorMessage.min).required(ErrorMessage.required),
+  complement: string(),
+  addressType: object().shape({ ...addressEntitySchema }),
+  addressCategory: string().nullable().required(ErrorMessage.required),
+};
+
+const addressBaseSchema = {
   id: number(),
   cep: string().required(ErrorMessage.required),
   city: string().nullable().required(ErrorMessage.required),

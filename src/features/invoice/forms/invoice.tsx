@@ -92,9 +92,9 @@ export const invoiceBaseSchema = {
   originalDueDate: date(),
   referenceDate: date().required(ErrorMessage.required),
   creationDate: date(),
-  paymentDate: date(),
-  cancelDate: date(),
-  deleteDate: date(),
+  paymentDate: date().nullable(),
+  cancelDate: date().nullable(),
+  deleteDate: date().nullable(),
   dueDate: date().required(ErrorMessage.required),
   price: number().default(0),
 };

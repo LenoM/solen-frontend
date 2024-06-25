@@ -37,7 +37,7 @@ import {
 import { LoadingSpinner } from "@/components/spinner";
 import { KinshipBadge, StatusBadge } from "@/features/client/status";
 import { contactBaseSchema } from "@/features/client/forms/contact";
-import { addressBaseSchema } from "@/features/client/forms/address";
+import { addressOutputSchema } from "@/features/client/forms/address";
 import { clientHistoryBaseSchema } from "@/features/client/table/list-history";
 import { invoiceBaseSchema } from "@/features/invoice/forms/invoice";
 import { ErrorMessage } from "@/utils/error.enum";
@@ -180,7 +180,7 @@ const clientSchema = object().shape({
   ),
   address: array(
     object().shape({
-      ...addressBaseSchema,
+      ...addressOutputSchema,
     })
   ),
   contacts: array(
@@ -652,7 +652,7 @@ export default function Personal() {
                             <FormItem>
                               <FormLabel>Parentesco</FormLabel>
                               <Select
-                                value={field.value?.toString()}
+                                value={field.value}
                                 onValueChange={field.onChange}
                               >
                                 <FormControl>
