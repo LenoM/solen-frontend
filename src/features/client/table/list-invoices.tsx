@@ -1,5 +1,5 @@
-import { Send, Printer } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { Send, Printer, Eye } from "lucide-react";
+import { useParams, Link } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,8 @@ import { toDateString, toMoneyString } from "@/utils/format-utils";
 import { DataTable } from "@/components/dataTable";
 import useInvoice from "@/hooks/useInvoice";
 import useClient from "@/hooks/useClient";
+
+const DETAIL_PATH = `${window.origin}/invoice`;
 
 export function Invoices() {
   const { clientId } = useParams();
@@ -63,6 +65,13 @@ export function Invoices() {
       cell: ({ row }) => {
         return (
           <>
+            <Link to={`${DETAIL_PATH}/${row.original.id}`}>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Vizualizar cadastro</span>
+                <Eye className="h-4 w-4" />
+              </Button>
+            </Link>
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
