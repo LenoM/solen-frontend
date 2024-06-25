@@ -37,7 +37,7 @@ export default function useAddress() {
 
     const response = await fetcher.get(url);
 
-    if (response) {
+    if (response.length > 0) {
       const { district } = response[0];
       const { city } = district;
       const { state } = city;
