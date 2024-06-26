@@ -253,7 +253,7 @@ export default function Personal() {
         form.setValue("categoryId", "");
       }
 
-      if (kinshipArray) {
+      if (kinshipArray && !data?.kinship) {
         form.setValue("kinship", "");
       }
     }
