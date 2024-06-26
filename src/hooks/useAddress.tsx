@@ -16,7 +16,7 @@ type AddressAttr = {
 
 export default function useAddress() {
   const fetcher = useFetcher();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   /* TODO: usar react-query */
   const [cityList, setCityList] = useState<AddressAttr[]>([]);

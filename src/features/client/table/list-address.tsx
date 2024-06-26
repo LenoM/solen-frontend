@@ -90,7 +90,7 @@ export interface AddressFormProps {
 
 const AddressDialog = ({ title, children, formData }: AddressFormProps) => {
   const { clientId } = useParams();
-  const { createAddress, updateAddress } = useAddress();
+  const { loading, createAddress, updateAddress } = useAddress();
 
   const handlerSubmit = async (newData: any) => {
     const isUpdate = newData.id! > 0;
@@ -110,6 +110,7 @@ const AddressDialog = ({ title, children, formData }: AddressFormProps) => {
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <AddressForm
+          isSaveLoading={loading}
           data={formData}
           onSubmit={(newData: AddressDataType) => handlerSubmit(newData)}
         />
