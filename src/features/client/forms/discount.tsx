@@ -39,11 +39,14 @@ import { isOutOfRange, toDateString } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
 import type { ProductType } from "@/features/product/form";
 import useProduct from "@/hooks/useProducts";
+import useDiscount from "@/hooks/useDiscount";
+import { DiscountDataType } from "@/features/discount";
 
 const discountSchema = object().shape({
   id: number().nullable(),
   price: string().required(ErrorMessage.required),
   productId: number().required(ErrorMessage.required),
+  discountTypeId: number().required(ErrorMessage.required),
   clientId: number().optional(),
   initialDate: date().required(ErrorMessage.required),
   finalDate: date()
@@ -59,21 +62,32 @@ type CancelInput = {
 };
 
 export default function DiscountForm({ onSubmit }: CancelInput) {
-  const { loading, getProducts, productsList } = useProduct();
+  const { loading: isLoadingProduct, getProducts, productsList } = useProduct();
+  const {
+    loading: isLoadingDiscountTipe,
+    getDiscountsTypes,
+    discountTypeList,
+  } = useDiscount();
 
-  const isLoading = loading || productsList.length == 0;
+  const isLoading =
+    isLoadingProduct ||
+    isLoadingDiscountTipe ||
+    productsList.length == 0 ||
+    discountTypeList.length == 0;
 
   const form = useForm({
     resolver: yupResolver(discountSchema),
   });
 
   useMemo(async () => await getProducts(), []);
+  useMemo(async () => await getDiscountsTypes(), []);
 
   const handleSubmit = () => {
     const newData = form.getValues();
 
     onSubmit({
       productId: newData.productId,
+      discountTypeId: newData.discountTypeId,
       price: newData.price,
       description: newData.description,
       initialDate: newData.initialDate,
@@ -216,6 +230,38 @@ export default function DiscountForm({ onSubmit }: CancelInput) {
                 />
               </div>
             )}
+
+            <div className="flex flex-col mb-2">
+              <FormField
+                name="discountTypeId"
+                control={form.control}
+                render={({ field: { onChange, value } }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de desconto</FormLabel>
+                    <Select value={value?.toString()} onValueChange={onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Tipo de desconto" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {discountTypeList.map((comp: DiscountDataType) => {
+                          return (
+                            <SelectItem
+                              key={`comp-${comp.id}`}
+                              value={comp.id!.toString()}
+                            >
+                              {comp.description}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <div className="flex flex-col mb-2">
               <MoneyInput

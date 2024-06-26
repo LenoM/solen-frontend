@@ -34,6 +34,7 @@ export function Discounts() {
 
   const handlerSubmit = async ({
     productId,
+    discountTypeId,
     price,
     description,
     initialDate,
@@ -41,7 +42,8 @@ export function Discounts() {
   }: DiscountType) => {
     await createDiscount(
       Number(clientId),
-      productId,
+      Number(productId),
+      Number(discountTypeId),
       Number(price),
       description,
       initialDate,
@@ -55,7 +57,11 @@ export function Discounts() {
 
   const columns: ColumnDef<DiscountType>[] = [
     {
-      accessorKey: "product.description",
+      accessorKey: "discountType",
+      header: "Desconto",
+    },
+    {
+      accessorKey: "productName",
       header: "Pruduto",
     },
     {
@@ -66,6 +72,12 @@ export function Discounts() {
       accessorKey: "price",
       header: "Preço",
       accessorFn: (data: DiscountType) => toMoneyString(Number(data.price)),
+    },
+    {
+      accessorKey: "initialDate",
+      header: "Inicio",
+      accessorFn: (data: DiscountType) =>
+        toDateString(data?.initialDate?.toString()),
     },
     {
       accessorKey: "finalDate",

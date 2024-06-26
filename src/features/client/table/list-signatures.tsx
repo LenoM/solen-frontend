@@ -68,6 +68,12 @@ export function Signatures() {
       accessorFn: (data: SignatureType) => toMoneyString(Number(data.price)),
     },
     {
+      accessorKey: "initialDate",
+      header: "Inicio",
+      accessorFn: (data: SignatureType) =>
+        toDateString(data?.initialDate?.toString()),
+    },
+    {
       accessorKey: "finalDate",
       header: "Término",
       accessorFn: (data: SignatureType) =>
