@@ -352,7 +352,7 @@ export default function Personal() {
           ) : (
             <>
               <div className="flex flex-row-reverse gap-4">
-                {data?.isActive && <StatusBadge isActive={data.isActive} />}
+                {data?.isActive != undefined && <StatusBadge isActive={data.isActive} />}
                 {data?.kinship && <KinshipBadge kinship={data.kinship} />}
               </div>
 
