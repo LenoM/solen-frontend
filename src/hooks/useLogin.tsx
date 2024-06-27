@@ -28,8 +28,8 @@ const useLogin = () => {
       const response = await fetch(url, params);
       const res = await response.json();
 
-      if (response.ok && res.email && res.access_token) {
-        setToken(res.email, res.access_token);
+      if (response.ok && res.access_token) {
+        setToken(res.access_token);
         navigate("/");
         return;
       }

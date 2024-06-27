@@ -4,9 +4,8 @@ export const isLoggedIn = (): boolean => {
   return Boolean(localStorage.getItem("isLoggedIn")) === true;
 };
 
-export const setToken = (email: string, token: string) => {
+export const setToken = (token: string) => {
   localStorage.setItem("isLoggedIn", "true");
-  localStorage.setItem("username", email);
   localStorage.setItem("accessToken", token);
 };
 
