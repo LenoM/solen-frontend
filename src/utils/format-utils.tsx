@@ -89,7 +89,7 @@ export const toDateValue = (
 };
 
 export const toDateString = (
-  dateString: Date | string | undefined
+  dateString: Date | string | null | undefined
 ): string | undefined => {
   if (!dateString) return undefined;
 
