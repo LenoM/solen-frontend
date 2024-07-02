@@ -1,5 +1,5 @@
 import { object, string, number, array, boolean, InferType } from "yup";
-import validator from "validator";
+import { isTaxID } from "validator";
 import { useParams } from "react-router-dom";
 import { FormEvent, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -325,7 +325,7 @@ export default function Personal() {
   const onBlurCPF = (e: FormEvent<HTMLInputElement>) => {
     const input = getNumbers(e.currentTarget.value);
 
-    const isValid = validator.isTaxID(input, "pt-BR");
+    const isValid = isTaxID(input, "pt-BR");
 
     if (!isValid) {
       form.setError("cpf", { message: ErrorMessage.invalidCPF });
@@ -352,7 +352,9 @@ export default function Personal() {
           ) : (
             <>
               <div className="flex flex-row-reverse gap-4">
-                {data?.isActive != undefined && <StatusBadge isActive={data.isActive} />}
+                {data?.isActive != undefined && (
+                  <StatusBadge isActive={data.isActive} />
+                )}
                 {data?.kinship && <KinshipBadge kinship={data.kinship} />}
               </div>
 

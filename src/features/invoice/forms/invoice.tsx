@@ -84,11 +84,11 @@ export const loadInvoiceData = (data?: InvoiceType): InvoiceType => {
 
 export const invoiceBaseSchema = {
   id: number().nullable(),
-  invoiceNumber: string(),
+  invoiceNumber: string().nullable(),
   isAgreement: boolean(),
   bankAccountId: number(),
   clientId: number(),
-  barCode: string(),
+  barCode: string().nullable(),
   originalDueDate: date(),
   referenceDate: date().required(ErrorMessage.required),
   creationDate: date(),
