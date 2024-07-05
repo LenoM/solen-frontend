@@ -53,7 +53,7 @@ import {
   toMoneyString,
 } from "@/utils/format-utils";
 
-import type { ClientType } from "@/features/client/forms/personal";
+import type { ClientType } from "@/features/client/client-schema";
 import type { InvoiceItemType } from "@/features/invoice/forms/invoice-item";
 import InvoiceItemForm, {
   invoiceItemBaseSchema,

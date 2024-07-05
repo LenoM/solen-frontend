@@ -1,8 +1,7 @@
 import { toast } from "sonner";
 import { useState } from "react";
 
-import type { AddressDataType } from "@/features/client/forms/address";
-import type { ClientType } from "@/features/client/forms/personal";
+import type { ClientType } from "@/features/client/client-schema";
 import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
 
@@ -200,13 +199,10 @@ export default function useAddress() {
             );
 
             const newAddr = [
-              ...prev?.address.slice(0, addrIndex),
+              ...prev.address.slice(0, addrIndex),
               response,
-              ...prev?.address.slice(addrIndex + 1),
+              ...prev.address.slice(addrIndex + 1),
             ];
-
-            console.log("response", response);
-            console.log("newAddr", newAddr);
 
             return { ...prev, address: newAddr };
           }

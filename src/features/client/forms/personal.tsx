@@ -1,4 +1,3 @@
-import { object, string, number, array, boolean, InferType } from "yup";
 import { isTaxID } from "validator";
 import { useParams } from "react-router-dom";
 import { FormEvent, useEffect, useMemo } from "react";
@@ -36,17 +35,15 @@ import {
 
 import { LoadingSpinner } from "@/components/spinner";
 import { KinshipBadge, StatusBadge } from "@/features/client/status";
-import { contactBaseSchema } from "@/features/client/forms/contact";
-import { addressOutputSchema } from "@/features/client/forms/address";
-import { clientHistoryBaseSchema } from "@/features/client/table/list-history";
-import { invoiceBaseSchema } from "@/features/invoice/forms/invoice";
+import type { ClientType } from "@/features/client/client-schema";
+import { clientSchema } from "@/features/client/client-schema";
+import { Entity, kinshipArray } from "@/utils/utils";
 import { ErrorMessage } from "@/utils/error.enum";
-import { Entity } from "@/utils/utils";
 import useCompany from "@/hooks/useCompany";
 import useCategory from "@/hooks/useCategory";
 import useClient from "@/hooks/useClient";
 
-const loadClientData = (data?: any): ClientType => {
+const loadClientData = (data?: ClientType | undefined): ClientType => {
   return {
     id: data?.id || 0,
     holderId: data?.holderId || "",
@@ -71,136 +68,6 @@ const loadClientData = (data?: any): ClientType => {
     address: data?.address || [],
   };
 };
-
-const kinshipArray = [
-  { id: "Conjuge", name: "Cônjuge" },
-  { id: "Enteado", name: "Enteado" },
-  { id: "Filho", name: "Filho" },
-  { id: "Mae", name: "Mãe" },
-  { id: "Pai", name: "Pai" },
-];
-
-const clientBaseSchema = {
-  id: number().nullable(),
-  name: string().required(ErrorMessage.required),
-  socialName: string().required(ErrorMessage.required),
-  isHolder: boolean().default(true),
-  isActive: boolean().default(true),
-  gender: string()
-    .required(ErrorMessage.required)
-    .equals(["Masculino", "Feminino"], ErrorMessage.equals),
-  cpf: string().transform(formatCPF).required(ErrorMessage.required).length(14),
-  rg: string()
-    .required(ErrorMessage.required)
-    .min(5, ErrorMessage.invalidRG)
-    .max(12, ErrorMessage.invalidRG),
-  birthday: string()
-    .transform((value) => formatDate(toDateString(value)))
-    .required(ErrorMessage.invalidDate)
-    .length(10, ErrorMessage.invalidDate),
-  referenceDate: string()
-    .transform((value) => formatDate(toDateString(value)))
-    .required(ErrorMessage.invalidDate)
-    .length(10, ErrorMessage.invalidDate),
-  motherName: string().required(ErrorMessage.required),
-  fatherName: string().required(ErrorMessage.required),
-};
-
-const holderBaseSchema = {
-  categoryId: string()
-    .when("isHolder", {
-      is: (value: boolean) => value === false,
-      then: () => string().nullable(),
-    })
-    .when("isHolder", {
-      is: (value: boolean) => value === true,
-      then: () =>
-        number()
-          .transform((value) => (Number.isNaN(value) ? null : value))
-          .required(ErrorMessage.required)
-          .min(1, ErrorMessage.equals),
-    }),
-  companyId: string()
-    .when("isHolder", {
-      is: (value: boolean) => value === false,
-      then: () => string().nullable(),
-    })
-    .when("isHolder", {
-      is: (value: boolean) => value === true,
-      then: () =>
-        number()
-          .transform((value) => (Number.isNaN(value) ? null : value))
-          .required(ErrorMessage.required)
-          .min(1, ErrorMessage.equals),
-    }),
-  holderId: string()
-    .when("isHolder", {
-      is: (value: boolean) => value === true,
-      then: () => string().nullable(),
-    })
-    .when("isHolder", {
-      is: (value: boolean) => value === false,
-      then: () =>
-        string()
-          .transform((value) => (Number.isNaN(value) ? null : value))
-          .required(ErrorMessage.required)
-          .min(1, ErrorMessage.equals),
-    }),
-  kinship: string()
-    .when("isHolder", {
-      is: (value: boolean) => value === true,
-      then: () => string().nullable(),
-    })
-    .when("isHolder", {
-      is: (value: boolean) => value === false,
-      then: () => string().required(ErrorMessage.required),
-    }),
-  bondDate: string()
-    .when("isHolder", {
-      is: (value: boolean) => value === true,
-      then: () => string().nullable(),
-    })
-    .when("isHolder", {
-      is: (value: boolean) => value === false,
-      then: () =>
-        string()
-          .transform((value) => formatDate(toDateString(value)))
-          .required(ErrorMessage.invalidDate)
-          .length(10, ErrorMessage.invalidDate),
-    }),
-};
-
-const clientSchema = object().shape({
-  ...clientBaseSchema,
-  ...holderBaseSchema,
-  dependents: array(
-    object().shape({
-      ...clientBaseSchema,
-    })
-  ),
-  address: array(
-    object().shape({
-      ...addressOutputSchema,
-    })
-  ),
-  contacts: array(
-    object().shape({
-      ...contactBaseSchema,
-    })
-  ),
-  invoices: array(
-    object().shape({
-      ...invoiceBaseSchema,
-    })
-  ),
-  clientHistory: array(
-    object().shape({
-      ...clientHistoryBaseSchema,
-    })
-  ),
-});
-
-export type ClientType = InferType<typeof clientSchema>;
 
 export default function Personal() {
   const { companyList, getCompany } = useCompany();

@@ -34,7 +34,7 @@ import { formatCPF } from "@/utils/format-utils";
 import CancelForm from "@/features/client/forms/cancel";
 import ReactivateForm from "@/features/client/forms/reactivate";
 import type { CancelType } from "@/features/client/forms/cancel";
-import type { ClientType } from "@/features/client/forms/personal";
+import type { ClientType } from "@/features/client/client-schema";
 import type { ReativateType } from "@/features/client/forms/reactivate";
 import useClient from "@/hooks/useClient";
 

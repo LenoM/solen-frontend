@@ -1,12 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
-import {
-  Ban,
-  EllipsisVertical,
-  ShieldCheck,
-  Eye,
-} from "lucide-react";
+import { Ban, EllipsisVertical, ShieldCheck, Eye } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 
 import {
@@ -35,7 +30,7 @@ import type { CancelType } from "@/features/client/forms/cancel";
 
 import ReactivateForm from "@/features/client/forms/reactivate";
 import type { ReativateType } from "@/features/client/forms/reactivate";
-import type { ClientType } from "@/features/client/forms/personal";
+import type { ClientType } from "@/features/client/client-schema";
 import { queryClient } from "@/lib/react-query";
 import useClient from "@/hooks/useClient";
 
