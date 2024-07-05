@@ -21,7 +21,7 @@ import useClient from "@/hooks/useClient";
 
 const DETAIL_PATH = `${window.origin}/invoice`;
 
-export function Invoices() {
+export default function Invoices() {
   const { clientId } = useParams();
   const { getClientByid } = useClient();
   const { data: client } = getClientByid(Number(clientId));

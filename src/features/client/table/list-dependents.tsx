@@ -40,7 +40,7 @@ import useClient from "@/hooks/useClient";
 
 const pathNewClient = `${window.origin}/client/add`;
 
-export function Dependents() {
+export default function Dependents() {
   const { cancelClient, reactivateClient, getClientByid } = useClient();
   const { clientId: holderId } = useParams();
   const { data: client } = getClientByid(Number(holderId));

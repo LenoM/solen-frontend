@@ -26,7 +26,7 @@ import type { DiscountType } from "@/features/client/forms/discount";
 import { toDateString, toMoneyString } from "@/utils/format-utils";
 import useDiscount from "@/hooks/useDiscount";
 
-export function Discounts() {
+export default function Discounts() {
   const { clientId } = useParams();
   const { getDiscountsByClient, createDiscount, deleteDiscount } =
     useDiscount();

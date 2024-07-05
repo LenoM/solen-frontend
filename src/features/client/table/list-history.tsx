@@ -20,7 +20,7 @@ const clientHistorySchema = object().shape({
 
 export type ClientHistoryType = InferType<typeof clientHistorySchema>;
 
-export function ClientHistory() {
+export default function ClientHistory() {
   const { clientId } = useParams();
   const { getClientByid } = useClient();
   const { data: client } = getClientByid(Number(clientId));

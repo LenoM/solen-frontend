@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,14 +13,23 @@ import {
   BookOpenText,
 } from "lucide-react";
 
-import Personal from "@/features/client/forms/personal";
-import { Address } from "@/features/client/table/list-address";
-import { Invoices } from "@/features/client/table/list-invoices";
-import { Contacts } from "@/features/client/table/list-contacts";
-import { Discounts } from "@/features/client/table/list-discount";
-import { Signatures } from "@/features/client/table/list-signatures";
-import { Dependents } from "@/features/client/table/list-dependents";
-import { ClientHistory } from "@/features/client/table/list-history";
+const Personal = lazy(() => import("@/features/client/forms/personal"));
+const Address = lazy(() => import("@/features/client/table/list-address"));
+const Invoices = lazy(() => import("@/features/client/table/list-invoices"));
+const Contacts = lazy(() => import("@/features/client/table/list-contacts"));
+const Discounts = lazy(() => import("@/features/client/table/list-discount"));
+const Signatures = lazy(
+  () => import("@/features/client/table/list-signatures")
+);
+const Dependents = lazy(
+  () => import("@/features/client/table/list-dependents")
+);
+const CrmHistory = lazy(
+  () => import("@/features/client/table/list-crm-history")
+);
+const ClientHistory = lazy(
+  () => import("@/features/client/table/list-history")
+);
 
 export default function ClientDetails() {
   return (

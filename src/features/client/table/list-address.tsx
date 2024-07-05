@@ -119,7 +119,7 @@ const AddressDialog = ({ title, children, formData }: AddressFormProps) => {
   );
 };
 
-export function Address() {
+export default function Address() {
   const { clientId } = useParams();
   const { getClientByid } = useClient();
   const { data: client } = getClientByid(Number(clientId));

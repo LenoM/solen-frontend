@@ -23,7 +23,7 @@ import { toDateString, toMoneyString } from "@/utils/format-utils";
 import useProductPrice from "@/hooks/useProductPrice";
 import useSignature from "@/hooks/useSignature";
 
-export function Signatures() {
+export default function Signatures() {
   const { clientId } = useParams();
   const { getSignatureByClient, createSignature, deleteSignature } =
     useSignature();

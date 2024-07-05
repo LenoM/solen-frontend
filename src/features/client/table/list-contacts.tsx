@@ -46,7 +46,7 @@ export interface ContactFormProps {
   formData: ContactType;
 }
 
-export function Contacts() {
+export default function Contacts() {
   const { clientId } = useParams();
   const { getClientByid } = useClient();
   const { data: client } = getClientByid(Number(clientId));
