@@ -10,6 +10,15 @@ export default defineConfig({
   build: {
     cssMinify: true,
     minify: true,
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes("radix-ui")) {
+            return "@radix-ui";
+          }
+        },
+      },
+    },
   },
   plugins: [react(), compression()],
   resolve: {
