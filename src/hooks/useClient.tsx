@@ -28,7 +28,7 @@ export default function useClient() {
     setLoading(false);
   };
 
-  const getFilterClient = async (input: string | undefined) => {
+  const getFilterClient = (input: string | undefined) => {
     return useQuery<ClientType[] | undefined>({
       queryKey: ["getClient"],
       queryFn: () => getClient(input),

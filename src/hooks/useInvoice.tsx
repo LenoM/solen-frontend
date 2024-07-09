@@ -16,7 +16,7 @@ export default function useInvoice() {
   const [currentData, setCurrentData] = useState<InvoiceType>();
   const [batchList, setBatchList] = useState([]);
 
-  const getInvoices = async (filter: InvoiceFilterType) => {
+  const getInvoices = (filter: InvoiceFilterType) => {
     return useQuery<InvoiceType[]>({
       queryKey: ["getInvoices"],
       queryFn: () => retrieveInvoices(filter),
