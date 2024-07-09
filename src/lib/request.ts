@@ -12,7 +12,7 @@ export enum ResponseFormat {
 export default function useFetcher() {
   const headers = getHeader();
 
-  const get = async (urlPath: string): Promise<any> => {
+  const get = async <T>(urlPath: string): Promise<T | undefined> => {
     try {
       const url = `${BASE_URL}/${urlPath}`;
 
@@ -38,7 +38,10 @@ export default function useFetcher() {
     }
   };
 
-  const del = async (urlPath: string, body?: BodyInit): Promise<any> => {
+  const del = async <T>(
+    urlPath: string,
+    body?: BodyInit
+  ): Promise<T | undefined> => {
     try {
       const url = `${BASE_URL}/${urlPath}`;
 
@@ -65,7 +68,10 @@ export default function useFetcher() {
     }
   };
 
-  const put = async (urlPath: string, body: BodyInit): Promise<any> => {
+  const put = async <T>(
+    urlPath: string,
+    body: BodyInit
+  ): Promise<T | undefined> => {
     try {
       const url = `${BASE_URL}/${urlPath}`;
 
@@ -92,11 +98,10 @@ export default function useFetcher() {
     }
   };
 
-  const post = async (
+  const post = async <T>(
     urlPath: string,
-    body: BodyInit,
-    format = ResponseFormat.JSON
-  ): Promise<any> => {
+    body: BodyInit
+  ): Promise<T | undefined> => {
     try {
       const url = `${BASE_URL}/${urlPath}`;
 
@@ -107,13 +112,7 @@ export default function useFetcher() {
       };
 
       const response = await fetch(url, params);
-      let res: any;
-
-      if (format == ResponseFormat.TEXT) {
-        res = await response.text();
-      } else {
-        res = await response.json();
-      }
+      const res = await response.json();
 
       if (response.ok && res) {
         return res;
@@ -129,7 +128,10 @@ export default function useFetcher() {
     }
   };
 
-  const patch = async (urlPath: string, body: BodyInit): Promise<any> => {
+  const patch = async <T>(
+    urlPath: string,
+    body: BodyInit
+  ): Promise<T | undefined> => {
     try {
       const url = `${BASE_URL}/${urlPath}`;
 
