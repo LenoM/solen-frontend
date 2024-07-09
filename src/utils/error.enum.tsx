@@ -1,4 +1,4 @@
-export const SERVER_ERROR_MESSAGE = "Sistema indisponível";
+export const SERVER_ERROR_MESSAGE = "Erro interno ao acessar o recurso";
 
 export enum ErrorMessage {
   required = "Campo obrigatório",

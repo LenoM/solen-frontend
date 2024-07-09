@@ -4,11 +4,6 @@ import { getHeader } from "@/utils/headers-utils";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-export enum ResponseFormat {
-  JSON,
-  TEXT,
-}
-
 export default function useFetcher() {
   const headers = getHeader();
 
@@ -32,8 +27,8 @@ export default function useFetcher() {
         description: res.message,
       });
     } catch (err) {
-      toast.error(`Falha na requisição`, {
-        description: `${SERVER_ERROR_MESSAGE} /${urlPath}`,
+      toast.error("Falha na requisição", {
+        description: `${SERVER_ERROR_MESSAGE} GET /${urlPath}`,
       });
     }
   };
@@ -62,8 +57,8 @@ export default function useFetcher() {
         description: res.message,
       });
     } catch (err) {
-      toast.error(`Falha na requisição`, {
-        description: `${SERVER_ERROR_MESSAGE} /${urlPath}`,
+      toast.error("Falha na requisição", {
+        description: `${SERVER_ERROR_MESSAGE} DELETE /${urlPath}`,
       });
     }
   };
@@ -92,8 +87,8 @@ export default function useFetcher() {
         description: res.message,
       });
     } catch (err) {
-      toast.error(`Falha na requisição`, {
-        description: `${SERVER_ERROR_MESSAGE}, PUT ${urlPath}`,
+      toast.error("Falha na requisição", {
+        description: `${SERVER_ERROR_MESSAGE} PUT /${urlPath}`,
       });
     }
   };
@@ -122,8 +117,8 @@ export default function useFetcher() {
         description: res.message,
       });
     } catch (err) {
-      toast.error(`Falha na requisição POST ${urlPath}`, {
-        description: SERVER_ERROR_MESSAGE,
+      toast.error("Falha na requisição", {
+        description: `${SERVER_ERROR_MESSAGE} POST /${urlPath}`,
       });
     }
   };
@@ -152,8 +147,8 @@ export default function useFetcher() {
         description: res.message,
       });
     } catch (err) {
-      toast.error(`Falha na requisição`, {
-        description: `${SERVER_ERROR_MESSAGE}, PATCH ${urlPath}`,
+      toast.error("Falha na requisição", {
+        description: `${SERVER_ERROR_MESSAGE} PATCH /${urlPath}`,
       });
     }
   };
