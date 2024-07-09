@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import type { ClientType } from "@/features/client/forms/personal";
+import type { ClientType } from "@/features/client/client-schema";
 import { toDateValue } from "@/utils/format-utils";
 import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
@@ -19,7 +19,7 @@ export default function useClient() {
   const getClients = async () => {
     setLoading(true);
 
-    const response = await fetcher.get("client");
+    const response = await fetcher.get<ClientType[]>("client");
 
     if (response) {
       setClientsList(response);
@@ -29,14 +29,16 @@ export default function useClient() {
   };
 
   const getFilterClient = async (input: string | undefined) => {
-    return useQuery<ClientType[]>({
+    return useQuery<ClientType[] | undefined>({
       queryKey: ["getClient"],
       queryFn: () => getClient(input),
       enabled: !!input && input.length > 5 && input.length % 2 == 0,
     });
   };
 
-  const getClient = async (input: string | undefined) => {
+  const getClient = async (
+    input: string | undefined
+  ): Promise<ClientType[] | undefined> => {
     if (!input || input.length < MIN_INPUT_LENGTH) {
       toast.warning("Busca de clientes", {
         description: `Informe ao menos ${MIN_INPUT_LENGTH} caracteres`,
@@ -48,7 +50,7 @@ export default function useClient() {
 
     const url = `client/filter/${input}`;
 
-    const response = await fetcher.get(url);
+    const response = await fetcher.get<ClientType[]>(url);
 
     if (response) {
       queryClient.setQueryData(["getClient"], response);
@@ -64,7 +66,7 @@ export default function useClient() {
 
     const url = `client/family/${id}`;
 
-    const response = await fetcher.get(url);
+    const response = await fetcher.get<ClientType[]>(url);
 
     if (response) {
       setClientsList(response);
@@ -137,7 +139,7 @@ export default function useClient() {
       reason,
     });
 
-    const response = await fetcher.patch(url, body);
+    const response = await fetcher.patch<ClientType>(url, body);
 
     if (response) {
       if (holderId === clientId) {
@@ -169,7 +171,7 @@ export default function useClient() {
       dependents,
     });
 
-    const response = await fetcher.patch(url, body);
+    const response = await fetcher.patch<ClientType>(url, body);
 
     if (response) {
       if (holderId === clientId) {
@@ -187,7 +189,7 @@ export default function useClient() {
   };
 
   const getClientByid = (clientId: number) => {
-    return useQuery<ClientType>({
+    return useQuery<ClientType | undefined>({
       queryKey: ["getClientById", { clientId }],
       queryFn: () => retrieveClientByid(clientId),
       refetchOnMount: false,
@@ -195,12 +197,14 @@ export default function useClient() {
     });
   };
 
-  const retrieveClientByid = async (clientId: number) => {
+  const retrieveClientByid = async (
+    clientId: number
+  ): Promise<ClientType | undefined> => {
     setLoading(true);
 
     if (clientId) {
       const url = `client/${clientId}`;
-      const response = await fetcher.get(url);
+      const response = await fetcher.get<ClientType>(url);
 
       if (response) {
         return response;
@@ -250,7 +254,7 @@ export default function useClient() {
       kinship,
     });
 
-    const response = await fetcher.put(url, body);
+    const response = await fetcher.put<ClientType>(url, body);
 
     if (response) {
       queryClient.invalidateQueries({
@@ -302,7 +306,7 @@ export default function useClient() {
       kinship,
     });
 
-    const response = await fetcher.post("client", body);
+    const response = await fetcher.post<ClientType>("client", body);
 
     if (response) {
       toast.success("Cadastro salvo", {
@@ -317,7 +321,7 @@ export default function useClient() {
   const deleteClient = async (clientId: number) => {
     setLoading(true);
     const url = `client/${clientId}`;
-    await fetcher.del(url);
+    await fetcher.del<ClientType>(url);
     setLoading(false);
   };
 

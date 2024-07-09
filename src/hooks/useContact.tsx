@@ -2,7 +2,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 import type { ContactType } from "@/features/client/forms/contact";
-import type { ClientType } from "@/features/client/forms/personal";
+import type { ClientType } from "@/features/client/client-schema";
 import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
 
@@ -23,7 +23,7 @@ export default function useContact() {
       isWhatsapp,
     });
 
-    const response = await fetcher.post("contact", body);
+    const response = await fetcher.post<ContactType>("contact", body);
 
     if (response) {
       queryClient.setQueryData(
@@ -58,7 +58,7 @@ export default function useContact() {
       isWhatsapp,
     });
 
-    const response = await fetcher.put(url, body);
+    const response = await fetcher.put<ContactType>(url, body);
 
     if (response) {
       queryClient.setQueryData(
@@ -84,7 +84,7 @@ export default function useContact() {
 
     const url = `contact/${contactId}`;
 
-    const response = await fetcher.del(url);
+    const response = await fetcher.del<ContactType>(url);
 
     if (response) {
       queryClient.setQueryData(
