@@ -2,19 +2,20 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import type { InvoiceType } from "@/features/invoice/forms/invoice";
 import type { InvoiceFilterType } from "@/features/invoice/forms/filter";
 import type { BatchFilterType } from "@/features/batch-generator/form";
+import type { BatchGeneratorType } from "@/features/batch-generator";
+import type { InvoiceType } from "@/features/invoice/forms/invoice";
 import { loadInvoiceData } from "@/features/invoice/forms/invoice";
 import { toDateString } from "@/utils/format-utils";
 import { queryClient } from "@/lib/react-query";
-import useFetcher, { ResponseFormat } from "@/lib/request";
+import useFetcher from "@/lib/request";
 
 export default function useInvoice() {
   const fetcher = useFetcher();
   const [loading, setLoading] = useState(false);
   const [currentData, setCurrentData] = useState<InvoiceType>();
-  const [batchList, setBatchList] = useState([]);
+  const [batchList, setBatchList] = useState<BatchGeneratorType[]>([]);
 
   const getInvoices = (filter: InvoiceFilterType) => {
     return useQuery<InvoiceType[]>({
@@ -57,7 +58,7 @@ export default function useInvoice() {
 
     const url = `invoice?${query}`;
 
-    const response = await fetcher.get(url);
+    const response = await fetcher.get<InvoiceType[]>(url);
 
     if (response) {
       setLoading(false);
@@ -66,6 +67,7 @@ export default function useInvoice() {
     }
 
     setLoading(false);
+    return [];
   };
 
   const getInvoice = async (invoiceId: number) => {
@@ -73,7 +75,7 @@ export default function useInvoice() {
 
     if (!isNaN(invoiceId)) {
       const url = `invoice/${invoiceId}`;
-      const response = await fetcher.get(url);
+      const response = await fetcher.get<InvoiceType>(url);
 
       if (response) {
         setCurrentData(response);
@@ -89,7 +91,7 @@ export default function useInvoice() {
     setLoading(true);
 
     const url = `invoice/batch`;
-    const response = await fetcher.get(url);
+    const response = await fetcher.get<BatchGeneratorType[]>(url);
 
     if (response) {
       setBatchList(response);
@@ -102,18 +104,14 @@ export default function useInvoice() {
     setLoading(true);
 
     const body: BodyInit = JSON.stringify(data);
-    const response = await fetcher.post(
-      "invoice/print",
-      body,
-      ResponseFormat.TEXT
-    );
+    const response = await fetcher.post<{ url: string }>("invoice/print", body);
 
-    if (response) {
+    if (response && response.url) {
       toast.success("Impressão de boleto", {
         description: `O boleto está disponível`,
         action: {
           label: "Baixar",
-          onClick: () => window.open(response),
+          onClick: () => window.open(response.url),
         },
       });
     }
@@ -143,9 +141,10 @@ export default function useInvoice() {
       data.bankAccountId = null;
     }
 
+    const url = "invoice/all";
     const body: BodyInit = JSON.stringify(data);
 
-    const response = await fetcher.post("invoice/all", body);
+    const response = await fetcher.post<BatchGeneratorType>(url, body);
 
     if (response) {
       toast.success("Lote adicionado com sucesso", {

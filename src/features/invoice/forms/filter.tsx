@@ -62,9 +62,9 @@ export default function InvoiceFilter() {
     defaultValues: loadData(),
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newData = form.getValues();
-    retrieveInvoices(newData);
+    await retrieveInvoices(newData);
   };
 
   return (
