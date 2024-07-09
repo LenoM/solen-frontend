@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -17,19 +16,14 @@ import UserForm from "@/features/user/form";
 import useUser from "@/hooks/useUser";
 
 export default function User() {
-  const { usersList, loading, setUsersList, getUsers } = useUser();
-
-  useEffect(() => {
-    if (usersList.length === 0) {
-      getUsers();
-    }
-  }, []);
+  const { getUserList } = useUser();
+  const { data: usersList, isLoading } = getUserList();
 
   return (
     <div className="sx:p-0 md:p-6 pt-1 h-screen space-y-4">
       <h1 className="text-3xl font-bold text-center">Usuários</h1>
 
-      {loading ? (
+      {isLoading ? (
         <LoadingSpinner />
       ) : (
         <>
@@ -47,12 +41,12 @@ export default function User() {
                   <DialogTitle>Convidar Usuário</DialogTitle>
                 </DialogHeader>
 
-                <UserForm setUsersList={setUsersList} />
+                <UserForm />
               </DialogContent>
             </Dialog>
           </div>
 
-          <DataTable columns={columns} data={usersList} />
+          <DataTable columns={columns} data={usersList ?? []} />
         </>
       )}
     </div>

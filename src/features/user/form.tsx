@@ -1,5 +1,5 @@
 import { object, string, boolean, InferType, ref } from "yup";
-import { Dispatch, SetStateAction, useMemo } from "react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -61,11 +61,7 @@ const userSchema = object({
 
 export type UserType = InferType<typeof userSchema>;
 
-type UserFormProps = {
-  setUsersList?: Dispatch<SetStateAction<UserType[]>>;
-};
-
-export default function UserForm({ setUsersList }: UserFormProps) {
+export default function UserForm() {
   const { userId } = useParams();
 
   const { loading, currentData, getUser, createUser, updateUser } = useUser();
@@ -80,11 +76,10 @@ export default function UserForm({ setUsersList }: UserFormProps) {
   const showPasswordField = form.getValues("isChangePassword") || !userId;
 
   const onSubmit = async () => {
-    let newData: UserType = form.getValues();
+    const newData = form.getValues();
 
     if (!userId) {
-      newData = await createUser(newData);
-      setUsersList && setUsersList((prev: UserType[]) => [...prev, newData]);
+      await createUser(newData);
     } else {
       await updateUser(userId, newData);
     }

@@ -1,16 +1,17 @@
 import { toast } from "sonner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 import { UserType, loadUserData } from "@/features/user/form";
+import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
 
 export default function useUser() {
   const fetcher = useFetcher();
 
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [usersList, setUsersList] = useState<UserType[]>([]);
+  const [loading, setLoading] = useState(false);
   const [currentData, setCurrentData] = useState<UserType>();
 
   const createUser = async (data: UserType) => {
@@ -25,10 +26,16 @@ export default function useUser() {
       isActive,
     });
 
-    const response = await fetcher.post("user", body);
+    const response = await fetcher.post<UserType>("user", body);
 
     if (response) {
       setLoading(false);
+
+      queryClient.setQueryData(["getUsers"], (prev: UserType[]) => {
+        if (prev) {
+          return [...prev, response];
+        }
+      });
 
       toast.success("Usuário adicionado", {
         description: "O usuário foi adicionado com sucesso",
@@ -60,6 +67,22 @@ export default function useUser() {
         description: "O usuário foi salvo com sucesso",
       });
 
+      queryClient.setQueryData(["getUsers"], (prev: UserType[]) => {
+        if (prev) {
+          const userIndex = prev.findIndex((usu) => usu.id === userId);
+
+          const users = [
+            ...prev.slice(0, userIndex),
+            response,
+            ...prev.slice(userIndex + 1),
+          ];
+
+          setLoading(false);
+
+          return users;
+        }
+      });
+
       navigate(`/user`);
     }
 
@@ -70,7 +93,7 @@ export default function useUser() {
     setLoading(true);
 
     if (userId) {
-      const response = await fetcher.get(`user/${userId}`);
+      const response = await fetcher.get<UserType>(`user/${userId}`);
 
       if (response) {
         setCurrentData(response);
@@ -82,25 +105,35 @@ export default function useUser() {
     setLoading(false);
   };
 
+  const getUserList = () => {
+    const { data, isLoading } = useQuery<UserType[]>({
+      queryKey: ["getUsers"],
+      queryFn: () => getUsers(),
+      refetchOnMount: false,
+    });
+
+    return { data, isLoading };
+  };
+
   const getUsers = async () => {
     setLoading(true);
 
-    const response = await fetcher.get("user");
+    const response = await fetcher.get<UserType[]>("user");
 
     if (response) {
-      setUsersList(response);
+      queryClient.setQueryData(["getUsers"], response);
+      setLoading(false);
+      return response;
     }
-
     setLoading(false);
+    return [];
   };
 
   return {
-    usersList,
-    setUsersList,
     currentData,
     loading,
     getUser,
-    getUsers,
+    getUserList,
     createUser,
     updateUser,
   };
