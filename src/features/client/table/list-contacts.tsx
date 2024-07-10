@@ -32,7 +32,7 @@ const editContact = (data: ContactType): ContactType => {
   };
 };
 
-const formatContact = (data: any) => {
+const formatContact = (data: ContactType) => {
   if (data.contactType === "Email") {
     return data.value;
   }
@@ -69,7 +69,7 @@ export default function Contacts() {
     );
   };
 
-  const handlerSubmit = async (newData: any) => {
+  const handlerSubmit = async (newData: ContactType) => {
     const isUpdate = newData.id! > 0;
 
     if (isUpdate) {
