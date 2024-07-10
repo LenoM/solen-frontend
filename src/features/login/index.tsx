@@ -30,7 +30,7 @@ const loginSchema = object({
 export type LoginType = InferType<typeof loginSchema>;
 
 export default function Login() {
-  const login = useLogin();
+  const { onLogin } = useLogin();
 
   const form = useForm({
     resolver: yupResolver(loginSchema),
@@ -39,10 +39,6 @@ export default function Login() {
       password: "",
     },
   });
-
-  const onSubmit = async ({ email, password }: LoginType) => {
-    login.onLogin({ email, password });
-  };
 
   return (
     <section>
@@ -53,11 +49,7 @@ export default function Login() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                action="#"
-                method="POST"
-              >
+              <form onSubmit={form.handleSubmit(onLogin)}>
                 <div className="grid w-full items-center gap-4">
                   <div className="flex flex-col space-y-1.5">
                     <FormField
