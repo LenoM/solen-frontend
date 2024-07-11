@@ -10,7 +10,7 @@ export default function useSupplier() {
   const getSuppliers = async () => {
     setLoading(true);
 
-    const response = await fetcher.get("supplier");
+    const response = await fetcher.get<Entity[]>("supplier");
 
     if (response) {
       setSuppliersList(response);

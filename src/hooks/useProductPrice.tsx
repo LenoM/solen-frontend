@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { SignatureType } from "@/features/client/forms/signature";
 import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
+import { ProductPriceType } from "@/features/client/forms/product-price";
 
 export default function useProductPrice() {
   const fetcher = useFetcher();
@@ -25,7 +26,7 @@ export default function useProductPrice() {
       initialDate,
       finalDate,
     });
-    const response = await fetcher.post("product-price", body);
+    const response = await fetcher.post<ProductPriceType>("product-price", body);
 
     if (response) {
       queryClient.setQueryData(

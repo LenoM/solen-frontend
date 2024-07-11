@@ -11,7 +11,7 @@ export default function useCategory() {
   const getCategories = async () => {
     setLoading(true);
 
-    const response = await fetcher.get("category");
+    const response = await fetcher.get<Entity[]>("category");
 
     if (response) {
       setCategoryList(response);

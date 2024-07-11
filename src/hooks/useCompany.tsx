@@ -10,7 +10,7 @@ export default function useCompany() {
   const getCompany = async () => {
     setLoading(true);
 
-    const response = await fetcher.get("company");
+    const response = await fetcher.get<Entity[]>("company");
     if (response) {
       setCompanyList(response);
     }

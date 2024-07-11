@@ -54,7 +54,7 @@ export default function useSignature() {
       finalDate,
     });
 
-    const response = await fetcher.del(url, body);
+    const response = await fetcher.del<SignatureType>(url, body);
 
     if (response) {
       queryClient.setQueryData(
@@ -83,7 +83,7 @@ export default function useSignature() {
 
     if (!isNaN(clientId)) {
       const url = `signature/client/${clientId}`;
-      const response = await fetcher.get(url);
+      const response = await fetcher.get<SignatureType[]>(url);
 
       if (response) {
         setLoading(false);
@@ -92,6 +92,7 @@ export default function useSignature() {
     }
 
     setLoading(false);
+    return [];
   };
 
   return {

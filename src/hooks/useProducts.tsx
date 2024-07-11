@@ -45,7 +45,7 @@ export default function useProduct() {
 
     const url = `product/${productId}`;
 
-    const response = await fetcher.del(url);
+    const response = await fetcher.del<ProductType>(url);
 
     if (response) {
       setCurrentData(response);
@@ -68,7 +68,7 @@ export default function useProduct() {
       isActive: Boolean(isActive),
     });
 
-    const response = await fetcher.put(url, body);
+    const response = await fetcher.put<ProductType>(url, body);
 
     if (response) {
       toast.success("Produto salvo", {
@@ -86,7 +86,7 @@ export default function useProduct() {
 
     if (!isNaN(productId)) {
       const url = `product/${productId}`;
-      const response = await fetcher.get(url);
+      const response = await fetcher.get<ProductType>(url);
 
       if (response) {
         setCurrentData(response);
@@ -101,7 +101,7 @@ export default function useProduct() {
   const getProducts = async () => {
     setLoading(true);
 
-    const response = await fetcher.get("product");
+    const response = await fetcher.get<ProductType[]>("product");
 
     if (response) {
       setProductsList(response);

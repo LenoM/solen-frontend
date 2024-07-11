@@ -3,13 +3,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import type { DiscountType } from "@/features/client/forms/discount";
+import type { DiscountDataType } from "@/features/discount";
 import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
 
 export default function useDiscount() {
   const fetcher = useFetcher();
   const [loading, setLoading] = useState(true);
-  const [discountTypeList, setDiscountTypeList] = useState([]);
+  const [discountTypeList, setDiscountTypeList] = useState<DiscountType[]>([]);
 
   const createDiscount = async (
     clientId: number,
@@ -80,7 +81,7 @@ export default function useDiscount() {
   };
 
   const getDiscountsByClient = (clientId: number) => {
-    return useQuery<DiscountType[]>({
+    return useQuery<DiscountDataType[]>({
       queryKey: ["getDiscountsByClient", { clientId }],
       queryFn: () => retrieveDiscountsByClient(clientId),
       refetchOnMount: false,
@@ -93,7 +94,7 @@ export default function useDiscount() {
     const url = `discount/client/${clientId}`;
 
     if (!isNaN(clientId) && clientId > 0) {
-      const response = await fetcher.get(url);
+      const response = await fetcher.get<DiscountDataType[]>(url);
 
       if (response) {
         return response;
@@ -101,21 +102,22 @@ export default function useDiscount() {
     }
 
     setLoading(false);
+    return [];
   };
 
   const getDiscountsTypes = async () => {
     setLoading(true);
     const url = `discount/types`;
 
-    const response = await fetcher.get(url);
+    const response = await fetcher.get<DiscountType[]>(url);
 
     if (response) {
       setDiscountTypeList(response);
       setLoading(false);
       return response;
     }
-
     setLoading(false);
+    return [];
   };
 
   return {

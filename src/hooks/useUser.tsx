@@ -60,7 +60,7 @@ export default function useUser() {
     });
 
     const url = `user/${userId}`;
-    const response = await fetcher.put(url, body);
+    const response = await fetcher.put<UserType>(url, body);
 
     if (response) {
       toast.success("Usuário salvo", {
