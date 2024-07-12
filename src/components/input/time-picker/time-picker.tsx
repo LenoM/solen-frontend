@@ -1,7 +1,3 @@
-"use client";
-
-// FONTE https://time.openstatus.dev/#time-picker-utils.tsx
- 
 import * as React from "react";
 import { Clock } from "lucide-react";
 import { Label } from "@/components/ui/label";

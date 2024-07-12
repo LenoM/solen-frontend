@@ -40,7 +40,7 @@ import { ErrorMessage } from "@/utils/error.enum";
 import type { ProductType } from "@/features/product/form";
 import useProduct from "@/hooks/useProducts";
 import useDiscount from "@/hooks/useDiscount";
-import { DiscountDataType } from "@/features/discount";
+import type { DiscountDataType } from "@/features/discount";
 
 const discountSchema = object().shape({
   id: number().nullable(),

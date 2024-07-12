@@ -1,5 +1,5 @@
 import { object, string, number, boolean, InferType } from "yup";
-import validator from "validator";
+import { isEmail, isMobilePhone } from "validator";
 import { FormEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -71,9 +71,9 @@ export const contactBaseSchema = {
       message: ErrorMessage.invalidContact,
       test: (values, ctx) => {
         if (ctx.parent.contactType === "Email") {
-          return validator.isEmail(values);
+          return isEmail(values);
         } else {
-          return validator.isMobilePhone(values, "pt-BR");
+          return isMobilePhone(values, "pt-BR");
         }
       },
     }),
