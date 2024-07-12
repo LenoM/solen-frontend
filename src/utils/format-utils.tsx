@@ -6,6 +6,7 @@ import "dayjs/locale/pt-br";
 dayjs.locale("pt-br");
 dayjs.extend(utc);
 dayjs.extend(customParseFormat);
+const TIMEZONE_DAFAULT = -3;
 
 export const normalizePhoneNumber = (value: string | undefined) => {
   if (!value) return "";
@@ -103,6 +104,34 @@ export const toDateString = (
   const result = isValid ? dateString : undefined;
 
   return result;
+};
+
+export const toDateTimeString = (
+  dateString: Date | string | number | null | undefined
+): string | undefined => {
+  if (!dateString) return undefined;
+
+  console.log("ini", dateString);
+  dateString = dayjs
+    .utc(dateString)
+    .utcOffset(TIMEZONE_DAFAULT)
+    .format("DD/MM/YYYY HH:mm:ss");
+
+  const isValid = dayjs(dateString, "DD/MM/YYYY HH:mm:ss", true).isValid();
+  const result = isValid ? dateString : undefined;
+
+  return result;
+};
+
+export const toDateTimeValue = (
+  dateString: Date | string | null
+): Date | undefined => {
+  if (!dateString) {
+    return undefined;
+  }
+
+  const value = dayjs.utc(dateString, "DD/MM/YYYY HH:mm", true).toDate();
+  return value;
 };
 
 export const toMoneyString = (value: number) => {
