@@ -106,16 +106,14 @@ export default function useUser() {
   };
 
   const getUserList = () => {
-    const { data, isLoading } = useQuery<UserType[]>({
+    return useQuery<UserType[] | undefined>({
       queryKey: ["getUsers"],
       queryFn: () => getUsers(),
       refetchOnMount: false,
     });
-
-    return { data, isLoading };
   };
 
-  const getUsers = async () => {
+  const getUsers = async (): Promise<UserType[] | undefined> => {
     setLoading(true);
 
     const response = await fetcher.get<UserType[]>("user");
@@ -126,7 +124,6 @@ export default function useUser() {
       return response;
     }
     setLoading(false);
-    return [];
   };
 
   return {
