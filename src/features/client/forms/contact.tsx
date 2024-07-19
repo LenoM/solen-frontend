@@ -31,11 +31,9 @@ import { normalizePhoneNumber } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
 
 export const loadContactData = (data?: ContactType): ContactType => {
-  const { clientId } = useParams();
-
   return {
     id: data?.id || 0,
-    clientId: data?.clientId || Number(clientId),
+    clientId: data?.clientId || 0,
     value: data?.value || "",
     contactType: data?.contactType || "",
     isWhatsapp: data?.isWhatsapp || false,

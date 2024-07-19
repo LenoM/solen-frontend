@@ -22,16 +22,6 @@ import useContact from "@/hooks/useContact";
 import { useParams } from "react-router-dom";
 import useClient from "@/hooks/useClient";
 
-const editContact = (data: ContactType): ContactType => {
-  return {
-    id: data.id,
-    clientId: data.clientId,
-    value: data.value,
-    isWhatsapp: data.isWhatsapp,
-    contactType: data.contactType,
-  };
-};
-
 const formatContact = (data: ContactType) => {
   if (data.contactType === "Email") {
     return data.value;
@@ -40,7 +30,7 @@ const formatContact = (data: ContactType) => {
   return normalizePhoneNumber(data.value);
 };
 
-export interface ContactFormProps {
+interface ContactFormProps {
   title: string;
   children: JSX.Element[] | JSX.Element;
   formData: ContactType;
@@ -75,6 +65,7 @@ export default function Contacts() {
     if (isUpdate) {
       await updateContact(newData);
     } else {
+      newData.clientId = Number(clientId)
       await createContact(newData);
     }
   };
@@ -105,7 +96,7 @@ export default function Contacts() {
           <>
             <ContactDialog
               title="Editar contato"
-              formData={editContact(row.original)}
+              formData={loadContactData(row.original)}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Edit</span>
