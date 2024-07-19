@@ -12,7 +12,7 @@ const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
   (props, ref) => {
     const { className, ...rest } = props;
     return (
-        <div ref={ref} className={cn(spinnerVariants, className)} {...rest} />
+      <div ref={ref} className={cn(spinnerVariants, className)} {...rest} />
     );
   }
 );
