@@ -134,12 +134,12 @@ export default function Dependents() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Link to={newPath}>
-              <Button variant="outline" className="h-8 w-8 p-0">
+            <Button variant="outline" className="h-8 w-8 p-0" asChild>
+              <Link to={newPath}>
                 <span className="sr-only">Vizualizar cadastro</span>
                 <Eye className="h-4 w-4" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
 
             <Dialog
               open={isOpenModalCancel}

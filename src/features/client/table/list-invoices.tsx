@@ -65,12 +65,12 @@ export default function Invoices() {
       cell: ({ row }) => {
         return (
           <>
-            <Link to={`${DETAIL_PATH}/${row.original.id}`}>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="ghost" className="h-8 w-8 p-0" asChild>
+              <Link to={`${DETAIL_PATH}/${row.original.id}`}>
                 <span className="sr-only">Vizualizar cadastro</span>
                 <Eye className="h-4 w-4" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
 
             <Dialog>
               <DialogTrigger asChild>

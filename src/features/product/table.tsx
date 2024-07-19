@@ -34,12 +34,12 @@ export const columns: ColumnDef<ProductType>[] = [
       const newPath = `${window.origin}/product/${row.original.id}`;
 
       return (
-        <Link to={newPath}>
-          <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="h-8 w-8 p-0" asChild>
+          <Link to={newPath}>
             <span className="sr-only">Open menu</span>
             <Eye className="h-4 w-4" />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       );
     },
   },

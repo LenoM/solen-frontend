@@ -98,17 +98,17 @@ export default function Invoices() {
       cell: ({ row }) => {
         return (
           <>
-            <Link to={`${DETAIL_PATH}/${row.original.id}`}>
-              <Button variant="outline" className="h-8 w-8 p-0">
-                <span className="sr-only">Vizualizar cadastro</span>
+            <Button variant="ghost" className="h-8 w-8 p-0" asChild>
+              <Link to={`${DETAIL_PATH}/${row.original.id}`}>
+                <span className="sr-only">Vizualizar boleto</span>
                 <Eye className="h-4 w-4" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
 
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">Imprimir boleto</span>
                   <Printer className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
@@ -141,7 +141,7 @@ export default function Invoices() {
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">Enviar boleto</span>
                   <Send className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
