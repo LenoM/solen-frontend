@@ -77,9 +77,9 @@ export default function InvoiceParam() {
 
   const isLoading =
     loading ||
-    companyList.length == 0 ||
-    productsList.length == 0 ||
-    categoryList.length == 0;
+    companyList.length === 0 ||
+    productsList.length === 0 ||
+    categoryList.length === 0;
 
   const form = useForm({
     resolver: yupResolver(invoiceFilterSchema),

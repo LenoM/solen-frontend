@@ -84,7 +84,11 @@ type AddressFormProps = {
   onSubmit: (newData: AddressDataType) => void;
 };
 
-export default function AddressForm({ data, isSaveLoading, onSubmit }: AddressFormProps) {
+export default function AddressForm({
+  data,
+  isSaveLoading,
+  onSubmit,
+}: AddressFormProps) {
   const {
     loading,
     getAddressByCEP,
@@ -105,7 +109,10 @@ export default function AddressForm({ data, isSaveLoading, onSubmit }: AddressFo
   } = useAddress();
 
   const isLoading =
-    loading || isSaveLoading || stateList.length == 0 || addressTypeList.length == 0;
+    loading ||
+    isSaveLoading ||
+    stateList.length === 0 ||
+    addressTypeList.length === 0;
 
   const form = useForm({
     resolver: yupResolver(addressSchema),

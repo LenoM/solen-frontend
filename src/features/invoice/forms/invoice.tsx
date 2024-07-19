@@ -130,7 +130,7 @@ export default function InvoiceForm() {
 
   const selectedClientId = form.watch("clientId");
 
-  const isLoading = loading || clientsList.length == 0;
+  const isLoading = loading || clientsList.length === 0;
 
   useEffect(() => {
     if (currentData?.clientId !== selectedClientId) {

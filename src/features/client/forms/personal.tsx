@@ -94,9 +94,9 @@ export default function Personal() {
 
   const isLoading =
     loading ||
-    companyList.length == 0 ||
-    categoryList.length == 0 ||
-    clientsList.length == 0;
+    companyList.length === 0 ||
+    categoryList.length === 0 ||
+    clientsList.length === 0;
 
   useMemo(async () => await getCompany(), []);
   useMemo(async () => await getCategories(), []);

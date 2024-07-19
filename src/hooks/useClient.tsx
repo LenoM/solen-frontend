@@ -32,7 +32,7 @@ export default function useClient() {
     return useQuery<ClientType[] | undefined>({
       queryKey: ["getClient"],
       queryFn: () => getClient(input),
-      enabled: !!input && input.length > 5 && input.length % 2 == 0,
+      enabled: !!input && input.length > 5 && input.length % 2 === 0,
     });
   };
 

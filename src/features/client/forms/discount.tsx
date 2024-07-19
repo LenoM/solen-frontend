@@ -72,8 +72,8 @@ export default function DiscountForm({ onSubmit }: CancelInput) {
   const isLoading =
     isLoadingProduct ||
     isLoadingDiscountTipe ||
-    productsList.length == 0 ||
-    discountTypeList.length == 0;
+    productsList.length === 0 ||
+    discountTypeList.length === 0;
 
   const form = useForm({
     resolver: yupResolver(discountSchema),
