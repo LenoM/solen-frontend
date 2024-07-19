@@ -8,7 +8,6 @@ export enum ErrorMessage {
   notEquals = "Senhas não conferem",
   invalidRG = "RG inválido",
   invalidCPF = "CPF inválido",
-  invalidPrice = "Preço inválido",
   invalidDate = "Data inválida",
   invalidMinDate = "Digite uma data posterior",
   invalidEmail = "Email inválido",

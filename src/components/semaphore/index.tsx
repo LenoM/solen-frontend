@@ -17,7 +17,7 @@ const semaphoreVariants = cva("rounded-full w-4 h-4", {
   },
 });
 
-export interface SemaphoreProps
+interface SemaphoreProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof semaphoreVariants> {}
 
@@ -32,4 +32,4 @@ function Semaphore({ className, variant, ...props }: SemaphoreProps) {
   );
 }
 
-export { Semaphore, semaphoreVariants };
+export { Semaphore };

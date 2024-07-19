@@ -82,7 +82,7 @@ const editAddress = (data: AddressCustomType): AddressDataType => {
   };
 };
 
-export interface AddressFormProps {
+interface AddressFormProps {
   title: string;
   children: JSX.Element[] | JSX.Element;
   formData: AddressDataType;

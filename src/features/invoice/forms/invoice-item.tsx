@@ -24,7 +24,7 @@ import {
 import MoneyInput from "@/components/input/money";
 import type { ProductType } from "@/features/product/form";
 import type { DiscountDataType } from "@/features/discount";
-import type { ClientType } from "@/features/client/forms/personal";
+import type { ClientType } from "@/features/client/client-schema";
 import useDiscount from "@/hooks/useDiscount";
 import useProduct from "@/hooks/useProducts";
 import useClient from "@/hooks/useClient";
@@ -32,7 +32,7 @@ import { Entity } from "@/utils/utils";
 import { ErrorMessage } from "@/utils/error.enum";
 import { LoadingSpinner } from "@/components/spinner";
 
-export const entityBaseSchema = {
+const entityBaseSchema = {
   id: number().nullable(),
   name: string().nullable(),
   description: string().nullable(),

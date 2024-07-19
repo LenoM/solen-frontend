@@ -18,7 +18,7 @@ const clientHistorySchema = object().shape({
   ...clientHistoryBaseSchema,
 });
 
-export type ClientHistoryType = InferType<typeof clientHistorySchema>;
+type ClientHistoryType = InferType<typeof clientHistorySchema>;
 
 export default function ClientHistory() {
   const { clientId } = useParams();
