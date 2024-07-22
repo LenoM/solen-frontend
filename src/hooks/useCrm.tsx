@@ -11,13 +11,17 @@ export default function useCrm() {
   const getNextCall = async () => {
     setLoading(true);
 
-    const response = await fetcher.get("crm/next-call");
+    const response = await fetcher.get<number>("crm/next-call");
 
-    if (response) {
+    if (response && response > 0) {
       navigate(`/client/${response}`);
+
+      toast.info("Ligação iniciada", {
+        description: "Verifique o histórico de chamadas",
+      });
     }
 
-    if (response === undefined) {
+    if (Number(response) === -1) {
       toast.success("Parabéns!", {
         description: "Não há novas ligações",
       });

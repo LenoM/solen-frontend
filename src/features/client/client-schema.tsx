@@ -3,7 +3,7 @@ import { object, string, number, array, boolean, InferType } from "yup";
 import { contactBaseSchema } from "@/features/client/forms/contact";
 import { addressOutputBaseSchema } from "@/features/client/forms/address";
 import { clientHistoryBaseSchema } from "@/features/client/table/list-history";
-import { crmBaseSchema } from "@/features/crm/form";
+import { crmBaseSchema } from "@/features/crm/collection-form";
 import { invoiceBaseSchema } from "@/features/invoice/forms/invoice";
 
 import { ErrorMessage } from "@/utils/error.enum";

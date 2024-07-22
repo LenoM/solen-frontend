@@ -10,6 +10,7 @@ import {
   Home,
   ShoppingBasket,
   PhoneCall,
+  Headset,
   BookOpenText,
 } from "lucide-react";
 
@@ -93,6 +94,14 @@ export default function ClientDetails() {
             </div>
 
             <div className="text-center">
+              <TabsTrigger
+                value="crm"
+                className="rounded w-12 h-12"
+                aria-label="Histórico de contatos"
+              >
+                <Headset className="w-6 h-6" />
+              </TabsTrigger>
+            </div>
 
             <div className="text-center">
               <TabsTrigger
@@ -180,6 +189,17 @@ export default function ClientDetails() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <Invoices />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="crm">
+            <Card>
+              <CardHeader className="text-center">
+                <CardTitle>Atendimentos</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <CrmHistory />
               </CardContent>
             </Card>
           </TabsContent>
