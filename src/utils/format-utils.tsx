@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import "dayjs/locale/pt-br";
@@ -78,7 +78,7 @@ export const isOutOfRange = (date: Date) => {
 };
 
 export const toDateValue = (
-  dateString: Date | string | null
+  dateString: Date | string | null | undefined
 ): Date | undefined => {
   if (!dateString) {
     return undefined;
@@ -123,13 +123,12 @@ export const toDateTimeString = (
 };
 
 export const toDateTimeValue = (
-  dateString: Date | string | null
-): Date | undefined => {
+  dateString: Date | string | null | undefined
+): Date | Dayjs | undefined => {
   if (!dateString) {
     return undefined;
   }
-
-  const value = dayjs.utc(dateString, "DD/MM/YYYY HH:mm", true).toDate();
+  const value = dayjs(dateString).utcOffset(0, true);
   return value;
 };
 
