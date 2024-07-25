@@ -12,7 +12,7 @@ export default function useProduct() {
   const [productsList, setProductsList] = useState<ProductType[]>([]);
   const [currentData, setCurrentData] = useState<ProductType>();
 
-  const createProduct = async (data: ProductType) => {
+  const createProduct = async (data: ProductType): Promise<ProductType | undefined> => {
     setLoading(true);
 
     const { name, description, isActive, billingMethod, supplierId } = data;
@@ -25,7 +25,7 @@ export default function useProduct() {
       isActive: Boolean(isActive),
     });
 
-    const response = await fetcher.post("product", body);
+    const response = await fetcher.post<ProductType>("product", body);
 
     if (response) {
       setLoading(false);
