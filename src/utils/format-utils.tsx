@@ -9,10 +9,10 @@ import { fromZonedTime } from "date-fns-tz";
 
 const LIMIT_OF_DAYS = 91;
 const DATE_FORMAT = "dd/MM/yyyy";
-const DATE_TIME_FORMAT = "dd/MM/yyyy hh:mm";
+const DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm";
 const TIMEZONE = "America/Sao_Paulo";
 
-export { ptBR } from "date-fns/locale"
+export { ptBR } from "date-fns/locale";
 
 export const normalizePhoneNumber = (value: string | undefined) => {
   if (!value) return "";
@@ -116,19 +116,16 @@ export const toDateTimeString = (
   dateString: Date | string | number | null | undefined
 ): string | undefined => {
   if (!dateString) return undefined;
-  
+
   if (dateString.toString().length > 24) {
     const result = format(dateString.toString(), DATE_TIME_FORMAT);
-    console.log('111')
     return result;
   } else {
-    console.log('222', )
     return format(
-      fromZonedTime(dateString?.toString(), TIMEZONE),
+      fromZonedTime(dateString?.toString().substring(0, 19), TIMEZONE),
       DATE_TIME_FORMAT
     );
   }
-
 };
 
 export const toDateTimeValue = (
