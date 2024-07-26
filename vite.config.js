@@ -54,6 +54,10 @@ export default defineConfig({
             return "@router";
           }
 
+          if (id.includes("date-fns")) {
+            return "@date";
+          }
+
           if (id.includes("react-icons")) {
             return "@icon";
           }

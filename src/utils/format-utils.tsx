@@ -1,11 +1,18 @@
-import dayjs, { Dayjs } from "dayjs";
-import utc from "dayjs/plugin/utc";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import "dayjs/locale/pt-br";
+import {
+  parse,
+  format,
+  addDays,
+  differenceInCalendarDays,
+  parseISO,
+} from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
 
-dayjs.locale("pt-br");
-dayjs.extend(utc);
-dayjs.extend(customParseFormat);
+const LIMIT_OF_DAYS = 91;
+const DATE_FORMAT = "dd/MM/yyyy";
+const DATE_TIME_FORMAT = "dd/MM/yyyy hh:mm";
+const TIMEZONE = "America/Sao_Paulo";
+
+export { ptBR } from "date-fns/locale"
 
 export const normalizePhoneNumber = (value: string | undefined) => {
   if (!value) return "";
@@ -61,74 +68,74 @@ export const getNumbers = (value: string) => {
 
 // TODO: O valor (-90) deve vir da config do sistema (DB)
 export const getMinDate = () => {
-  return dayjs().add(-90, "D");
+  return addDays(new Date(), -LIMIT_OF_DAYS);
 };
 // TODO: O valor (90) deve vir da config do sistema (DB)
 export const getMaxDate = () => {
-  return dayjs().add(90, "D");
+  return addDays(new Date(), LIMIT_OF_DAYS);
 };
 
 export const isOutOfRange = (date: Date) => {
-  const currenteDate = dayjs(date);
+  if (!date) return false;
 
-  const bf = currenteDate.diff(getMinDate(), "M");
-  const af = currenteDate.diff(getMaxDate(), "M");
+  const value = toDateTimeValue(new Date(date));
 
-  return af > 3 || bf < -3;
+  if (!value) return false;
+
+  const bf = differenceInCalendarDays(getMinDate(), value);
+  const af = differenceInCalendarDays(getMaxDate(), value);
+
+  return bf > -1 || af < -1;
 };
 
 export const toDateValue = (
-  dateString: Date | string | null | undefined
+  dateString: Date | string | null
 ): Date | undefined => {
-  if (!dateString) {
-    return undefined;
-  }
-
-  const value = dayjs.utc(dateString, "DD/MM/YYYY", true).toDate();
+  if (!dateString) return undefined;
+  const value = parse(dateString?.toString(), DATE_FORMAT, new Date());
   return value;
 };
 
 export const toDateString = (
-  dateString: Date | string | null | undefined
+  dateString: Date | string | undefined | null
 ): string | undefined => {
   if (!dateString) return undefined;
 
-  if (dateString.toString().length > 10) {
-    dateString = dayjs.utc(dateString).format("DD/MM/YYYY");
+  if (dateString.toString().length > 24) {
+    const result = format(dateString.toString(), DATE_FORMAT);
+    return result;
   } else {
-    dateString = dayjs.utc(dateString, "DD/MM/YYYY", true).format("DD/MM/YYYY");
+    return format(
+      parseISO(dateString.toString().replace("000Z", "")),
+      DATE_FORMAT
+    );
   }
-
-  const isValid = dayjs(dateString, "DD/MM/YYYY", true).isValid();
-  const result = isValid ? dateString : undefined;
-
-  return result;
 };
 
 export const toDateTimeString = (
   dateString: Date | string | number | null | undefined
 ): string | undefined => {
   if (!dateString) return undefined;
-
+  
   if (dateString.toString().length > 24) {
-    dateString = dayjs(dateString).format("DD/MM/YYYY HH:mm");
+    const result = format(dateString.toString(), DATE_TIME_FORMAT);
+    console.log('111')
+    return result;
   } else {
-    dateString = dayjs.utc(dateString).format("DD/MM/YYYY HH:mm");
+    console.log('222', )
+    return format(
+      fromZonedTime(dateString?.toString(), TIMEZONE),
+      DATE_TIME_FORMAT
+    );
   }
 
-  const isValid = dayjs(dateString, "DD/MM/YYYY HH:mm", true).isValid();
-  const result = isValid ? dateString : undefined;
-
-  return result;
 };
 
 export const toDateTimeValue = (
-  dateString: Date | string | null | undefined
-): Date | Dayjs | undefined => {
-  if (!dateString) {
-    return undefined;
-  }
-  const value = dayjs(dateString).utcOffset(0, true);
+  dateString: Date | string | number | null | undefined
+): Date | undefined => {
+  if (!dateString) return undefined;
+  const value = fromZonedTime(dateString, TIMEZONE);
   return value;
 };
 
