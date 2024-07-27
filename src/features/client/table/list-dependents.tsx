@@ -181,7 +181,7 @@ export default function Dependents() {
 
   return (
     <>
-      {client?.kinship == "Titular" && (
+      {client?.kinship === "Titular" && (
         <div className="text-right">
           <Button asChild>
             <Link to={pathNewClient}>

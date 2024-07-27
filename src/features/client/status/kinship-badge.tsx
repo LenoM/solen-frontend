@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 
 function KinshipBadge({ kinship = ''}) {
-  const isHolder = kinship == "Titular";
+  const isHolder = kinship === "Titular";
 
   return (
     <span tabIndex={0}>

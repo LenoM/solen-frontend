@@ -36,6 +36,8 @@ import useClient from "@/hooks/useClient";
 
 export function Clients() {
   const { cancelClient, reactivateClient } = useClient();
+  const [isOpenModalCancel, setIsOpenModalCancel] = useState(false);
+  const [isOpenModalReactivate, setIsOpenModalReactivate] = useState(false);
 
   const data = queryClient.getQueryData<ClientType[]>(["getClient"]) ?? [];
 
@@ -91,9 +93,6 @@ export function Clients() {
     {
       id: "actions",
       cell: ({ row }) => {
-        const [isOpenModalCancel, setIsOpenModalCancel] = useState(false);
-        const [isOpenModalReactivate, setIsOpenModalReactivate] =
-          useState(false);
         const newPath = `${window.origin}/client/${row.original.id}`;
 
         return (

@@ -58,7 +58,7 @@ type CancelInput = {
 export default function SignatureForm({ onSubmit }: CancelInput) {
   const { loading, getProducts, productsList } = useProduct();
 
-  const isLoading = loading || productsList.length == 0;
+  const isLoading = loading || productsList.length === 0;
 
   const form = useForm({
     resolver: yupResolver(signatureSchema),

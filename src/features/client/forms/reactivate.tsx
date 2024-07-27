@@ -52,7 +52,7 @@ export default function ReactivateForm({
 }: ReactivateInput) {
   const { loading, getFamily, clientsList } = useClient();
 
-  const isLoading = loading || clientsList.length == 0;
+  const isLoading = loading || clientsList.length === 0;
 
   const form = useForm({
     resolver: yupResolver(reactivateSchema),
