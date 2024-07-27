@@ -3,8 +3,8 @@ export const SERVER_ERROR_MESSAGE = "Erro interno ao acessar o recurso";
 export enum ErrorMessage {
   required = "Campo obrigatório",
   equals = "Escolha o valor correto",
-  min = "Digite o valor maior",
-  max = "Digite o valor menor",
+  min = "Digite um valor maior",
+  max = "Digite um valor menor",
   notEquals = "Senhas não conferem",
   invalidRG = "RG inválido",
   invalidCPF = "CPF inválido",
