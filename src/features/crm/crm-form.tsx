@@ -39,6 +39,7 @@ import {
   crmMotive,
   crmSubMotive,
   CrmType,
+  CLOSE_STATUS,
 } from "@/features/crm/crm-utils";
 import { toDateTimeString, toDateTimeValue } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
@@ -47,21 +48,33 @@ import { cn } from "@/lib/utils";
 
 export const crmBaseSchema = {
   id: number().default(0),
+  type: string(),
+  clientId: number(),
   creationDate: date(),
+  userId: string().optional(),
+  userIdForward: string().optional(),
+  collectStatusId: string().optional(),
   returnDate: string()
     .transform((value) => toDateTimeString(value))
     .required(ErrorMessage.invalidDate)
     .length(16, ErrorMessage.invalidDate),
   description: string().required(ErrorMessage.required),
-  userId: string(),
-  userIdForward: string(),
-  originId: number(),
-  statusId: number(),
-  motiveId: number(),
-  subMotiveId: number(),
-  collectStatusId: string().optional(),
-  clientId: number(),
-  type: string(),
+  originId: string()
+    .transform((value) => (Number.isNaN(value) ? null : value))
+    .required(ErrorMessage.required)
+    .min(1, ErrorMessage.min),
+  statusId: string()
+    .transform((value) => (Number.isNaN(value) ? null : value))
+    .required(ErrorMessage.required)
+    .min(1, ErrorMessage.equals),
+  motiveId: string()
+    .transform((value) => (Number.isNaN(value) ? null : value))
+    .required(ErrorMessage.required)
+    .min(1, ErrorMessage.equals),
+  subMotiveId: string()
+    .transform((value) => (Number.isNaN(value) ? null : value))
+    .required(ErrorMessage.required)
+    .min(1, ErrorMessage.equals),
 };
 
 const crmHistorySchema = object().shape({
@@ -76,11 +89,11 @@ export const loadCrmData = (data?: CrmHistoryType): CrmHistoryType => {
     creationDate: data?.creationDate || undefined,
     returnDate: data?.returnDate || "",
     description: data?.description || "",
-    userId: data?.userId || undefined,
-    userIdForward: data?.userIdForward || undefined,
-    statusId: data?.statusId || undefined,
-    motiveId: data?.motiveId || undefined,
-    subMotiveId: data?.subMotiveId || undefined,
+    userIdForward: data?.userIdForward || "",
+    statusId: data?.statusId || CLOSE_STATUS.toString(),
+    originId: data?.originId || "",
+    motiveId: data?.motiveId || "",
+    subMotiveId: data?.subMotiveId || "",
     collectStatusId: data?.collectStatusId || "",
     clientId: data?.clientId || undefined,
     type: CrmType.Service,
@@ -104,8 +117,6 @@ export default function CrmForm({
     resolver: yupResolver(crmHistorySchema),
     values: loadCrmData(data),
   });
-
-  console.log("form", form.control);
 
   const handleSubmit = () => {
     onSubmit(form.getValues());

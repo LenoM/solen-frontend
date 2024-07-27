@@ -66,7 +66,7 @@ const crmHistorySchema = object().shape({
 
 export type CollectHistoryType = InferType<typeof crmHistorySchema>;
 
-export const loadCrmData = (data?: CollectHistoryType | CrmHistoryType): CollectHistoryType => {
+export const loadCollectionData = (data?: CollectHistoryType | CrmHistoryType): CollectHistoryType => {
   return {
     id: data?.id || 0,
     returnDate: data?.returnDate || "",
@@ -92,7 +92,7 @@ export default function CrmCollectForm({
 
   const form = useForm({
     resolver: yupResolver(crmHistorySchema),
-    values: loadCrmData(data),
+    values: loadCollectionData(data),
   });
 
   const handleSubmit = () => {
