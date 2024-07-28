@@ -53,20 +53,20 @@ export const crmBaseSchema = {
   creationDate: date(),
   userId: string().optional(),
   userIdForward: string().optional(),
-  collectStatusId: string().optional(),
-  returnDate: string()
-    .transform((value) => toDateTimeString(value))
-    .required(ErrorMessage.invalidDate)
-    .length(16, ErrorMessage.invalidDate),
   description: string().required(ErrorMessage.required),
-  originId: string()
-    .transform((value) => (Number.isNaN(value) ? null : value))
-    .required(ErrorMessage.required)
-    .min(1, ErrorMessage.min),
+};
+
+export const crmAditionalSchema = {
+  collectStatusId: string().optional(),
+  returnDate: string().transform((value) => toDateTimeString(value)),
   statusId: string()
     .transform((value) => (Number.isNaN(value) ? null : value))
     .required(ErrorMessage.required)
     .min(1, ErrorMessage.equals),
+  originId: string()
+    .transform((value) => (Number.isNaN(value) ? null : value))
+    .required(ErrorMessage.required)
+    .min(1, ErrorMessage.min),
   motiveId: string()
     .transform((value) => (Number.isNaN(value) ? null : value))
     .required(ErrorMessage.required)
@@ -77,8 +77,9 @@ export const crmBaseSchema = {
     .min(1, ErrorMessage.equals),
 };
 
-const crmHistorySchema = object().shape({
+export const crmHistorySchema = object().shape({
   ...crmBaseSchema,
+  ...crmAditionalSchema,
 });
 
 export type CrmHistoryType = InferType<typeof crmHistorySchema>;
@@ -87,7 +88,7 @@ export const loadCrmData = (data?: CrmHistoryType): CrmHistoryType => {
   return {
     id: data?.id || 0,
     creationDate: data?.creationDate || undefined,
-    returnDate: data?.returnDate || "",
+    returnDate: data?.returnDate || undefined,
     description: data?.description || "",
     userIdForward: data?.userIdForward || "",
     statusId: data?.statusId || CLOSE_STATUS.toString(),

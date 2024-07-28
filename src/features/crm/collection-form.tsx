@@ -1,4 +1,4 @@
-import { date, number, object, InferType, string } from "yup";
+import { number, object, InferType, string } from "yup";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -33,27 +33,26 @@ import { Button } from "@/components/ui/button";
 import { TimePickerDemo } from "@/components/input/time-picker/time-picker";
 import { LoadingSpinner } from "@/components/spinner";
 
-import { CLOSE_STATUS, CrmType, crmCollectStatus } from "@/features/crm/crm-utils";
 import {
-  toDateTimeString,
-  toDateTimeValue,
-} from "@/utils/format-utils";
+  CLOSE_STATUS,
+  CrmType,
+  crmCollectStatus,
+} from "@/features/crm/crm-utils";
+import { toDateTimeString, toDateTimeValue } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
 import { Entity } from "@/utils/utils";
 import { cn } from "@/lib/utils";
-import { CrmHistoryType } from "./crm-form";
+import { CrmHistoryType, crmBaseSchema } from "./crm-form";
 
-export const crmBaseSchema = {
-  id: number().default(0),
-  creationDate: date(),
-  type: string(),
+const crmAditionalSchema = {
   statusId: number(),
-  clientId: number(),
+  originId: string().optional(),
+  motiveId: string().optional(),
+  subMotiveId: string().optional(),
   returnDate: string()
     .transform((value) => toDateTimeString(value))
     .required(ErrorMessage.invalidDate)
     .length(16, ErrorMessage.invalidDate),
-  description: string().required(ErrorMessage.required),
   collectStatusId: string()
     .transform((value) => (Number.isNaN(value) ? null : value))
     .required(ErrorMessage.required)
@@ -62,11 +61,14 @@ export const crmBaseSchema = {
 
 const crmHistorySchema = object().shape({
   ...crmBaseSchema,
+  ...crmAditionalSchema,
 });
 
 export type CollectHistoryType = InferType<typeof crmHistorySchema>;
 
-export const loadCollectionData = (data?: CollectHistoryType | CrmHistoryType): CollectHistoryType => {
+export const loadCollectionData = (
+  data?: CollectHistoryType | CrmHistoryType
+): CollectHistoryType => {
   return {
     id: data?.id || 0,
     returnDate: data?.returnDate || "",

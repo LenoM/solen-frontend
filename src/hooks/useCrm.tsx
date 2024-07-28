@@ -34,6 +34,58 @@ export default function useCrm() {
     setLoading(false);
   };
 
+  const updateCollect = async (data: CollectHistoryType | CrmHistoryType) => {
+    setLoading(true);
+
+    const {
+      id,
+      clientId,
+      statusId,
+      returnDate,
+      description,
+      type,
+      originId,
+      motiveId,
+      subMotiveId,
+      collectStatusId,
+    } = data;
+
+    const url = `crm/${id}`;
+
+    const body: BodyInit = JSON.stringify({
+      id,
+      clientId,
+      type,
+      returnDate,
+      description,
+      statusId: Number(statusId),
+      originId: Number(originId) ?? null,
+      motiveId: Number(motiveId) ?? null,
+      subMotiveId: Number(subMotiveId) ?? null,
+      collectStatusId: Number(collectStatusId) ?? null,
+    });
+
+    const response = await fetcher.put<CrmHistoryType>(url, body);
+
+    if (response) {
+      queryClient.setQueryData(
+        ["getClientById", { clientId }],
+        (prev: ClientType) => {
+          prev.crmHistory = prev?.crmHistory
+            ?.filter((d) => d.id !== response.id)
+            .concat(response);
+          return prev;
+        }
+      );
+
+      toast.success("Atendimento salvo", {
+        description: `O histórico de tendimento #${response.id} foi salvo`,
+      });
+    }
+
+    setLoading(false);
+  };
+
   const createCrm = async (data: CrmHistoryType) => {
     setLoading(true);
 
@@ -82,6 +134,7 @@ export default function useCrm() {
   return {
     loading,
     getNextCall,
+    updateCollect,
     createCrm,
   };
 }
