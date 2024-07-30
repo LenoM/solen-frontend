@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CalendarIcon, MinusCircle, PlusCircle, Trash } from "lucide-react";
 import { object, string, number, date, boolean, InferType, array } from "yup";
@@ -122,6 +122,13 @@ export default function InvoiceForm() {
   useMemo(async () => await getClients(), []);
   useMemo(async () => await getInvoice(Number(invoiceId)), [invoiceId]);
 
+  const onTotalSum = useCallback(() => {
+    if (data.length > 0) {
+      const total = data.reduce((total, ite) => total + Number(ite.price), 0);
+      setTotalPrice(total);
+    }
+  }, [data]);
+
   const form = useForm({
     resolver: yupResolver(invoiceSchema),
     values: loadInvoiceData(currentData),
@@ -146,10 +153,7 @@ export default function InvoiceForm() {
   }, [currentData]);
 
   useEffect(() => {
-    if (data.length > 0) {
-      const total = data.reduce((total, ite) => total + Number(ite.price), 0);
-      setTotalPrice(total);
-    }
+    onTotalSum();
   }, [data]);
 
   const onSubmit = async () => {
@@ -176,7 +180,7 @@ export default function InvoiceForm() {
     });
   };
 
-  const InvoiceAction = () => {
+  const InvoiceAction = memo(() => {
     return (
       <div className="flex place-content-end gap-2 mb-3 mt-12">
         <Dialog>
@@ -221,15 +225,15 @@ export default function InvoiceForm() {
         </Dialog>
       </div>
     );
-  };
+  });
 
-  const InvoiceTotal = () => {
+  const InvoiceTotal = memo(() => {
     return (
       <div className="flex flex-col mt-2 mb-2 text-right">
         <span className="font-black">Total: {toMoneyString(totalPrice)}</span>
       </div>
     );
-  };
+  });
 
   const columns: ColumnDef<InvoiceItemType>[] = [
     {
