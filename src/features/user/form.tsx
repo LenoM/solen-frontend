@@ -140,6 +140,7 @@ export default function UserForm() {
                       checked={field.value}
                       value={field.value?.toString()}
                       onCheckedChange={field.onChange}
+                      aria-label="is active"
                     />
                   </FormControl>
                 </FormItem>
@@ -168,6 +169,7 @@ export default function UserForm() {
                         checked={field.value}
                         value={field.value?.toString()}
                         onCheckedChange={field.onChange}
+                        aria-label="password will be change"
                       />
                     </FormControl>
                   </FormItem>

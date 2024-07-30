@@ -115,7 +115,7 @@ export default function InvoiceParam() {
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="category">
                             <SelectValue placeholder="Escolha a categoria" />
                           </SelectTrigger>
                         </FormControl>
@@ -154,7 +154,7 @@ export default function InvoiceParam() {
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="company">
                             <SelectValue placeholder="Escolha a empresa" />
                           </SelectTrigger>
                         </FormControl>
@@ -192,7 +192,7 @@ export default function InvoiceParam() {
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="product">
                             <SelectValue placeholder="Escolha o produto" />
                           </SelectTrigger>
                         </FormControl>
@@ -231,7 +231,7 @@ export default function InvoiceParam() {
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="bank">
                             <SelectValue placeholder="Escolha o banco" />
                           </SelectTrigger>
                         </FormControl>

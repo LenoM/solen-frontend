@@ -152,7 +152,7 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
                     onValueChange={onChange}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="billing method">
                         <SelectValue placeholder="Escolha o tipo" />
                       </SelectTrigger>
                     </FormControl>
@@ -186,7 +186,7 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
                       onValueChange={onChange}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger aria-label="supplier">
                           <SelectValue placeholder="Escolha o fornecedor" />
                         </SelectTrigger>
                       </FormControl>
@@ -224,6 +224,7 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
                       name="isActive"
                       onCheckedChange={onChange}
                       checked={value}
+                      aria-label="is active"
                     />
                   </FormControl>
                 </FormItem>

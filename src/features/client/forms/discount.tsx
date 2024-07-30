@@ -207,7 +207,7 @@ export default function DiscountForm({ onSubmit }: CancelInput) {
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="gender">
                             <SelectValue placeholder="Escolha o produto" />
                           </SelectTrigger>
                         </FormControl>
@@ -240,7 +240,7 @@ export default function DiscountForm({ onSubmit }: CancelInput) {
                     <FormLabel>Tipo de desconto</FormLabel>
                     <Select value={value?.toString()} onValueChange={onChange}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger aria-label="discount type">
                           <SelectValue placeholder="Tipo de desconto" />
                         </SelectTrigger>
                       </FormControl>

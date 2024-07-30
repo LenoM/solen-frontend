@@ -188,7 +188,7 @@ export default function SignatureForm({ onSubmit }: CancelInput) {
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="product">
                             <SelectValue placeholder="Escolha o produto" />
                           </SelectTrigger>
                         </FormControl>

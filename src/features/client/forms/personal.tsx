@@ -307,7 +307,7 @@ export default function Personal() {
                             value={field.value.toString()}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger aria-label="gender">
                                 <SelectValue placeholder="Escolha o gênero" />
                               </SelectTrigger>
                             </FormControl>
@@ -392,7 +392,11 @@ export default function Personal() {
                         </FormDescription>
                       </div>
                       <FormControl>
-                        <Switch onCheckedChange={onChange} checked={value} />
+                        <Switch
+                          aria-label="set as holder"
+                          onCheckedChange={onChange}
+                          checked={value}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -413,7 +417,7 @@ export default function Personal() {
                             onValueChange={onChange}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger aria-label="category">
                                 <SelectValue placeholder="Escolha a categoria" />
                               </SelectTrigger>
                             </FormControl>
@@ -448,7 +452,7 @@ export default function Personal() {
                             onValueChange={onChange}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger aria-label="company">
                                 <SelectValue placeholder="Escolha a empresa" />
                               </SelectTrigger>
                             </FormControl>
@@ -488,7 +492,7 @@ export default function Personal() {
                             onValueChange={onChange}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger aria-label="holder">
                                 <SelectValue placeholder="Escolha o titular" />
                               </SelectTrigger>
                             </FormControl>
@@ -525,7 +529,7 @@ export default function Personal() {
                                 onValueChange={field.onChange}
                               >
                                 <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger aria-label="kinship">
                                     <SelectValue placeholder="Escolha o parentesco" />
                                   </SelectTrigger>
                                 </FormControl>

@@ -122,7 +122,7 @@ export default function CrmCollectForm({
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="collect status">
                             <SelectValue placeholder="Escolha o status" />
                           </SelectTrigger>
                         </FormControl>

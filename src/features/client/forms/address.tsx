@@ -228,7 +228,7 @@ export default function AddressForm({
                           onValueChange={(value) => onChangeState(value)}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger aria-label="state">
                               <SelectValue placeholder="Escolha o estado" />
                             </SelectTrigger>
                           </FormControl>
@@ -268,7 +268,7 @@ export default function AddressForm({
                           onValueChange={(value) => onChangeCity(value)}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger aria-label="city">
                               <SelectValue placeholder="Escolha a cidade" />
                             </SelectTrigger>
                           </FormControl>
@@ -304,7 +304,7 @@ export default function AddressForm({
                           onValueChange={(value) => onChangeDistrict(value)}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger aria-label="district">
                               <SelectValue placeholder="Escolha o bairro" />
                             </SelectTrigger>
                           </FormControl>
@@ -343,7 +343,7 @@ export default function AddressForm({
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger aria-label="address category">
                               <SelectValue placeholder="Escolha a categoria" />
                             </SelectTrigger>
                           </FormControl>
@@ -377,7 +377,7 @@ export default function AddressForm({
                           defaultValue={field.value?.toString()}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger aria-label="address type">
                               <SelectValue placeholder="Escolha o tipo" />
                             </SelectTrigger>
                           </FormControl>

@@ -143,7 +143,7 @@ export default function ContactForm({ data, onSubmit }: ContactFormProps) {
                       onValueChange={(value) => onChangeType(value)}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger aria-label="contact type">
                           <SelectValue placeholder="Escolha o tipo" />
                         </SelectTrigger>
                       </FormControl>

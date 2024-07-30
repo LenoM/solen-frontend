@@ -144,7 +144,7 @@ export default function CrmForm({
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="origin">
                             <SelectValue placeholder="Escolha a origem" />
                           </SelectTrigger>
                         </FormControl>
@@ -182,7 +182,7 @@ export default function CrmForm({
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="status">
                             <SelectValue placeholder="Escolha o status" />
                           </SelectTrigger>
                         </FormControl>
@@ -220,7 +220,7 @@ export default function CrmForm({
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="motive">
                             <SelectValue placeholder="Escolha o motivo" />
                           </SelectTrigger>
                         </FormControl>
@@ -258,7 +258,7 @@ export default function CrmForm({
                         onValueChange={onChange}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="sub motive">
                             <SelectValue placeholder="Escolha o sub motivo" />
                           </SelectTrigger>
                         </FormControl>

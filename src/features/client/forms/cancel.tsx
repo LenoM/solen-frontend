@@ -126,7 +126,7 @@ export default function CancelForm({ referenceId, onSubmit }: CancelInput) {
                   <FormLabel>Motivo</FormLabel>
                   <Select value={value} onValueChange={onChange}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="reason">
                         <SelectValue placeholder="Escolha o motivo" />
                       </SelectTrigger>
                     </FormControl>

@@ -333,7 +333,7 @@ export default function InvoiceForm() {
                           onValueChange={onChange}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger aria-label="client">
                               <SelectValue placeholder="Escolha o titular" />
                             </SelectTrigger>
                           </FormControl>

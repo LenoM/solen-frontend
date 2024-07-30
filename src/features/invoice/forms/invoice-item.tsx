@@ -146,7 +146,7 @@ export default function InvoiceItemForm({
                             onValueChange={onChange}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger aria-label="client">
                                 <SelectValue placeholder="Escolha o titular" />
                               </SelectTrigger>
                             </FormControl>
@@ -181,7 +181,7 @@ export default function InvoiceItemForm({
                             onValueChange={onChange}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger aria-label="product">
                                 <SelectValue placeholder="Escolha o produto" />
                               </SelectTrigger>
                             </FormControl>
@@ -217,7 +217,7 @@ export default function InvoiceItemForm({
                               onValueChange={onChange}
                             >
                               <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger aria-label="discount type">
                                   <SelectValue placeholder="Tipo de desconto" />
                                 </SelectTrigger>
                               </FormControl>
