@@ -1,7 +1,7 @@
 import { object, string, number, array, boolean, InferType } from "yup";
 
 import { contactBaseSchema } from "@/features/client/forms/contact";
-import { addressOutputBaseSchema } from "@/features/client/forms/address";
+import { addressBaseSchema } from "@/features/client/forms/address";
 import { clientHistoryBaseSchema } from "@/features/client/table/list-history";
 import { crmAditionalSchema, crmBaseSchema } from "@/features/crm/crm-form";
 import { invoiceBaseSchema } from "@/features/invoice/forms/invoice";
@@ -110,7 +110,7 @@ export const clientSchema = object().shape({
   ),
   address: array(
     object().shape({
-      ...addressOutputBaseSchema,
+      ...addressBaseSchema,
     })
   ),
   contacts: array(

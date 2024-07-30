@@ -1,7 +1,8 @@
 import { toast } from "sonner";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-import type { ClientType } from "@/features/client/client-schema";
+import type { AddressDataType } from "@/features/client/forms/address";
 import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
 
@@ -34,30 +35,32 @@ export default function useAddress() {
 
     const url = `address/${input}`;
 
-    const response = await fetcher.get(url);
+    const response = await fetcher.get<AddressDataType[]>(url);
 
-    if (response.length > 0) {
-      const { district } = response[0];
-      const { city } = district;
-      const { state } = city;
+    if (response && response.length > 0) {
+      const { districtId, cityId, stateId } = response[0];
 
-      setCurrentState(state.id);
+      if (cityId && stateId && districtId) {
+        /*** Set State */
+        setCurrentState(stateId);
 
-      /*** Set City */
-      const hasCity = cityList.filter((el) => el.cityId === city.id).length;
-      if (cityList.length === 0 || !hasCity) {
-        await getCity(state.id);
-        setCurrentCity(city.id);
-      }
+        /*** Set City */
+        const hasCity = cityList.filter((el) => el.cityId === cityId).length;
 
-      /*** Set District */
-      const hasDistrict = districtList.filter(
-        (el) => el.id === district.id
-      ).length;
+        if (cityList.length === 0 || !hasCity) {
+          await getCity(stateId);
+          setCurrentCity(cityId);
+        }
 
-      if (districtList.length === 0 || !hasDistrict) {
-        await getDistrict(city.id);
-        setCurrentDistrict(district.id);
+        /*** Set District */
+        const hasDistrict = districtList.filter(
+          (el) => el.id === districtId
+        ).length;
+
+        if (districtList.length === 0 || !hasDistrict) {
+          await getDistrict(cityId);
+          setCurrentDistrict(districtId);
+        }
       }
     }
 
@@ -67,7 +70,7 @@ export default function useAddress() {
   const getAddressType = async () => {
     setLoading(true);
 
-    const response = await fetcher.get("address-type");
+    const response = await fetcher.get<AddressAttr[]>("address-type");
 
     if (response) {
       setAddressTypeList(response);
@@ -79,7 +82,7 @@ export default function useAddress() {
   const getStates = async () => {
     setLoading(true);
 
-    const response = await fetcher.get("states");
+    const response = await fetcher.get<AddressAttr[]>("states");
 
     if (response) {
       setStateList(response);
@@ -93,7 +96,7 @@ export default function useAddress() {
 
     const url = `state/${stateId}/city`;
 
-    const response = await fetcher.get(url);
+    const response = await fetcher.get<AddressAttr[]>(url);
 
     if (response) {
       setCityList(response);
@@ -107,7 +110,7 @@ export default function useAddress() {
 
     const url = `city/${cityId}/district`;
 
-    const response = await fetcher.get(url);
+    const response = await fetcher.get<AddressAttr[]>(url);
 
     if (response) {
       setDistrictList(response);
@@ -127,8 +130,8 @@ export default function useAddress() {
       number,
       complement,
       addressCategory,
-      addressType,
-      district,
+      addressTypeId,
+      districtId,
     } = data;
 
     const body: BodyInit = JSON.stringify({
@@ -137,18 +140,18 @@ export default function useAddress() {
       number: Number(number),
       complement,
       addressCategory,
-      addressTypeId: Number(addressType),
-      districtId: district,
+      addressTypeId: Number(addressTypeId),
+      districtId: districtId,
     });
 
-    const response = await fetcher.post(url, body);
+    const response = await fetcher.post<AddressDataType>(url, body);
 
     if (response) {
       queryClient.setQueryData(
-        ["getClientById", { clientId }],
-        (prev: ClientType) => {
-          if (prev && prev.address) {
-            return { ...prev, address: [...prev.address, response] };
+        ["getAddressByClient", { clientId }],
+        (prev: AddressDataType[]) => {
+          if (prev) {
+            return [...prev, response];
           }
         }
       );
@@ -171,8 +174,8 @@ export default function useAddress() {
       number,
       complement,
       addressCategory,
-      addressType,
-      district,
+      addressTypeId,
+      districtId,
     } = data;
 
     const url = `client/${clientId}/address/${id}`;
@@ -183,28 +186,28 @@ export default function useAddress() {
       number: Number(number),
       complement,
       addressCategory,
-      addressTypeId: Number(addressType),
-      districtId: district,
+      addressTypeId: Number(addressTypeId),
+      districtId: districtId,
     });
 
-    const response = await fetcher.put(url, body);
+    const response = await fetcher.put<AddressDataType>(url, body);
 
     if (response) {
       queryClient.setQueryData(
-        ["getClientById", { clientId }],
-        (prev: ClientType) => {
-          if (prev && prev?.address) {
-            const addrIndex = prev.address.findIndex(
+        ["getAddressByClient", { clientId }],
+        (prev: AddressDataType[]) => {
+          if (prev) {
+            const addrIndex = prev.findIndex(
               (adr) => Number(adr.id) === response.id
             );
 
             const newAddr = [
-              ...prev.address.slice(0, addrIndex),
+              ...prev.slice(0, addrIndex),
               response,
-              ...prev.address.slice(addrIndex + 1),
+              ...prev.slice(addrIndex + 1),
             ];
 
-            return { ...prev, address: newAddr };
+            return newAddr;
           }
         }
       );
@@ -222,14 +225,13 @@ export default function useAddress() {
 
     const url = `client/${clientId}/address/${addressId}`;
 
-    const response = await fetcher.del(url);
+    const response = await fetcher.del<AddressDataType>(url);
 
     if (response) {
       queryClient.setQueryData(
-        ["getClientById", { clientId }],
-        (prev: ClientType) => {
-          prev.address = prev?.address?.filter((d) => d.id !== response.id);
-          return prev;
+        ["getAddressByClient", { clientId }],
+        (prev: AddressDataType[]) => {
+          return prev?.filter((d) => d.id !== response.id);
         }
       );
 
@@ -239,6 +241,31 @@ export default function useAddress() {
     }
 
     setLoading(false);
+  };
+
+  const getAddressByClient = (clientId: number) => {
+    return useQuery<AddressDataType[]>({
+      queryKey: ["getAddressByClient", { clientId }],
+      queryFn: () => retriveAddressByClient(clientId),
+      refetchOnMount: false,
+    });
+  };
+
+  const retriveAddressByClient = async (clientId: number) => {
+    setLoading(true);
+
+    if (!isNaN(clientId)) {
+      const url = `client/${clientId}/address`;
+      const response = await fetcher.get<AddressDataType[]>(url);
+
+      if (response) {
+        setLoading(false);
+        return response;
+      }
+    }
+
+    setLoading(false);
+    return [];
   };
 
   return {
@@ -257,6 +284,7 @@ export default function useAddress() {
     currentDistrict,
     setCurrentState,
     setCurrentCity,
+    getAddressByClient,
     setCurrentDistrict,
     createAddress,
     updateAddress,

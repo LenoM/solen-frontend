@@ -21,65 +21,14 @@ import type { AddressDataType } from "@/features/client/forms/address";
 import { normalizeCepNumber } from "@/utils/format-utils";
 import { DataTable } from "@/components/dataTable";
 import useAddress from "@/hooks/useAddress";
-import useClient from "@/hooks/useClient";
 
-type AddressType = {
-  id: string;
-  abbreviation: string;
-};
-
-type District = {
-  id: string;
-  city: City;
-  abbreviation: string;
-};
-
-type State = {
-  id: string;
-  abbreviation: string;
-};
-
-type City = {
-  id: string;
-  abbreviation: string;
-  state: State;
-};
-
-type AddressCustomType = {
-  id: number;
-  address: string;
-  addressType: AddressType;
-  addressCategory: string;
-  district: District;
-  city: City;
-  state: State;
-  cep: string;
-  number: number;
-  complement: string;
-};
-
-const formatAddress = (data: AddressCustomType) => {
+const formatAddress = (data: AddressDataType) => {
   return (
-    data.addressType.abbreviation +
+    data.addressType?.abbreviation +
     `. ${data.address}` +
     (data.number ? `, ${data.number}` : "") +
     (data.complement ? `, ${data.complement}` : "")
   );
-};
-
-const editAddress = (data: AddressCustomType): AddressDataType => {
-  return {
-    id: data.id,
-    cep: data.cep,
-    city: data.district.city.id,
-    state: data.district.city.state.id,
-    district: data.district.id,
-    address: data.address,
-    number: data.number,
-    complement: data.complement,
-    addressType: data.addressType.id,
-    addressCategory: data.addressCategory,
-  };
 };
 
 interface AddressFormProps {
@@ -121,48 +70,40 @@ const AddressDialog = ({ title, children, formData }: AddressFormProps) => {
 
 export default function Address() {
   const { clientId } = useParams();
-  const { getClientByid } = useClient();
-  const { data: client } = getClientByid(Number(clientId));
-  const { deleteAddress } = useAddress();
-
-  // TODO: refactore
-  const clientAddress = client?.address
-    ? (client.address as unknown as AddressCustomType[])
-    : [];
+  const { deleteAddress, getAddressByClient } = useAddress();
+  const { data: address } = getAddressByClient(Number(clientId));
 
   const handlerDelete = async (clientId: number, addressId: number) => {
     await deleteAddress(clientId, addressId);
   };
 
-  const columns: ColumnDef<AddressCustomType>[] = [
+  const columns: ColumnDef<AddressDataType>[] = [
     {
       accessorKey: "address",
       header: "Endereço",
-      accessorFn: (data: AddressCustomType) =>
-        formatAddress(data).toUpperCase(),
+      accessorFn: (data: AddressDataType) => formatAddress(data).toUpperCase(),
     },
     {
       accessorKey: "district",
       header: "Bairro",
-      accessorFn: (data: AddressCustomType) =>
-        data.district.abbreviation.toUpperCase(),
+      accessorFn: (data: AddressDataType) =>
+        data?.district?.abbreviation.toUpperCase(),
     },
     {
       accessorKey: "city",
       header: "Cidade",
-      accessorFn: (data: AddressCustomType) =>
-        data.district.city.abbreviation.toUpperCase(),
+      accessorFn: (data: AddressDataType) =>
+        data?.city?.abbreviation.toUpperCase(),
     },
     {
       accessorKey: "state",
       header: "UF",
-      accessorFn: (data: AddressCustomType) =>
-        data.district.city.state.abbreviation,
+      accessorFn: (data: AddressDataType) => data?.state?.abbreviation,
     },
     {
       accessorKey: "cep",
       header: "CEP",
-      accessorFn: (data: AddressCustomType) => normalizeCepNumber(data.cep),
+      accessorFn: (data: AddressDataType) => normalizeCepNumber(data.cep),
     },
     {
       id: "actions",
@@ -171,7 +112,7 @@ export default function Address() {
           <>
             <AddressDialog
               title="Editar endereço"
-              formData={editAddress(row.original)}
+              formData={loadAddressData(row.original)}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Edit</span>
@@ -201,7 +142,7 @@ export default function Address() {
                   </DialogClose>
                   <Button
                     onClick={() =>
-                      handlerDelete(Number(clientId), row.original.id)
+                      handlerDelete(Number(clientId), Number(row.original.id))
                     }
                     type="submit"
                     variant="destructive"
@@ -229,7 +170,7 @@ export default function Address() {
         </AddressDialog>
       </div>
 
-      {client?.address && <DataTable columns={columns} data={clientAddress} />}
+      {address && <DataTable columns={columns} data={address} />}
     </>
   );
 }

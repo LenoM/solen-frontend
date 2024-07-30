@@ -28,48 +28,47 @@ import { normalizeCepNumber } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
 import useAddress from "@/hooks/useAddress";
 
+const emptyEntity = { id: "", abbreviation: "", description: "" };
+
 export const loadAddressData = (data?: AddressDataType) => {
   return {
     id: data?.id || 0,
     cep: data?.cep || "",
-    state: data?.state || "",
-    city: data?.city || "",
-    district: data?.district || "",
+    stateId: data?.stateId || "",
+    cityId: data?.cityId || "",
+    districtId: data?.districtId || "",
     address: data?.address || "",
     number: data?.number || 0,
     complement: data?.complement || "",
-    addressType: data?.addressType || "",
+    addressTypeId: data?.addressTypeId || undefined,
     addressCategory: data?.addressCategory || "",
+    city: data?.city || emptyEntity,
+    state: data?.state || emptyEntity,
+    district: data?.district || emptyEntity,
+    addressType: data?.addressType || emptyEntity,
   };
 };
 
 const addressEntitySchema = {
-  id: string(),
-  abbreviation: string().required(ErrorMessage.required),
+  id: string().optional().default(null),
+  abbreviation: string().optional().default(null),
 };
 
-export const addressOutputSchema = {
-  id: number(),
+export const addressBaseSchema = {
+  id: number().optional(),
   cep: string().required(ErrorMessage.required),
+  districtId: string(),
+  stateId: string(),
+  cityId: string(),
+  address: string().required(ErrorMessage.required),
+  number: number().min(0, ErrorMessage.min).required(ErrorMessage.required),
+  complement: string(),
+  addressTypeId: number(),
+  addressCategory: string().nullable().required(ErrorMessage.required),
+  city: object().shape({ ...addressEntitySchema }),
+  state: object().shape({ ...addressEntitySchema }),
   district: object().shape({ ...addressEntitySchema }),
-  address: string().required(ErrorMessage.required),
-  number: number().min(0, ErrorMessage.min).required(ErrorMessage.required),
-  complement: string(),
   addressType: object().shape({ ...addressEntitySchema }),
-  addressCategory: string().nullable().required(ErrorMessage.required),
-};
-
-const addressBaseSchema = {
-  id: number(),
-  cep: string().required(ErrorMessage.required),
-  city: string().nullable().required(ErrorMessage.required),
-  state: string().nullable().required(ErrorMessage.required),
-  district: string().nullable().required(ErrorMessage.required),
-  address: string().required(ErrorMessage.required),
-  number: number().min(0, ErrorMessage.min).required(ErrorMessage.required),
-  complement: string(),
-  addressType: string().nullable().required(ErrorMessage.required),
-  addressCategory: string().nullable().required(ErrorMessage.required),
 };
 
 const addressSchema = object().shape({
@@ -127,28 +126,28 @@ export default function AddressForm({
   }, [data]);
 
   useEffect(() => {
-    form.setValue("state", currentState);
+    form.setValue("stateId", currentState);
   }, [currentState]);
 
   useEffect(() => {
-    form.setValue("city", currentCity);
+    form.setValue("cityId", currentCity);
   }, [currentCity]);
 
   useEffect(() => {
-    form.setValue("district", currentDistrict);
+    form.setValue("districtId", currentDistrict);
   }, [currentDistrict]);
 
   const loadInitialData = (data: AddressDataType) => {
-    if (data.state) {
-      onChangeState(data.state);
+    if (data.stateId) {
+      onChangeState(data.stateId);
     }
 
-    if (data.city) {
-      onChangeCity(data.city);
+    if (data.cityId) {
+      onChangeCity(data.cityId);
     }
 
-    if (data.district) {
-      onChangeDistrict(data.district);
+    if (data.districtId) {
+      onChangeDistrict(data.districtId);
     }
   };
 
@@ -218,14 +217,14 @@ export default function AddressForm({
 
                 <div className="flex flex-col">
                   <FormField
-                    name="state"
+                    name="stateId"
                     control={form.control}
                     render={() => (
                       <FormItem>
                         <FormLabel>Estado</FormLabel>
                         <Select
-                          value={form.getValues("state")}
-                          defaultValue={form.getValues("state")}
+                          value={form.getValues("stateId")}
+                          defaultValue={form.getValues("stateId")}
                           onValueChange={(value) => onChangeState(value)}
                         >
                           <FormControl>
@@ -258,14 +257,14 @@ export default function AddressForm({
               <div className="grid md:grid-cols-2 xl:grid-cols-2 xs:grid-cols-1 gap-2">
                 <div className="flex flex-col">
                   <FormField
-                    name="city"
+                    name="cityId"
                     control={form.control}
                     render={() => (
                       <FormItem>
                         <FormLabel>Cidade</FormLabel>
                         <Select
-                          value={form.getValues("city")}
-                          defaultValue={form.getValues("city")}
+                          value={form.getValues("cityId")}
+                          defaultValue={form.getValues("cityId")}
                           onValueChange={(value) => onChangeCity(value)}
                         >
                           <FormControl>
@@ -295,13 +294,13 @@ export default function AddressForm({
                 <div className="flex flex-col">
                   <FormField
                     control={form.control}
-                    name="district"
+                    name="districtId"
                     render={() => (
                       <FormItem>
                         <FormLabel>Bairro</FormLabel>
                         <Select
-                          value={form.getValues("district")}
-                          defaultValue={form.getValues("district")}
+                          value={form.getValues("districtId")}
+                          defaultValue={form.getValues("districtId")}
                           onValueChange={(value) => onChangeDistrict(value)}
                         >
                           <FormControl>
@@ -369,13 +368,13 @@ export default function AddressForm({
                 <div className="flex flex-col">
                   <FormField
                     control={form.control}
-                    name="addressType"
+                    name="addressTypeId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo de endereço</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          defaultValue={field.value.toString()}
+                          defaultValue={field.value?.toString()}
                         >
                           <FormControl>
                             <SelectTrigger>
