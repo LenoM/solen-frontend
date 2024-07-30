@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import type { InvoiceFilterType } from "@/features/invoice/forms/filter";
 import type { BatchFilterType } from "@/features/batch-generator/form";
-import type { BatchGeneratorType } from "@/features/batch-generator";
+import type { BatchType } from "@/features/batch-generator";
 import type { InvoiceType } from "@/features/invoice/forms/invoice";
 import { loadInvoiceData } from "@/features/invoice/forms/invoice";
 import { toDateString } from "@/utils/format-utils";
@@ -15,7 +15,7 @@ export default function useInvoice() {
   const fetcher = useFetcher();
   const [loading, setLoading] = useState(false);
   const [currentData, setCurrentData] = useState<InvoiceType>();
-  const [batchList, setBatchList] = useState<BatchGeneratorType[]>([]);
+  const [batchList, setBatchList] = useState<BatchType[]>([]);
 
   const getInvoices = (filter: InvoiceFilterType) => {
     return useQuery<InvoiceType[]>({
@@ -91,7 +91,7 @@ export default function useInvoice() {
     setLoading(true);
 
     const url = `invoice/batch`;
-    const response = await fetcher.get<BatchGeneratorType[]>(url);
+    const response = await fetcher.get<BatchType[]>(url);
 
     if (response) {
       setBatchList(response);
@@ -144,7 +144,7 @@ export default function useInvoice() {
     const url = "invoice/all";
     const body: BodyInit = JSON.stringify(data);
 
-    const response = await fetcher.post<BatchGeneratorType>(url, body);
+    const response = await fetcher.post<BatchType>(url, body);
 
     if (response) {
       toast.success("Lote adicionado com sucesso", {

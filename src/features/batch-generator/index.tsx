@@ -45,7 +45,7 @@ const batchSchema = object().shape({
   status: mixed().oneOf(Object.values(BatchStatus)).required(),
 });
 
-type BatchType = InferType<typeof batchSchema>;
+export type BatchType = InferType<typeof batchSchema>;
 
 export type BatchGeneratorType = InferType<typeof invoiceFilterSchema>;
 
@@ -74,9 +74,7 @@ export default function BatchGenerator() {
       header: "Status",
       cell: ({ row }) => {
         const statusItem = row.original.status as keyof typeof BatchStatus;
-        return (
-          row.original.status && <Semaphore variant={BatchStatus[statusItem]} />
-        );
+        return statusItem && <Semaphore variant={BatchStatus[statusItem]} />;
       },
     },
   ];
