@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import type { DiscountType } from "@/features/client/forms/discount";
-import type { DiscountDataType } from "@/features/discount";
 import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
 
@@ -81,7 +80,7 @@ export default function useDiscount() {
   };
 
   const getDiscountsByClient = (clientId: number) => {
-    return useQuery<DiscountDataType[]>({
+    return useQuery<DiscountType[]>({
       queryKey: ["getDiscountsByClient", { clientId }],
       queryFn: () => retrieveDiscountsByClient(clientId),
       refetchOnMount: false,
@@ -94,7 +93,7 @@ export default function useDiscount() {
     const url = `discount/client/${clientId}`;
 
     if (!isNaN(clientId) && clientId > 0) {
-      const response = await fetcher.get<DiscountDataType[]>(url);
+      const response = await fetcher.get<DiscountType[]>(url);
 
       if (response) {
         return response;

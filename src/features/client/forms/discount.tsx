@@ -40,7 +40,6 @@ import { ErrorMessage } from "@/utils/error.enum";
 import type { ProductType } from "@/features/product/form";
 import useProduct from "@/hooks/useProducts";
 import useDiscount from "@/hooks/useDiscount";
-import type { DiscountDataType } from "@/features/discount";
 
 const discountSchema = object().shape({
   id: number().nullable(),
@@ -245,7 +244,7 @@ export default function DiscountForm({ onSubmit }: CancelInput) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {discountTypeList.map((comp: DiscountDataType) => {
+                        {discountTypeList.map((comp: DiscountType) => {
                           return (
                             <SelectItem
                               key={`comp-${comp.id}`}

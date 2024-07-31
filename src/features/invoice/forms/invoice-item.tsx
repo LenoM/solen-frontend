@@ -23,12 +23,11 @@ import {
 } from "@/components/ui/form";
 import MoneyInput from "@/components/input/money";
 import type { ProductType } from "@/features/product/form";
-import type { DiscountDataType } from "@/features/discount";
+import type { DiscountType } from "@/features/client/forms/discount";
 import type { ClientType } from "@/features/client/client-schema";
 import useDiscount from "@/hooks/useDiscount";
 import useProduct from "@/hooks/useProducts";
 import useClient from "@/hooks/useClient";
-import { Entity } from "@/utils/utils";
 import { ErrorMessage } from "@/utils/error.enum";
 import { LoadingSpinner } from "@/components/spinner";
 
@@ -106,7 +105,7 @@ export default function InvoiceItemForm({
     const currentProduct = productsList.find((p) => p.id == newData.productId);
     const currentClient = clientsList.find((p) => p.id == newData.clientId);
     const currentDiscount = discountTypeList.find(
-      (p: Entity) => p.id == newData.discountTypeId
+      (p: DiscountType) => p.id == newData.discountTypeId
     );
 
     newData.product = currentProduct ?? {};
@@ -223,7 +222,7 @@ export default function InvoiceItemForm({
                               </FormControl>
                               <SelectContent>
                                 {discountTypeList.map(
-                                  (comp: DiscountDataType) => {
+                                  (comp: DiscountType) => {
                                     return (
                                       <SelectItem
                                         key={`comp-${comp.id}`}
