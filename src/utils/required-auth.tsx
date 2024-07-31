@@ -4,8 +4,8 @@ import Layout from "@/components/default-page";
 import { isExpired, isLoggedIn } from "@/utils/local-storage-utils";
 
 const RequireAuth = () => {
+  const location = useLocation();
   if (!isLoggedIn() || isExpired()) {
-    const location = useLocation();
     return <Navigate to="/login" state={{ from: location }} />;
   }
 
