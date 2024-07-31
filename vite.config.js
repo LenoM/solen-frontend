@@ -58,7 +58,7 @@ export default defineConfig({
             return "@date";
           }
 
-          if (id.includes("react-icons")) {
+          if (id.includes("react-icons") || id.includes("lucide-react")) {
             return "@icon";
           }
 

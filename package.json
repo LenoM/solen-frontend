@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "NODE_ENV=production vite build",
+    "dev": "npm run css-build && vite",
+    "build": "NODE_ENV=production npm run css-build && vite build",
+    "css-build": "npx tailwindcss -o src/assets/build.css --minify",
     "lint": "npx eslint ./src",
     "preview": "NODE_ENV=production vite preview"
   },

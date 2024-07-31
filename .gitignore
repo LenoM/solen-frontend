@@ -1,5 +1,6 @@
 # ENVs
 *.env
+build.css
 
 # Logs
 logs
