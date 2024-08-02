@@ -12,12 +12,14 @@ import {
   PhoneCall,
   Headset,
   BookOpenText,
+  Paperclip,
 } from "lucide-react";
 
 const Personal = lazy(() => import("@/features/client/forms/personal"));
 const Address = lazy(() => import("@/features/client/table/list-address"));
 const Invoices = lazy(() => import("@/features/client/table/list-invoices"));
 const Contacts = lazy(() => import("@/features/client/table/list-contacts"));
+const Documents = lazy(() => import("@/features/client/table/list-documents"));
 const Discounts = lazy(() => import("@/features/client/table/list-discount"));
 const Signatures = lazy(
   () => import("@/features/client/table/list-signatures")
@@ -37,7 +39,7 @@ export default function ClientDetails() {
     <div className="sx:p-0 md:p-6 pt-1 h-screen space-y-4">
       <div className="flex items-center justify-between">
         <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="grid grid-cols-8 h-16 xl:pl-96 xl:pr-96">
+          <TabsList className="grid grid-cols-9 h-16 xl:pl-96 xl:pr-96">
             <div className="text-center">
               <TabsTrigger
                 value="personal"
@@ -54,6 +56,15 @@ export default function ClientDetails() {
                 aria-label="Lista dos dados de contato"
               >
                 <PhoneCall className="w-6 h-6" />
+              </TabsTrigger>
+            </div>
+            <div className="text-center">
+              <TabsTrigger
+                value="documents"
+                className="rounded w-12 h-12"
+                aria-label="Lista de documentos"
+              >
+                <Paperclip className="w-6 h-6" />
               </TabsTrigger>
             </div>
             <div className="text-center">
@@ -134,6 +145,17 @@ export default function ClientDetails() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <Contacts />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <Card>
+              <CardHeader className="text-center">
+                <CardTitle>Documentos</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Documents />
               </CardContent>
             </Card>
           </TabsContent>
