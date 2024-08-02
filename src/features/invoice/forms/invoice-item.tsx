@@ -1,4 +1,4 @@
-import { object, number, InferType, string } from "yup";
+import { object, number, InferType } from "yup";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -30,12 +30,7 @@ import useProduct from "@/hooks/useProducts";
 import useClient from "@/hooks/useClient";
 import { ErrorMessage } from "@/utils/error.enum";
 import { LoadingSpinner } from "@/components/spinner";
-
-const entityBaseSchema = {
-  id: number().nullable(),
-  name: string().nullable(),
-  description: string().nullable(),
-};
+import { entityBaseSchema } from "@/utils/utils";
 
 export const invoiceItemBaseSchema = {
   id: number().default(0),

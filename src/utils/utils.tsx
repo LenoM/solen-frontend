@@ -1,7 +1,15 @@
+import { number, string } from "yup";
+
 export type Entity = {
   id: number;
   name?: string;
   description?: string;
+};
+
+export const entityBaseSchema = {
+  id: number().nullable(),
+  name: string().nullable(),
+  description: string().nullable(),
 };
 
 export const kinshipArray = [
