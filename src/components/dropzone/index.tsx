@@ -46,18 +46,20 @@ const Dropzone = React.forwardRef<HTMLDivElement, DropzoneProps>(
       <Card
         ref={ref}
         className={cn(
-          `border-2 border-dashed bg-muted hover:cursor-pointer hover:border-muted-foreground/50`,
+          `mt-2 border-2 border-dashed bg-muted hover:cursor-pointer hover:border-muted-foreground/50`,
           classNameWrapper
         )}
       >
         <CardContent
-          className="flex flex-col items-center justify-center space-y-2 px-2 py-4 text-xs"
+          className="flex flex-col items-center justify-center space-y-2 px-2 py-6 text-xs"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={handleButtonClick}
         >
           <div className="flex items-center justify-center text-muted-foreground">
-            <span className="font-medium">{dropMessage}</span>
+            <span className="text-sm font-medium leading-none">
+              {dropMessage}
+            </span>
             <Input
               {...props}
               value={undefined}
