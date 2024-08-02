@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npm run css-build && vite",
+    "dev": "vite",
     "build": "NODE_ENV=production vite build",
     "lint": "npx eslint ./src",
     "preview": "NODE_ENV=production vite preview"
