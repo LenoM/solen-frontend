@@ -130,38 +130,36 @@ export default function ContactForm({ data, onSubmit }: ContactFormProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
         <div className="grid w-full items-center gap-1">
-          <div className="flex flex-col">
-            <div className="flex flex-col">
-              <FormField
-                name="contactType"
-                control={form.control}
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Tipo de Contato</FormLabel>
-                    <Select
-                      value={currentType}
-                      onValueChange={(value) => onChangeType(value)}
-                    >
-                      <FormControl>
-                        <SelectTrigger aria-label="contact type">
-                          <SelectValue placeholder="Escolha o tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {contactTypeArray.map((ctt) => {
-                          return (
-                            <SelectItem key={`state-${ctt}`} value={ctt}>
-                              {ctt}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          <div className="flex flex-col mb-2">
+            <FormField
+              name="contactType"
+              control={form.control}
+              render={() => (
+                <FormItem>
+                  <FormLabel>Tipo de Contato</FormLabel>
+                  <Select
+                    value={currentType}
+                    onValueChange={(value) => onChangeType(value)}
+                  >
+                    <FormControl>
+                      <SelectTrigger aria-label="contact type">
+                        <SelectValue placeholder="Escolha o tipo" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {contactTypeArray.map((ctt) => {
+                        return (
+                          <SelectItem key={`state-${ctt}`} value={ctt}>
+                            {ctt}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <div className="flex flex-col mb-2">

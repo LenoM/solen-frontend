@@ -132,66 +132,101 @@ export default function InvoiceItemForm({
           ) : (
             <>
               <div className="flex flex-col">
-                <div className="flex flex-col">
-                  <div className="flex flex-col mb-2">
-                    <FormField
-                      name="clientId"
-                      control={form.control}
-                      render={({ field: { onChange, value } }) => (
-                        <FormItem>
-                          <FormLabel>Cliente</FormLabel>
-                          <Select
-                            value={value?.toString()}
-                            onValueChange={onChange}
-                          >
-                            <FormControl>
-                              <SelectTrigger aria-label="client">
-                                <SelectValue placeholder="Escolha o titular" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {clientsList.map((ctt: ClientType) => {
-                                return (
-                                  <SelectItem
-                                    key={`state-${ctt.id}`}
-                                    value={ctt.id!.toString()}
-                                  >
-                                    {ctt.name}
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                <div className="flex flex-col mb-2">
+                  <FormField
+                    name="clientId"
+                    control={form.control}
+                    render={({ field: { onChange, value } }) => (
+                      <FormItem>
+                        <FormLabel>Cliente</FormLabel>
+                        <Select
+                          value={value?.toString()}
+                          onValueChange={onChange}
+                        >
+                          <FormControl>
+                            <SelectTrigger aria-label="client">
+                              <SelectValue placeholder="Escolha o titular" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {clientsList.map((ctt: ClientType) => {
+                              return (
+                                <SelectItem
+                                  key={`state-${ctt.id}`}
+                                  value={ctt.id!.toString()}
+                                >
+                                  {ctt.name}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
+                <div className="flex flex-col mb-2">
+                  <FormField
+                    name="productId"
+                    control={form.control}
+                    render={({ field: { onChange, value } }) => (
+                      <FormItem>
+                        <FormLabel>Produto</FormLabel>
+                        <Select
+                          value={value?.toString()}
+                          onValueChange={onChange}
+                        >
+                          <FormControl>
+                            <SelectTrigger aria-label="product">
+                              <SelectValue placeholder="Escolha o produto" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {productsList.map((comp: ProductType) => {
+                              return (
+                                <SelectItem
+                                  key={`comp-${comp.id}`}
+                                  value={comp.id!.toString()}
+                                >
+                                  {comp.name}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {isDiscount && (
                   <div className="flex flex-col mb-2">
                     <FormField
-                      name="productId"
+                      name="discountTypeId"
                       control={form.control}
                       render={({ field: { onChange, value } }) => (
                         <FormItem>
-                          <FormLabel>Produto</FormLabel>
+                          <FormLabel>Desconto</FormLabel>
                           <Select
                             value={value?.toString()}
                             onValueChange={onChange}
                           >
                             <FormControl>
-                              <SelectTrigger aria-label="product">
-                                <SelectValue placeholder="Escolha o produto" />
+                              <SelectTrigger aria-label="discount type">
+                                <SelectValue placeholder="Tipo de desconto" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {productsList.map((comp: ProductType) => {
+                              {discountTypeList.map((comp: DiscountType) => {
                                 return (
                                   <SelectItem
                                     key={`comp-${comp.id}`}
                                     value={comp.id!.toString()}
                                   >
-                                    {comp.name}
+                                    {comp.description}
                                   </SelectItem>
                                 );
                               })}
@@ -202,56 +237,18 @@ export default function InvoiceItemForm({
                       )}
                     />
                   </div>
+                )}
 
-                  {isDiscount && (
-                    <div className="flex flex-col mb-2">
-                      <FormField
-                        name="discountTypeId"
-                        control={form.control}
-                        render={({ field: { onChange, value } }) => (
-                          <FormItem>
-                            <FormLabel>Desconto</FormLabel>
-                            <Select
-                              value={value?.toString()}
-                              onValueChange={onChange}
-                            >
-                              <FormControl>
-                                <SelectTrigger aria-label="discount type">
-                                  <SelectValue placeholder="Tipo de desconto" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {discountTypeList.map(
-                                  (comp: DiscountType) => {
-                                    return (
-                                      <SelectItem
-                                        key={`comp-${comp.id}`}
-                                        value={comp.id!.toString()}
-                                      >
-                                        {comp.description}
-                                      </SelectItem>
-                                    );
-                                  }
-                                )}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
-
-                  <div className="flex flex-col mb-2">
-                    <MoneyInput
-                      form={form}
-                      label="Valor"
-                      name="price"
-                      placeholder="Valor do desconto"
-                    />
-                  </div>
+                <div className="flex flex-col mb-2">
+                  <MoneyInput
+                    form={form}
+                    label="Valor"
+                    name="price"
+                    placeholder="Valor do desconto"
+                  />
                 </div>
               </div>
+
               <div className="flex flex-col mb-4 mt-4">
                 <Button type="submit">Salvar</Button>
               </div>
