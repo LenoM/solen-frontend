@@ -43,8 +43,8 @@ import {
 } from "@/features/crm/crm-utils";
 import { toDateTimeString, toDateTimeValue } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
-import { Entity } from "@/utils/utils";
 import { cn } from "@/lib/utils";
+import type { Entity } from "@/utils/utils";
 
 export const crmBaseSchema = {
   id: number().default(0),

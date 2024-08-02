@@ -40,9 +40,9 @@ import {
 } from "@/features/crm/crm-utils";
 import { toDateTimeString, toDateTimeValue } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
-import { Entity } from "@/utils/utils";
 import { cn } from "@/lib/utils";
 import { CrmHistoryType, crmBaseSchema } from "./crm-form";
+import type { Entity } from "@/utils/utils";
 
 const crmAditionalSchema = {
   statusId: number(),

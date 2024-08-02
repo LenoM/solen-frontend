@@ -38,10 +38,10 @@ import useCategory from "@/hooks/useCategory";
 
 import { toDateString, isOutOfRange } from "@/utils/format-utils";
 import { ErrorMessage } from "@/utils/error.enum";
-import { Entity } from "@/utils/utils";
 import { cn } from "@/lib/utils";
 
 import type { ProductType } from "@/features/product/form";
+import type { Entity } from "@/utils/utils";
 
 const loadData = (): BatchFilterType => {
   return {

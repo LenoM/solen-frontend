@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Entity } from "@/utils/utils";
 import useFetcher from "@/lib/request";
+import type { Entity } from "@/utils/utils";
 
 export default function useCompany() {
   const fetcher = useFetcher();
