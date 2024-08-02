@@ -1,6 +1,7 @@
 import { object, string, number, date, InferType } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
+import { useMemo } from "react";
 
 import {
   Form,
@@ -21,11 +22,11 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { LoadingSpinner } from "@/components/spinner";
 import DropzoneControlled from "@/components/dropzone";
 
-import type { Entity } from "@/utils/utils";
 import { entityBaseSchema } from "@/utils/utils";
-import { ErrorMessage } from "@/utils/error.enum";
+import useDocument from "@/hooks/useDocument";
 
 const documentBaseSchema = {
   id: number().nullable(),
@@ -33,7 +34,7 @@ const documentBaseSchema = {
   description: string().optional(),
   clientId: number().nullable(),
   creatorUserId: number().nullable(),
-  docTypeId: number().required(ErrorMessage.required),
+  docTypeId: number(),
   docType: object()
     .shape({ ...entityBaseSchema })
     .optional(),
@@ -51,7 +52,7 @@ export const loadDocumentData = (data?: DocumentDataType): DocumentDataType => {
   return {
     id: data?.id || 0,
     clientId: data?.clientId || 0,
-    docTypeId: data?.docTypeId || 0,
+    docTypeId: data?.docTypeId || undefined,
     creatorUserId: data?.creatorUserId || 0,
     description: data?.description || "",
     documentUrl: data?.documentUrl || "",
@@ -66,77 +67,85 @@ type DocumentFormProps = {
 };
 
 export default function DocumentForm({ data, onSubmit }: DocumentFormProps) {
-  let categoryList: Entity[] = [];
+  const { loading, getDocumentType, documentTypeList } = useDocument();
 
   const form = useForm({
     resolver: yupResolver(documentSchema),
     values: loadDocumentData(data),
   });
 
+  const isLoading = loading || documentTypeList.length === 0;
+
+  useMemo(async () => await getDocumentType(), []);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
-        <div className="grid w-full items-center gap-1">
-          <div className="flex flex-col mb-2">
-            <FormField
-              name="docTypeId"
-              control={form.control}
-              render={({ field: { onChange, value } }) => (
-                <FormItem>
-                  <FormLabel>Tipo de documento</FormLabel>
-                  <Select value={value?.toString()} onValueChange={onChange}>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <div className="grid w-full items-center gap-1">
+            <div className="flex flex-col mb-2">
+              <FormField
+                name="docTypeId"
+                control={form.control}
+                render={({ field: { onChange, value } }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de documento</FormLabel>
+                    <Select value={value?.toString()} onValueChange={onChange}>
+                      <FormControl>
+                        <SelectTrigger aria-label="documentTypeId">
+                          <SelectValue placeholder="Escolha o tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {documentTypeList.map((cat) => {
+                          return (
+                            <SelectItem
+                              key={`cat-${cat.id}`}
+                              value={cat.id.toString()}
+                            >
+                              {cat.description}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Observação</FormLabel>
                     <FormControl>
-                      <SelectTrigger aria-label="documentTypeId">
-                        <SelectValue placeholder="Escolha o tipo" />
-                      </SelectTrigger>
+                      <Textarea
+                        placeholder="Registre as observações..."
+                        className="resize-none"
+                        {...field}
+                      />
                     </FormControl>
-                    <SelectContent>
-                      {categoryList.map((cat: Entity) => {
-                        return (
-                          <SelectItem
-                            key={`cat-${cat.id}`}
-                            value={cat.id.toString()}
-                          >
-                            {cat.description}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          <div className="flex flex-col mb-2">
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Observação</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Registre as observações..."
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+            <div className="flex flex-col mb-2">
+              <DropzoneControlled form={form} name="file" />
+            </div>
 
-          <div className="flex flex-col mb-2">
-            <DropzoneControlled form={form} name="file" />
+            <div className="flex flex-col mb-4 mt-4">
+              <Button type="submit">Salvar</Button>
+            </div>
           </div>
-
-          <div className="flex flex-col mb-4 mt-4">
-            <Button type="submit">Salvar</Button>
-          </div>
-        </div>
+        )}
       </form>
     </Form>
   );
