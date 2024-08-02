@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "npm run css-build && vite",
-    "build": "NODE_ENV=production npm run css-build && vite build",
-    "css-build": "npx tailwindcss -o src/assets/build.css --minify",
+    "build": "NODE_ENV=production vite build",
     "lint": "npx eslint ./src",
     "preview": "NODE_ENV=production vite preview"
   },
