@@ -1,5 +1,9 @@
 import { lazy } from "react";
-import { Users, User as UserIcon } from "lucide-react";
+import {
+  Users,
+  User as UserIcon,
+  FileChartColumnIncreasing as ReportIcon,
+} from "lucide-react";
 import { LogOut } from "lucide-react";
 import { Receipt } from "lucide-react";
 import { BarChartBig } from "lucide-react";
@@ -17,6 +21,8 @@ const ClientAdd = lazy(() => import("@/features/client/add"));
 const ClientDetails = lazy(() => import("@/features/client/details"));
 const User = lazy(() => import("@/features/user"));
 const UserDetail = lazy(() => import("@/features/user/details"));
+const Report = lazy(() => import("@/features/custom-report"));
+const ReportDatail = lazy(() => import("@/features/custom-report/details"));
 
 export const features = [
   {
@@ -95,6 +101,19 @@ export const features = [
     path: "/user/:userId",
     isMenuItem: false,
     element: <UserDetail />,
+  },
+  {
+    label: "Relatórios",
+    path: "/report",
+    isMenuItem: true,
+    element: <Report />,
+    icon: <ReportIcon />,
+  },
+  {
+    label: "Relatório",
+    path: "/report/:reportId",
+    isMenuItem: false,
+    element: <ReportDatail />,
   },
   {
     label: "Sair",
