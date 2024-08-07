@@ -20,6 +20,10 @@ export default defineConfig({
             return "@calendar";
           }
 
+          if (id.includes("@radix-ui")) {
+            return "@ui-base";
+          }
+
           if (id.includes("components/input") || id.includes("components/ui")) {
             return "@ui";
           }
