@@ -53,8 +53,6 @@ export default function ReportForm() {
   const onSubmit = async () => {
     const newData = form.getValues();
 
-    console.log(newData);
-
     if (!reportId) {
       await createReport(newData);
     } else {

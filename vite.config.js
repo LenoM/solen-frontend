@@ -84,7 +84,10 @@ export default defineConfig({
             return "@prod";
           }
 
-          if (id.includes("features/invoice")) {
+          if (
+            id.includes("features/invoice") ||
+            id.includes("features/batch-generator")
+          ) {
             return "@inv";
           }
 
