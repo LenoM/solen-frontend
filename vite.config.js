@@ -64,6 +64,10 @@ export default defineConfig({
             return "@dash";
           }
 
+          if (id.includes("features/custom-report")) {
+            return "@report";
+          }
+
           if (id.includes("features/user")) {
             return "@user";
           }
