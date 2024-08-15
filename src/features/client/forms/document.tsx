@@ -33,9 +33,9 @@ const documentBaseSchema = {
   creationDate: date().nullable(),
   description: string().optional(),
   clientId: number().nullable(),
-  creatorUserId: number().nullable(),
+  creatorUserId: string().nullable(),
   docTypeId: number(),
-  docType: object()
+  documentType: object()
     .shape({ ...entityBaseSchema })
     .optional(),
   documentUrl: string().nullable(),
@@ -53,10 +53,10 @@ export const loadDocumentData = (data?: DocumentDataType): DocumentDataType => {
     id: data?.id || 0,
     clientId: data?.clientId || 0,
     docTypeId: data?.docTypeId || undefined,
-    creatorUserId: data?.creatorUserId || 0,
+    creatorUserId: data?.creatorUserId || "",
     description: data?.description || "",
     documentUrl: data?.documentUrl || "",
-    docName: data?.docName || "",
+    documentType: data?.documentType || undefined,
     docType: data?.docType || undefined,
   };
 };
