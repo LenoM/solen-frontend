@@ -19,7 +19,7 @@ import CrmCollectForm, {
 import type { CollectHistoryType } from "@/features/crm/collection-form";
 import type { CrmHistoryType } from "@/features/crm/crm-form";
 import CrmForm, { loadCrmData } from "@/features/crm/crm-form";
-import { UserType } from "@/features/user/form";
+
 import {
   CLOSE_STATUS,
   CrmType,
@@ -27,7 +27,7 @@ import {
   crmSubMotive,
 } from "@/features/crm/crm-utils";
 
-import { toDateTimeString } from "@/utils/format-utils";
+import { formatUserName, toDateTimeString } from "@/utils/format-utils";
 import useClient from "@/hooks/useClient";
 import useUser from "@/hooks/useUser";
 import useCrm from "@/hooks/useCrm";
@@ -37,14 +37,6 @@ const CrmStatus = {
   2: "secondary",
   3: "destructive",
 } as const;
-
-const formatUserName = (
-  userId: string | undefined,
-  user: UserType[] | undefined
-) => {
-  if (!userId || !user) return "";
-  return user?.filter((usr: UserType) => usr.id === userId)[0].name;
-};
 
 const formatMotive = (id: string) => {
   if (!id) return "Cobrança";
