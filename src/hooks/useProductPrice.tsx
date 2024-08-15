@@ -2,9 +2,9 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 import type { SignatureType } from "@/features/client/forms/signature";
+import type { ProductPriceType } from "@/features/client/forms/product-price";
 import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
-import { ProductPriceType } from "@/features/client/forms/product-price";
 
 export default function useProductPrice() {
   const fetcher = useFetcher();

@@ -3,8 +3,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import useFetcher from "@/lib/request";
 import { queryClient } from "@/lib/react-query";
-import { CrmHistoryType } from "@/features/crm/crm-form";
 import type { ClientType } from "@/features/client/client-schema";
+import type { CrmHistoryType } from "@/features/crm/crm-form";
 import type { CollectHistoryType } from "@/features/crm/collection-form";
 
 export default function useCrm() {

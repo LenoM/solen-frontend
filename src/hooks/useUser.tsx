@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { UserType, loadUserData } from "@/features/user/form";
+import type { UserType } from "@/features/user/form";
+import { loadUserData } from "@/features/user/form";
 import { queryClient } from "@/lib/react-query";
 import useFetcher from "@/lib/request";
 
