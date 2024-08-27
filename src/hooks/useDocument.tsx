@@ -29,6 +29,31 @@ export default function useDocument() {
     setLoading(false);
   };
 
+  const deleteDocument = async (clientId: number, documentId: number) => {
+    setLoading(true);
+
+    const url = `client/${clientId}/document/${documentId}`;
+
+    const response = await fetcher.del<DocumentDataType>(url);
+
+    if (response) {
+      queryClient.setQueryData(
+        ["getDocumentsByClient", { clientId }],
+        (prev: DocumentDataType[]) => {
+          if (prev) {
+            prev = prev?.filter((d) => d.id !== response.id);
+            return prev;
+          }
+        }
+      );
+
+      toast.success("Documento deletado", {
+        description: `O documento foi removido com sucesso!`,
+      });
+    }
+    setLoading(false);
+  };
+
   const createDocument = async (data: DocumentDataType) => {
     setLoading(true);
 
@@ -115,6 +140,7 @@ export default function useDocument() {
     loading,
     createDocument,
     getDocumentType,
+    deleteDocument,
     getDocumentByClient,
     documentTypeList,
   };

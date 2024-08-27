@@ -31,7 +31,7 @@ export default function Documents() {
   const { getUserList } = useUser();
   const { data: user } = getUserList();
 
-  const { getDocumentByClient, createDocument } = useDocument();
+  const { getDocumentByClient, createDocument, deleteDocument } = useDocument();
   const { data: documents } = getDocumentByClient(Number(clientId));
 
   const handlerSubmit = async (newData: DocumentDataType) => {
@@ -39,6 +39,9 @@ export default function Documents() {
     await createDocument(newData);
   };
 
+  const handlerDelete = async (clientId: number, documentId: number) => {
+    await deleteDocument(clientId, documentId);
+  };
 
   const columns: ColumnDef<DocumentDataType>[] = [
     {
@@ -98,6 +101,11 @@ export default function Documents() {
                   </DialogClose>
                   <Button
                     onClick={() =>
+                      handlerDelete(
+                        Number(row.original.clientId),
+                        Number(row.original.id)
+                      )
+                    }
                     type="submit"
                     variant="destructive"
                     className="mb-2"
