@@ -23,9 +23,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingSpinner } from "@/components/spinner";
-import DropzoneControlled from "@/components/dropzone";
+import DropzoneControlled, { fileBaseSchema } from "@/components/dropzone";
 
 import { entityBaseSchema } from "@/utils/utils";
+import { ErrorMessage } from "@/utils/error.enum";
 import useDocument from "@/hooks/useDocument";
 
 const documentBaseSchema = {
@@ -34,12 +35,15 @@ const documentBaseSchema = {
   description: string().optional(),
   clientId: number().nullable(),
   creatorUserId: string().nullable(),
-  docTypeId: number(),
+  docTypeId: string()
+    .transform((value) => (Number.isNaN(value) ? null : value))
+    .required(ErrorMessage.required)
+    .min(1, ErrorMessage.equals),
   documentType: object()
     .shape({ ...entityBaseSchema })
     .optional(),
   documentUrl: string().nullable(),
-  docName: string().nullable(),
+  file: fileBaseSchema,
 };
 
 const documentSchema = object().shape({
@@ -52,12 +56,12 @@ export const loadDocumentData = (data?: DocumentDataType): DocumentDataType => {
   return {
     id: data?.id || 0,
     clientId: data?.clientId || 0,
-    docTypeId: data?.docTypeId || undefined,
+    docTypeId: data?.docTypeId || "",
     creatorUserId: data?.creatorUserId || "",
     description: data?.description || "",
     documentUrl: data?.documentUrl || "",
     documentType: data?.documentType || undefined,
-    docType: data?.docType || undefined,
+    file: data?.file || undefined,
   };
 };
 

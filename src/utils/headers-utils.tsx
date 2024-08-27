@@ -9,7 +9,7 @@ const getHeader = () => {
     navigate("/login");
   }
 
-  const headers = {
+  const headers: HeadersInit = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
   };

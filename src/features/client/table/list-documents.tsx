@@ -31,8 +31,14 @@ export default function Documents() {
   const { getUserList } = useUser();
   const { data: user } = getUserList();
 
-  const { getDocumentByClient } = useDocument();
+  const { getDocumentByClient, createDocument } = useDocument();
   const { data: documents } = getDocumentByClient(Number(clientId));
+
+  const handlerSubmit = async (newData: DocumentDataType) => {
+    newData.clientId = Number(clientId);
+    await createDocument(newData);
+  };
+
 
   const columns: ColumnDef<DocumentDataType>[] = [
     {

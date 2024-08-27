@@ -14,4 +14,7 @@ export enum ErrorMessage {
   invalidPassword = "Senhas inválida",
   invalidLength = "Digite ao menos 7 digitos",
   invalidContact = "Digite um contato válido",
+  invalidFile = "Arquivo inválido",
+  invalidFileLength = "Tamanho do arquivo não permitido",
+  invalidFileFormat = "Formato do arquivo não permitido",
 }

@@ -99,13 +99,13 @@ export default function useFetcher() {
   ): Promise<T | undefined> => {
     try {
       const url = `${BASE_URL}/${urlPath}`;
-
+      
       const params: RequestInit = {
         method: "POST",
         headers,
         body,
       };
-
+      
       const response = await fetch(url, params);
       const res = await response.json();
 
