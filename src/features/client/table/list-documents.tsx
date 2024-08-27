@@ -31,12 +31,21 @@ export default function Documents() {
   const { getUserList } = useUser();
   const { data: user } = getUserList();
 
-  const { getDocumentByClient, createDocument, deleteDocument } = useDocument();
+  const {
+    getDocumentByClient,
+    createDocument,
+    deleteDocument,
+    downloadDocument,
+  } = useDocument();
   const { data: documents } = getDocumentByClient(Number(clientId));
 
   const handlerSubmit = async (newData: DocumentDataType) => {
     newData.clientId = Number(clientId);
     await createDocument(newData);
+  };
+
+  const handlerDownload = async (documentUrl: string | null | undefined) => {
+    await downloadDocument(documentUrl);
   };
 
   const handlerDelete = async (clientId: number, documentId: number) => {
@@ -71,8 +80,7 @@ export default function Documents() {
         return (
           <>
             <Button
-              onClick={() =>
-              }
+              onClick={() => handlerDownload(row.original.documentUrl)}
               variant="ghost"
               className="h-8 w-8 p-0"
             >

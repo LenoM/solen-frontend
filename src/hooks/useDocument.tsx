@@ -29,6 +29,23 @@ export default function useDocument() {
     setLoading(false);
   };
 
+  const downloadDocument = async (documentUrl: string | null | undefined) => {
+    if (!documentUrl) {
+      toast.error("Erro no download", {
+        description: "O documento não está disponível",
+      });
+      return;
+    }
+
+    toast.success("Download do documento", {
+      description: `O documento está disponível`,
+      action: {
+        label: "Baixar",
+        onClick: () => window.open(documentUrl),
+      },
+    });
+  };
+
   const deleteDocument = async (clientId: number, documentId: number) => {
     setLoading(true);
 
@@ -141,6 +158,7 @@ export default function useDocument() {
     createDocument,
     getDocumentType,
     deleteDocument,
+    downloadDocument,
     getDocumentByClient,
     documentTypeList,
   };
