@@ -58,7 +58,6 @@ type DropzoneControolledProps = {
 
 export default function DropzoneControlled(props: DropzoneControolledProps) {
   function handleOnDrop(fileList: FileList | null) {
-    console.log("acceptedFiles", fileList);
     if (fileList && fileList.length > 0) {
       const file = fileList[0];
 
