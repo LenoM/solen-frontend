@@ -37,7 +37,7 @@ export default defineConfig({
             return "@lib";
           }
 
-          if (id.includes("react-icons") || id.includes("lucide-react")) {
+          if (id.includes("lucide-react")) {
             return "@icon";
           }
 
