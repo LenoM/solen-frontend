@@ -26,18 +26,6 @@ const BatchStatus = {
   Cancel: "destructive",
 } as const;
 
-const invoiceFilterSchema = object().shape({
-  categoryId: number().nullable(),
-  productId: number().nullable(),
-  clientId: number().nullable(),
-  companyId: number().nullable(),
-  invoiceId: number().nullable(),
-  initialReferenceDate: date().nullable(),
-  finalReferenceDate: date().nullable(),
-  initialDueDate: date().nullable(),
-  finalDueDate: date().nullable(),
-});
-
 const batchSchema = object().shape({
   id: number().nullable(),
   creationDate: date().nullable(),
@@ -46,8 +34,6 @@ const batchSchema = object().shape({
 });
 
 export type BatchType = InferType<typeof batchSchema>;
-
-export type BatchGeneratorType = InferType<typeof invoiceFilterSchema>;
 
 export default function BatchGenerator() {
   const { loading, batchList, getBatchs } = useInvoice();

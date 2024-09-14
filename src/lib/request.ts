@@ -26,7 +26,7 @@ export default function useFetcher() {
       toast.error(`Erro na requisição`, {
         description: res.message,
       });
-    } catch (err) {
+    } catch {
       toast.error("Falha na requisição", {
         description: `${SERVER_ERROR_MESSAGE} GET /${urlPath}`,
       });
@@ -56,7 +56,7 @@ export default function useFetcher() {
       toast.error(`Erro na requisição`, {
         description: res.message,
       });
-    } catch (err) {
+    } catch {
       toast.error("Falha na requisição", {
         description: `${SERVER_ERROR_MESSAGE} DELETE /${urlPath}`,
       });
@@ -86,7 +86,7 @@ export default function useFetcher() {
       toast.error(`Erro na requisição`, {
         description: res.message,
       });
-    } catch (err) {
+    } catch {
       toast.error("Falha na requisição", {
         description: `${SERVER_ERROR_MESSAGE} PUT /${urlPath}`,
       });
@@ -116,7 +116,7 @@ export default function useFetcher() {
       toast.error(`Erro na requisição`, {
         description: res.message,
       });
-    } catch (err) {
+    } catch {
       toast.error("Falha na requisição", {
         description: `${SERVER_ERROR_MESSAGE} POST /${urlPath}`,
       });
@@ -146,7 +146,7 @@ export default function useFetcher() {
       toast.error(`Erro na requisição`, {
         description: res.message,
       });
-    } catch (err) {
+    } catch {
       toast.error("Falha na requisição", {
         description: `${SERVER_ERROR_MESSAGE} PATCH /${urlPath}`,
       });

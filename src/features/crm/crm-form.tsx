@@ -77,7 +77,7 @@ export const crmAditionalSchema = {
     .min(1, ErrorMessage.equals),
 };
 
-export const crmHistorySchema = object().shape({
+const crmHistorySchema = object().shape({
   ...crmBaseSchema,
   ...crmAditionalSchema,
 });

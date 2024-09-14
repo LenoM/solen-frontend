@@ -59,10 +59,10 @@ export default function useCrm() {
       returnDate,
       description,
       statusId: Number(statusId),
-      originId: Number(originId) ?? null,
-      motiveId: Number(motiveId) ?? null,
-      subMotiveId: Number(subMotiveId) ?? null,
-      collectStatusId: Number(collectStatusId) ?? null,
+      originId: Number(originId) || null,
+      motiveId: Number(motiveId) || null,
+      subMotiveId: Number(subMotiveId) || null,
+      collectStatusId: Number(collectStatusId) || null,
     });
 
     const response = await fetcher.put<CrmHistoryType>(url, body);

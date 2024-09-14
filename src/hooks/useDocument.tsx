@@ -120,7 +120,7 @@ export default function useDocument() {
       });
 
       setLoading(false);
-    } catch (error) {
+    } catch {
       toast.error("Falha no upload", {
         description: `${SERVER_ERROR_MESSAGE} /upload`,
       });

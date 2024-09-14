@@ -37,7 +37,7 @@ const useLogin = () => {
       toast.error("Erro no login", {
         description: res.message,
       });
-    } catch (err: any) {
+    } catch {
       toast.error("Falha no login", {
         description: `${SERVER_ERROR_MESSAGE} /login`,
       });

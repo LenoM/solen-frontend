@@ -66,13 +66,13 @@ export default function CrmHistory() {
   const { data: user } = getUserList();
 
   const handlerCollectSubmit = async (newData: CollectHistoryType) => {
-    newData.clientId = Number(clientId) ?? 0;
+    newData.clientId = Number(clientId) || 0;
     newData.statusId = CLOSE_STATUS;
     await updateCollect(newData);
   };
 
   const handlerCrmSubmit = async (newData: CrmHistoryType) => {
-    newData.clientId = Number(clientId) ?? 0;
+    newData.clientId = Number(clientId) || 0;
     newData.collectStatusId = undefined;
     const isUpdate = newData.id! > 0;
 
