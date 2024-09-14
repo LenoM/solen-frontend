@@ -61,6 +61,7 @@ import InvoiceItemForm, {
 
 import useClient from "@/hooks/useClient";
 import useInvoice from "@/hooks/useInvoice";
+import { Badge } from "@/components/ui/badge";
 
 export const loadInvoiceData = (data?: InvoiceType): InvoiceType => {
   return {
@@ -246,14 +247,15 @@ export default function InvoiceForm() {
       accessorFn: (data: InvoiceItemType) => data.client?.name ?? "",
     },
     {
-      accessorKey: "productId",
-      header: "Produto",
-      accessorFn: (data: InvoiceItemType) =>
-        data.discountType?.id ? "" : data.product.id,
-    },
-    {
-      header: "Desconto",
-      accessorFn: (data: InvoiceItemType) => data.discountType?.id,
+      header: "Tipo",
+
+      cell: ({ row }) => {
+        return (
+          <Badge variant={"secondary"} className="rounded-xl">
+            {row.original.discountType?.id ? "Desconto" : "Produto"}
+          </Badge>
+        );
+      },
     },
     {
       header: "Item",
