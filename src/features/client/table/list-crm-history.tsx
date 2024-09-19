@@ -126,7 +126,7 @@ export default function CrmHistory() {
     },
     {
       accessorKey: "statusId",
-      header: "Status",
+      header: () => <div className="text-center">Status</div>,
       cell: ({ row }) => {
         const statusItem = Number(
           row.original.statusId

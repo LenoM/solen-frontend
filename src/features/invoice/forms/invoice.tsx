@@ -248,7 +248,6 @@ export default function InvoiceForm() {
     },
     {
       header: "Tipo",
-
       cell: ({ row }) => {
         return (
           <Badge variant={"secondary"} className="rounded-xl">

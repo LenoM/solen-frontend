@@ -57,7 +57,7 @@ export default function BatchGenerator() {
     },
     {
       accessorKey: "status",
-      header: "Status",
+      header: () => <div className="text-center">Status</div>,
       cell: ({ row }) => {
         const statusItem = row.original.status as keyof typeof BatchStatus;
         return statusItem && <Semaphore variant={BatchStatus[statusItem]} />;
