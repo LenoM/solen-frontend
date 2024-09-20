@@ -1,6 +1,7 @@
 import { object, string, InferType, date } from "yup";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { Info } from "lucide-react";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { LoadingSpinner } from "@/components/spinner";
 import { ErrorMessage } from "@/utils/error.enum";
@@ -29,6 +37,9 @@ export const loadReportData = (data?: ReportType): ReportType => {
     creationDate: data?.creationDate || undefined,
   };
 };
+
+const QUERY_EXEMPLE = 'SELECT * FROM table_name WHERE field_name = 1';
+const PARAM_EXEMPLE = '@@param("name": "id", "label": "ID do Produto", "type": "number", "mask": "#")';
 
 const reportSchema = object({
   id: string(),
@@ -88,7 +99,25 @@ export default function ReportForm() {
               name="query"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Query</FormLabel>
+                  <FormLabel>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <p className="inline-flex">
+                            Query
+                            <Info className="ml-1 h-4 w-4 opacity-50" />
+                          </p>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Exemplo:</p>
+                          <p className="font-thin">{QUERY_EXEMPLE}</p>
+                          <br/>
+                          <p>Exemplo de parâmetro (variáveis):</p>
+                          <p className="font-thin">{PARAM_EXEMPLE}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Adicione uma query válida"
