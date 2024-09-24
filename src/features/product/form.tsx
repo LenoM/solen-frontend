@@ -91,9 +91,8 @@ export default function ProductForm({ setProductsList }: ProductFormProps) {
     if (!productId && newData) {
       const newProd = await createProduct(newData);
 
-      if (newProd) {
-        setProductsList &&
-          setProductsList((prev: ProductType[]) => [...prev, newProd]);
+      if (newProd && setProductsList) {
+        setProductsList((prev: ProductType[]) => [...prev, newProd]);
       }
     } else {
       await updateProduct(Number(newData.id), newData);

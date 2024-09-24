@@ -41,7 +41,7 @@ const AddressDialog = ({ title, children, formData }: AddressFormProps) => {
   const { clientId } = useParams();
   const { loading, createAddress, updateAddress } = useAddress();
 
-  const handlerSubmit = async (newData: any) => {
+  const handlerSubmit = async (newData: AddressDataType) => {
     const isUpdate = newData.id! > 0;
 
     if (isUpdate) {

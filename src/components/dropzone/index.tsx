@@ -51,12 +51,12 @@ interface DropzoneProps
   handleOnDrop: (acceptedFiles: FileList | null) => void;
 }
 
-type DropzoneControolledProps = {
+type DropzoneControlledProps = {
   form: UseFormReturn<any>;
   name: string;
 };
 
-export default function DropzoneControlled(props: DropzoneControolledProps) {
+export default function DropzoneControlled(props: DropzoneControlledProps) {
   function handleOnDrop(fileList: FileList | null) {
     if (fileList && fileList.length > 0) {
       const file = fileList[0];
