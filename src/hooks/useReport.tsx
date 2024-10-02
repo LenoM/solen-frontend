@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { FieldValues } from "react-hook-form";
 
 import type { ReportType } from "@/features/custom-report/form";
 import { loadReportData } from "@/features/custom-report/form";
@@ -102,11 +103,12 @@ export default function useReport() {
     setLoading(false);
   };
 
-  const printReport = async (id: number) => {
+  const printReport = async (id: number, queryParam: FieldValues = {}) => {
     setLoading(true);
 
-    const body: BodyInit = JSON.stringify({ id });
-    const response = await fetcher.post<{ url: string }>("report/print", body);
+    const url = `report/print/${id}`
+    const body: BodyInit = JSON.stringify({ ...queryParam });
+    const response = await fetcher.post<{ url: string }>(url, body);
 
     if (response && response.url) {
       toast.success("Impressão de relatório", {
@@ -121,11 +123,12 @@ export default function useReport() {
     setLoading(false);
   };
 
-  const exportReport = async (id: number) => {
+  const exportReport = async (id: number, queryParam: FieldValues = {}) => {
     setLoading(true);
 
-    const body: BodyInit = JSON.stringify({ id });
-    const response = await fetcher.post<{ url: string }>("report/export", body);
+    const url = `report/export/${id}`
+    const body: BodyInit = JSON.stringify({ ...queryParam });
+    const response = await fetcher.post<{ url: string }>(url, body);
 
     if (response && response.url) {
       toast.success("Exportação de relatório", {

@@ -19,6 +19,8 @@ import { LoadingSpinner } from "@/components/spinner";
 import { DataTable } from "@/components/dataTable";
 
 import type { ReportType } from "@/features/custom-report/form";
+import { getQueryParam } from "@/features/custom-report/utils";
+import ReportParam from "@/features/custom-report/param";
 import ReportForm from "@/features/custom-report/form";
 
 import { toDateString } from "@/utils/format-utils";
@@ -113,26 +115,39 @@ export default function Report() {
                 <DialogHeader>
                   <DialogTitle>Impressão de relatório</DialogTitle>
                   <DialogDescription>
-                    Tem certeza que deseja imprimir o relatório?
+                    Preencha os campos obrigatórios
                   </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button type="button" variant="secondary" className="mb-2">
-                      Cancelar
-                    </Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Button
-                      onClick={() => handlerPrint(Number(row.original.id))}
-                      type="submit"
-                      variant="default"
-                      className="mb-2"
-                    >
-                      Imprimir
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
+
+                {getQueryParam(row?.original?.query) ? (
+                  <ReportParam
+                    reportId={row.original?.id}
+                    query={row.original.query}
+                    option="Print"
+                  />
+                ) : (
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="mb-2"
+                      >
+                        Cancelar
+                      </Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        onClick={() => handlerPrint(Number(row.original.id))}
+                        type="submit"
+                        variant="default"
+                        className="mb-2"
+                      >
+                        Imprimir
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                )}
               </DialogContent>
             </Dialog>
 
@@ -150,23 +165,36 @@ export default function Report() {
                     Tem certeza que deseja exportar o relatório?
                   </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button type="button" variant="secondary" className="mb-2">
-                      Cancelar
-                    </Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Button
-                      onClick={() => handlerExport(Number(row.original.id))}
-                      type="submit"
-                      variant="default"
-                      className="mb-2"
-                    >
-                      Exportar
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
+
+                {getQueryParam(row?.original?.query) ? (
+                  <ReportParam
+                    reportId={row.original?.id}
+                    query={row.original.query}
+                    option="Export"
+                  />
+                ) : (
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="mb-2"
+                      >
+                        Cancelar
+                      </Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        onClick={() => handlerExport(Number(row.original.id))}
+                        type="submit"
+                        variant="default"
+                        className="mb-2"
+                      >
+                        Exportar
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                )}
               </DialogContent>
             </Dialog>
           </>

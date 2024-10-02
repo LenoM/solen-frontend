@@ -17,4 +17,5 @@ export enum ErrorMessage {
   invalidFile = "Arquivo inválido",
   invalidFileLength = "Tamanho do arquivo não permitido",
   invalidFileFormat = "Formato do arquivo não permitido",
+  invalidQuery = "Query inválida",
 }
