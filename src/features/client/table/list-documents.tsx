@@ -19,9 +19,10 @@ import { Button } from "@/components/ui/button";
 import DocumentForm, {
   loadDocumentData,
 } from "@/features/client/forms/document";
+import { formatUserName } from "@/features/user/form";
 import type { DocumentDataType } from "@/features/client/forms/document";
 
-import { formatUserName, toDateTimeString } from "@/utils/format-utils";
+import { toDateTimeString } from "@/utils/format-utils";
 import useDocument from "@/hooks/useDocument";
 import useUser from "@/hooks/useUser";
 

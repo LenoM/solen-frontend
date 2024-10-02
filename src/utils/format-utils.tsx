@@ -142,11 +142,3 @@ export const toMoneyString = (value: number) => {
     currency: "BRL",
   }).format(value);
 };
-
-export const formatUserName = (
-  userId: string | null | undefined,
-  user: any[] | undefined
-) => {
-  if (!userId || !user) return "";
-  return user?.filter((usr) => usr.id === userId)[0].name;
-};

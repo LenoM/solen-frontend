@@ -61,6 +61,15 @@ const userSchema = object({
 
 export type UserType = InferType<typeof userSchema>;
 
+export const formatUserName = (
+  userId: string | null | undefined,
+  user: UserType[] | undefined
+) => {
+  if (!userId || !user) return "";
+  return user?.filter((usr) => usr.id === userId)[0].name;
+};
+
+
 export default function UserForm() {
   const { userId } = useParams();
 

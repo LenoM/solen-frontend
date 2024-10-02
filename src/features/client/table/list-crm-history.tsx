@@ -19,6 +19,7 @@ import CrmCollectForm, {
 import type { CollectHistoryType } from "@/features/crm/collection-form";
 import type { CrmHistoryType } from "@/features/crm/crm-form";
 import CrmForm, { loadCrmData } from "@/features/crm/crm-form";
+import { formatUserName } from "@/features/user/form";
 
 import {
   CLOSE_STATUS,
@@ -27,7 +28,7 @@ import {
   crmSubMotive,
 } from "@/features/crm/crm-utils";
 
-import { formatUserName, toDateTimeString } from "@/utils/format-utils";
+import { toDateTimeString } from "@/utils/format-utils";
 import useClient from "@/hooks/useClient";
 import useUser from "@/hooks/useUser";
 import useCrm from "@/hooks/useCrm";
