@@ -101,14 +101,14 @@ export const toDateString = (
 ): string | undefined => {
   if (!dateString) return undefined;
 
-  if (dateString.toString().length > 24) {
-    const result = format(dateString.toString(), DATE_FORMAT);
-    return result;
+  const dateStr = dateString.toString();
+
+  if (dateStr.length > 24) {
+    return format(dateStr, DATE_FORMAT);
+  } else if (dateStr.length === 10) {
+    return dateStr;
   } else {
-    return format(
-      parseISO(dateString.toString().replace("000Z", "")),
-      DATE_FORMAT
-    );
+    return format(parseISO(dateStr.replace("000Z", "")), DATE_FORMAT);
   }
 };
 
