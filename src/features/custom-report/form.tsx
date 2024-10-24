@@ -38,8 +38,9 @@ export const loadReportData = (data?: ReportType): ReportType => {
   };
 };
 
-const QUERY_EXEMPLE = 'SELECT * FROM table_name WHERE field_name = 1';
-const PARAM_EXEMPLE = '@@param("name": "id", "label": "ID do Produto", "type": "number", "mask": "#")';
+const QUERY_EXEMPLE = "SELECT * FROM table_name WHERE field_name = 1";
+const PARAM_EXEMPLE =
+  '@@param("name": "id", "label": "ID do Produto", "type": "number", "mask": "#")';
 
 const reportSchema = object({
   id: string(),
@@ -52,7 +53,8 @@ export type ReportType = InferType<typeof reportSchema>;
 
 export default function ReportForm() {
   const { reportId } = useParams();
-  const { loading, currentData, getReport, createReport, updateReport } = useReport();
+  const { loading, currentData, getReport, createReport, updateReport } =
+    useReport();
 
   useMemo(async () => await getReport(reportId), [reportId]);
 
@@ -111,7 +113,7 @@ export default function ReportForm() {
                         <TooltipContent>
                           <p>Exemplo:</p>
                           <p className="font-thin">{QUERY_EXEMPLE}</p>
-                          <br/>
+                          <br />
                           <p>Exemplo de parâmetro (variáveis):</p>
                           <p className="font-thin">{PARAM_EXEMPLE}</p>
                         </TooltipContent>

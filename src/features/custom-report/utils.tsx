@@ -7,5 +7,5 @@ export type CustomInputType = {
 
 export const getQueryParam = (query: string | undefined) => {
   const regex = new RegExp("@@param([^)]*)[)]", "g");
-  return query?.match(regex);
+  return [...new Set(query?.match(regex))]
 }
